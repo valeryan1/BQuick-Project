@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BQuick.Controllers
 {
+
     public class RFQController : Controller
     {
         public readonly BQuickDbContext _context;
@@ -17,5 +18,16 @@ namespace BQuick.Controllers
         {
             return View(await _context.RFQs.Include(r => r.Customer).ToListAsync());
         }
+
+        public IActionResult Rfq()
+        {
+            return View();
+        }
+
+        public IActionResult CreateRFQ()
+        {
+            return View();
+        }
     }
+
 }
