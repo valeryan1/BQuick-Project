@@ -411,3 +411,7 @@ main .contentt {
     font-weight: 600;
     font-size: 17px;
 }
+
+.underline {
+    text-decoration: underline;
+}
