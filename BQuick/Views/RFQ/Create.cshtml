@@ -1,0 +1,315 @@
+﻿@{
+    ViewData["Title"] = "Create RFQ";
+}
+
+<main class="content mt-3 mx-md-5">
+    <div class="container ">
+        <div class="header mt-4 mb-4" style="font-size: 29px;">
+            <span class="text-danger fw-bold underline">RFQ</span> &gt; <span class="tes fw-bold underline"> Create RFQ</span>   
+            <span class="float-sm-end fw-bold">#RFQYY0000</span>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="my-4">
+                    <label for="rfq-name" class="form-label form-label-bold">RFQ Name</label>
+                    <input type="text" class="form-control" id="rfq-name">
+                </div>
+
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="mb-3">
+                            <label for="company-name" class="form-label form-label-bold">Company Name</label>
+                            <input type="text" class="form-control" id="company-name">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="end-user" class="form-label form-label-bold">End User</label>
+                            <input type="text" class="form-control" id="end-user">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="request-date" class="form-label form-label-bold">Request Date</label>
+                            <input type="date" class="form-control" id="request-date">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="due-date" class="form-label form-label-bold">Due Date</label>
+                            <input type="date" class="form-control" id="due-date">
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6">
+                        <div class="mb-3">
+                            <label for="resource" class="form-label form-label-bold">Resource</label>
+                            <input type="text" class="form-control" id="resource">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="category" class="form-label form-label-bold">Category</label>
+                            <input type="text" class="form-control" id="category">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="opportunity" class="form-label form-label-bold">Opportunity</label>
+                            <input type="text" class="form-control" id="opportunity">
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="fw-bold underline mt-5 mb-4">Notes</h5>
+
+                <div class="row">
+                    <div class="col-12 col-sm-6">
+                        <div class="mb-3">
+                            <label for="budget" class="form-label form-label-bold">Budget</label>
+                            <input type="number" class="form-control" id="budget">
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6">
+                        <div class="mb-3">
+                            <label for="leadtime" class="form-label form-label-bold">Leadtime</label>
+                            <input type="text" class="form-control" id="leadtime">
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Item Name</th>
+                            <th>Item Description</th>
+                            <th>Qty</th>
+                            <th>UoM</th>
+                            <th>Budget</th>
+                            <th>Leadtime</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td><input type="text" class="form-control"></td>
+                            <td><input type="text" class="form-control"></td>
+                            <td><input type="number" class="form-control" value="00"></td>
+                            <td><input type="text" class="form-control"></td>
+                            <td><input type="number" class="form-control"></td>
+                            <td><input type="text" class="form-control"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="btn btn-primary" type="button">Add</button>
+
+                <hr>
+
+                <div class="mb-3">
+                    <label for="formFile" class="form-label form-label-bold">Attachment</label>
+                    <input class="form-control" type="file" id="formFile">
+                </div>
+                <button type="button" class="btn btn-primary">Delegation</button>
+                <button type="button" class="btn btn-primary">Item List</button>
+            </div>
+            <div class="col-sm-4">
+                <div class="card mt-2">
+                    <div class="card-body text-center">
+                        <button type="button" class="btn btn-success">Save</button>
+                        <button type="button" class="btn btn-danger">Discard</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+@* @model BQuick.Models.RFQ
+
+@{
+    ViewData["Title"] = "Create RFQ";
+}
+
+<main class="content mt-3 mx-md-5">
+    <div class="container">
+        <div class="header mt-4 mb-4" style="font-size: 29px;">
+            <span class="text-danger fw-bold underline">RFQ</span> &gt; <span class="tes fw-bold underline"> Create RFQ</span>
+            <span class="float-sm-end fw-bold">@ViewBag.RFQCode</span>
+        </div>
+
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="my-4">
+                        <label asp-for="RFQName" class="form-label form-label-bold">RFQ Name</label>
+                        <input asp-for="RFQName" class="form-control" required>
+                        <span asp-validation-for="RFQName" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 col-sm-6">
+                            <div class="mb-3">
+                                <label asp-for="Customer.CompanyName" class="form-label form-label-bold">Company Name</label>
+                                <select asp-for="CustomerID" asp-items="ViewBag.Customers" class="form-select">
+                                    <option value="">-- Select Company --</option>
+                                </select>
+                                <span asp-validation-for="CustomerID" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Customer.ContactPerson" class="form-label form-label-bold">End User</label>
+                                <input asp-for="Customer.ContactPerson" class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="RequestDate" class="form-label form-label-bold">Request Date</label>
+                                <input asp-for="RequestDate" class="form-control" type="date" required>
+                                <span asp-validation-for="RequestDate" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="DueDate" class="form-label form-label-bold">Due Date</label>
+                                <input asp-for="DueDate" class="form-control" type="date" required>
+                                <span asp-validation-for="DueDate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6">
+                            <div class="mb-3">
+                                <label asp-for="AssignedTo" class="form-label form-label-bold">Resource</label>
+                                <select asp-for="AssignedTo" asp-items="ViewBag.Users" class="form-select">
+                                    <option value="">-- Select Resource --</option>
+                                </select>
+                                <span asp-validation-for="AssignedTo" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Category" class="form-label form-label-bold">Category</label>
+                                <select asp-for="Category" class="form-select" required>
+                                    <option value="">-- Select Category --</option>
+                                    <option value="Project">Project</option>
+                                    <option value="Middle Project">Middle Project</option>
+                                    <option value="Non-Project">Non-Project</option>
+                                </select>
+                                <span asp-validation-for="Category" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="opportunity" class="form-label form-label-bold">Opportunity</label>
+                                <select id="opportunity" class="form-select">
+                                    <option value="">-- Select Opportunity --</option>
+                                    <option value="General">General</option>
+                                    <option value="Bundle Installation">Bundle Installation</option>
+                                    <option value="Professional Service">Professional Service</option>
+                                    <option value="Service Centre">Service Centre</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold underline mt-5 mb-4">Notes</h5>
+
+                    <div class="mb-3">
+                        <textarea asp-for="RFQNotes[0].NoteText" class="form-control" rows="4"></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 col-sm-6">
+                            <div class="mb-3">
+                                <label asp-for="TotalBudget" class="form-label form-label-bold">Budget</label>
+                                <input asp-for="TotalBudget" class="form-control" type="number" step="0.01">
+                                <span asp-validation-for="TotalBudget" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6">
+                            <div class="mb-3">
+                                <label for="leadtime" class="form-label form-label-bold">Leadtime</label>
+                                <input type="text" class="form-control" id="leadtime">
+                            </div>
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold underline mt-5 mb-4">Items</h5>
+
+                    <table class="table" id="itemsTable">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Item Name</th>
+                                <th>Item Description</th>
+                                <th>Qty</th>
+                                <th>UoM</th>
+                                <th>Budget</th>
+                                <th>Leadtime</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td><input type="text" class="form-control" name="RFQItems[0].Item.ItemName"></td>
+                                <td><input type="text" class="form-control" name="RFQItems[0].Item.Description"></td>
+                                <td><input type="number" class="form-control" name="RFQItems[0].Quantity" value="1"></td>
+                                <td><input type="text" class="form-control" name="RFQItems[0].Item.UnitOfMeasure"></td>
+                                <td><input type="number" class="form-control" name="RFQItems[0].UnitPrice" step="0.01"></td>
+                                <td><input type="text" class="form-control" name="RFQItems[0].Leadtime"></td>
+                                <td><button type="button" class="btn btn-danger btn-sm remove-item">Remove</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button type="button" class="btn btn-primary" id="addItem">Add Item</button>
+
+                    <hr>
+
+                    <div class="mb-3">
+                        <label for="formFile" class="form-label form-label-bold">Attachment</label>
+                        <input class="form-control" type="file" id="formFile" name="attachment">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-12 text-end">
+                    <button type="submit" class="btn btn-success">Save</button>
+                    <a asp-action="Index" class="btn btn-danger">Discard</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</main>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function() {
+            let itemCount = 1;
+
+            $('#addItem').click(function() {
+                itemCount++;
+                const newRow = `
+                    <tr>
+                        <td>${itemCount}</td>
+                        <td><input type="text" class="form-control" name="RFQItems[${itemCount-1}].Item.ItemName"></td>
+                        <td><input type="text" class="form-control" name="RFQItems[${itemCount-1}].Item.Description"></td>
+                        <td><input type="number" class="form-control" name="RFQItems[${itemCount-1}].Quantity" value="1"></td>
+                        <td><input type="text" class="form-control" name="RFQItems[${itemCount-1}].Item.UnitOfMeasure"></td>
+                        <td><input type="number" class="form-control" name="RFQItems[${itemCount-1}].UnitPrice" step="0.01"></td>
+                        <td><input type="text" class="form-control" name="RFQItems[${itemCount-1}].Leadtime"></td>
+                        <td><button type="button" class="btn btn-danger btn-sm remove-item">Remove</button></td>
+                    </tr>
+                `;
+                $('#itemsTable tbody').append(newRow);
+            });
+
+            $(document).on('click', '.remove-item', function() {
+                $(this).closest('tr').remove();
+            });
+        });
+    </script>
+}
+ *@
