@@ -167,9 +167,6 @@ a.sidebar-link:hover {
     font-size: 1.3rem;
     text-decoration: none !important;
     border-radius: 0.425rem;
-    display: flex;
-    gap: 0.3rem;
-    align-items: center;
     font-weight: 700;
 }
 
@@ -334,6 +331,44 @@ main .content-div {
 tr.highlight th {
     background-color: #293b5f;
     color: #fff;
+}
+
+.status {
+    display: flex;
+    width: 10rem;
+    justify-content: center;
+    align-items: center;
+}
+
+#open {
+    background-color: #00d9ff;
+}
+
+#waiting-purc {
+    background-color: #ff7d00;
+}
+
+#waiting-discuss, #waiting-report {
+    background-color: #0050f4;
+    color: #fff;
+}
+
+#waiting-pic {
+    background-color: #ff00c9;
+}
+
+#waiting-purc-and-discuss {
+    background: linear-gradient(to bottom, #ff7d00 50%, #0050f4 50%);
+}
+
+#ready-to-submit {
+    background-color: #ffbd00;
+}
+
+.waiting-purc-and-discuss {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.5rem;
 }
 
 .form-label {

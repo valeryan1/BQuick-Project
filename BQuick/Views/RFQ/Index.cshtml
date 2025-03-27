@@ -21,6 +21,69 @@
                 </tr>
             </thead>
             <tbody>
+                <tr>
+                    <td>RFQ240001</td>
+                    <td>08-07-24</td>
+                    <td>10-07-24</td>
+                    <td>PEB</td>
+                    <td>Instalasi Lan</td>
+                    <td>IDR100000000</td>
+                    <td class="d-flex justify-content-center"><span id="open" class="rounded-pill status">Open</span></td>
+                </tr>
+                <tr>
+                    <td>RFQ240007</td>
+                    <td>08-07-24</td>
+                    <td>10-07-24</td>
+                    <td>BPB</td>
+                    <td>Service Data Center</td>
+                    <td>IDR100000000</td>
+                    <td class="d-flex justify-content-center"><span id="waiting-purc" class="rounded-pill status">Waiting Purc</span></td>
+                </tr>
+                <tr>
+                    <td>RFQ240009</td>
+                    <td>08-07-24</td>
+                    <td>10-07-24</td>
+                    <td>BPB</td>
+                    <td>Laptop & Peripheral</td>
+                    <td>IDR100000000</td>
+                    <td class="d-flex justify-content-center"><span id="waiting-discuss" class="rounded-pill status">Waiting Discuss</span></td>
+                </tr>
+                <tr>
+                    <td>RFQ240010</td>
+                    <td>08-07-24</td>
+                    <td>10-07-24</td>
+                    <td>BPB</td>
+                    <td>Instalasi Lain</td>
+                    <td>IDR100000000</td>
+                    <td class="d-flex justify-content-center"><span id="waiting-pic" class="rounded-pill status">Waiting PIC</span></td>
+                </tr>
+                <tr>
+                    <td>RFQ240011</td>
+                    <td>08-07-24</td>
+                    <td>10-07-24</td>
+                    <td>PEB</td>
+                    <td>Instalasi Lain</td>
+                    <td>IDR100000000</td>
+                    <td class="d-flex justify-content-center"><span id="waiting-report" class="rounded-pill status">Waiting Report</span></td>
+                </tr>
+                <tr>
+                    <td>RFQ240012</td>
+                    <td>08-07-24</td>
+                    <td>10-07-24</td>
+                    <td>ABH</td>
+                    <td>Instalasi Lain</td>
+                    <td>IDR100000000</td>
+                    <td class="d-flex justify-content-center"><span id="waiting-purc-and-discuss" class="waiting-purc-and-discuss rounded-pill status"><span>Waiting Purc</span><span class="text-white">Waiting Discuss</span></span></td>
+                </tr>
+                <tr>
+                    <td>RFQ240013</td>
+                    <td>08-07-24</td>
+                    <td>10-07-24</td>
+                    <td>PEB</td>
+                    <td>Instalasi Lain</td>
+                    <td>IDR100000000</td>
+                    <td class="d-flex justify-content-center"><span id="ready-to-submit" class="rounded-pill status">Ready to Submit</span></td>
+                </tr>
                 @foreach (var rfq in Model)
                 {
                     <tr>
@@ -29,7 +92,10 @@
                         <td>@rfq.DueDate.ToShortDateString()</td>
                         <td>@rfq.Customer.CustomerCode</td>
                         <td>@rfq.RFQName</td>
-                        <td>@rfq.TotalBudget?.ToString("C")</td>
+                        <td>@rfq.Currency@rfq.TotalBudget</td>
+                        @switch (rfq.Status) {
+                            @* Complete here *@
+                        }
                         <td>@rfq.Status</td>
                     </tr>
                 }
