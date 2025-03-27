@@ -24,7 +24,23 @@ namespace BQuick.Controllers
 
         public IActionResult Create()
         {
+            ViewBag.RFQCode = GenerateRFQCode();
+
+            ViewBag.Customers = new SelectList(_context.Customers, "CustomerID", "CompanyName");
+
+            ViewBag.Users = new SelectList(_context.Users, "UserID", "FullName");
+
             return View();
+        }
+
+        private string GenerateRFQCode()
+        {
+            var year = DateTime.Now.ToString("yy");
+
+            var lastRFQ = _context.RFQs.OrderByDescending(r => r.RFQID).FirstOrDefault();
+            var sequenceNumber = (lastRFQ?.RFQID ?? 0) + 1;
+
+            return $"RFQ{year}{sequenceNumber:D4}";
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
