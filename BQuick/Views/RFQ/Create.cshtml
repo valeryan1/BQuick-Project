@@ -12,7 +12,7 @@
         </div>
 
         <form asp-action="Create" method="post" enctype="multipart/form-data">
-            <div class="row">
+            <div class="row justify-content-center">
                 <div class="col-12">
                     <div class="my-4">
                         <label asp-for="RFQName" class="form-label form-label-bold">RFQ Name</label>
@@ -115,7 +115,7 @@
                                 <td><input type="text" class="form-control" name="RFQItems[0].Item.UnitOfMeasure"></td>
                                 <td><input type="number" class="form-control" name="RFQItems[0].UnitPrice" step="1" min="0"></td>
                                 <td><input type="text" class="form-control" name="RFQItems[0].Leadtime"></td>
-                                <td><button type="button" class="btn btn-danger btn-sm remove-item">Remove</button></td>
+                                <td><button type="button" class="btn btn-danger btn-sm remove-item"><i class="bx bx-trash text-white"></i></button></td>
                             </tr>
                         </tbody>
                     </table>
@@ -135,7 +135,7 @@
                 </div>
 
                 <div class="col-sm-4">
-                    <div class="card mt-2">
+                    <div class="card mt-2 border-0">
                         <div class="card-body text-center">
                             <button type="button" class="btn btn-success">Save</button>
                             <button type="button" class="btn btn-danger">Discard</button>

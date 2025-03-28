@@ -341,28 +341,28 @@ tr.highlight th {
 }
 
 #open {
-    background-color: #00d9ff;
+    background-color: #14d5ff;
 }
 
 #waiting-purc {
-    background-color: #ff7d00;
+    background-color: #ff8600;
 }
 
 #waiting-discuss, #waiting-report {
-    background-color: #0050f4;
+    background-color: #004eec;
     color: #fff;
 }
 
 #waiting-pic {
-    background-color: #ff00c9;
+    background-color: #ff00c4;
 }
 
 #waiting-purc-and-discuss {
-    background: linear-gradient(to bottom, #ff7d00 50%, #0050f4 50%);
+    background: linear-gradient(to bottom, #ff8600 50%, #004eec 50%);
 }
 
 #ready-to-submit {
-    background-color: #ffbd00;
+    background-color: #ffc000;
 }
 
 .waiting-purc-and-discuss {

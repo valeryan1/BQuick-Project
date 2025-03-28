@@ -93,10 +93,32 @@
                         <td>@rfq.Customer.CustomerCode</td>
                         <td>@rfq.RFQName</td>
                         <td>@rfq.Currency@rfq.TotalBudget</td>
-                        @switch (rfq.Status) {
-                            @* Complete here *@
-                        }
-                        <td>@rfq.Status</td>
+                        <td class="d-flex justify-content-center">
+                            @switch (rfq.Status)
+                            {
+                                case "Open":
+                                    <span id="open" class="rounded-pill status">@rfq.Status</span>
+                                    break;
+                                case "Waiting Purc":
+                                    <span id="waiting-purc" class="rounded-pill status">@rfq.Status</span>
+                                    break;
+                                case "Waiting Discuss":
+                                    <span id="waiting-discuss" class="rounded-pill status">@rfq.Status</span>
+                                    break;
+                                case "Waiting PIC":
+                                    <span id="waiting-pic" class="rounded-pill status">@rfq.Status</span>
+                                    break;
+                                case "Waiting Report":
+                                    <span id="waiting-report" class="rounded-pill status">@rfq.Status</span>
+                                    break;
+                                case "Waiting Purc and Discuss":
+                                    <span id="waiting-purc-and-discuss" class="waiting-purc-and-discuss rounded-pill status"><span>Waiting Purc</span><span class="text-white">Waiting Discuss</span></span>
+                                    break;
+                                case "Ready to Submit":
+                                    <span id="ready-to-submit" class="rounded-pill status">@rfq.Status</span>
+                                    break;
+                            }
+                        </td>
                     </tr>
                 }
             </tbody>
