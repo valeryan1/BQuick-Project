@@ -33,6 +33,11 @@ namespace BQuick.Controllers
             return View();
         }
 
+        public IActionResult AddCustomer()
+        {
+            return View();
+        }
+
         private string GenerateRFQCode()
         {
             var year = DateTime.Now.ToString("yy");

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Outfit:wght@100..900&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Outfit:wght@100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Outfit:wght@100..900&family=Roboto:ital,wdth,wght@0,96.3,100..900;1,96.3,100..900&display=swap');
 
 * {
@@ -374,4 +374,29 @@ tr.highlight th {
 .form-label {
     font-weight: 600;
     font-size: 17px;
+}
+
+.address-checkboxes {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #000;
+    outline: none;
+    cursor: pointer;
+}
+
+.address-checkboxes:checked {
+    background-color: #39c337;
+    border: 0px solid #39c337;
+    position: relative;
+}
+
+.address-checkboxes:checked::after {
+    content: '\2714';
+    font-size: 14px;
+    color: #fcffff;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
