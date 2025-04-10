@@ -5,251 +5,263 @@
 }
 
 <main class="content mt-3 mx-md-5">
-    <div class="container ">
+    <div class="container d-flex flex-column align-items-center">
         <div class="header mt-4 mb-4" style="font-size: 29px;">
             <a class="text-decoration-none" asp-controller="RFQ" asp-action="Index"><span class="text-danger fw-bold">RFQ</span></a> &gt; <span class="tes fw-bold text-decoration">Create RFQ</span>
             <span class="float-sm-end fw-bold">@ViewBag.RFQCode</span>
         </div>
 
-        <form asp-action="AddCustomer" method="post" enctype="multipart/form-data">
-            <div class="my-4 row justify-content-center">
-                <div class="col-12">
-                    <div class="mb-3">
-                        <label asp-for="Customer.CompanyName" class="form-label form-label-bold">
-                            Company Name
-                        </label>
-                        <input asp-for="Customer.CompanyName" class="form-control" placeholder="Company Name" required />
-                    </div>
+        <div>
+            <button id="create-customer-option">
+                Create Customer (Temporary Button)
+            </button>
+        </div>
 
-                    <div class="mb-3">
-                        <label class="form-label form-label-bold">
-                            Profile Picture
-                        </label>
-                        <input class="form-control" type="file" id="customer-profile-picture" name="attachment">
-                    </div>
+        <div class="add-customer-form-pop-up p-4">
+            <div class="add-customer-form-close-btn">
+                &times;
+            </div>
 
-                    <div class="my-4 row">
-                        <div class="d-flex align-items-center gap-1" style="font-size: 20px;">
-                            <i class='bx bx-info-circle fw-bold'></i>
-                            <span class="fw-bold">
-                                Basic Information
-                            </span>
-                        </div>
-
-                        <div class="col-12 col-sm-6">
-                            <div class="mb-3">
-                                <label class="form-label form-label-bold">
-                                    Fax
-                                </label>
-                                <input type="tel" class="form-control" id="customer-fax" placeholder="Fax">
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label form-label-bold">
-                                    Currency default
-                                </label>
-                                <select class="form-select">
-                                    <option value="">Currency default</option>
-                                    <option value="IDR">IDR</option>
-                                    <option value="USD">USD</option>
-                                    <option value="SGD">SGD</option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label asp-for="Customer.Phone" class="form-label form-label-bold">
-                                    Phone
-                                </label>
-                                <input asp-for="Customer.Phone" type="tel" class="form-control" id="customer-phone" placeholder="Phone">
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label form-label-bold">
-                                    Mobile
-                                </label>
-                                <input type="tel" class="form-control" id="customer-mobile" placeholder="Mobile">
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label form-label-bold">
-                                    Account Receivable
-                                </label>
-                                <input type="text" class="form-control" id="customer-account-receivable" placeholder="Account Receivable">
-                            </div>
-                        </div>
-
-                        <div class="col-12 col-sm-6">
-                            <div class="mb-3">
-                                <label asp-for="Customer.Email" class="form-label form-label-bold">
-                                    Email
-                                </label>
-                                <input type="email" class="form-control" id="customer-email" placeholder="Email">
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label form-label-bold">
-                                    TOP
-                                </label>
-                                <select class="form-select">
-                                    <option value="">TOP</option>
-                                    <option value="30 days">30 days</option>
-                                    <option value="45 days">45 days</option>
-                                    <option value="60 days">60 days</option>
-                                    <option value="65 days">65 days</option>
-                                    <option value="90 days">90 days</option>
-                                    <option value="Cash in Advance">Cash in Advance</option>
-                                    <option value="Cash before Delivery">Cash before Delivery</option>
-                                    <option value="Cash on Delivery">Cash on Delivery</option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label form-label-bold">
-                                    NPWP
-                                </label>
-                                <input type="text" class="form-control" id="customer-npwp" placeholder="NPWP">
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label form-label-bold">
-                                    Account Payable
-                                </label>
-                                <input type="text" class="form-control" id="customer-account-payable" placeholder="Account Payable">
-                            </div>
+            <form asp-action="AddCustomer" method="post" enctype="multipart/form-data" class="add-customer-form">
+                <div class="my-4 row justify-content-center">
+                    <div class="col-12">
+                        <div class="mb-3">
+                            <label asp-for="Customer.CompanyName" class="form-label form-label-bold">
+                                Company Name
+                            </label>
+                            <input asp-for="Customer.CompanyName" class="form-control" placeholder="Company Name" required />
                         </div>
 
                         <div class="mb-3">
-                            <label for="formFile" class="form-label form-label-bold">Attachment</label>
-                            <input class="form-control" type="file" id="formFile" name="attachment">
+                            <label class="form-label form-label-bold">
+                                Profile Picture
+                            </label>
+                            <input class="form-control" type="file" id="customer-profile-picture" name="attachment">
                         </div>
-                    </div>
 
-                    <div>
-                        <div class="d-flex align-items-center gap-1" style="font-size: 20px;">
-                            <span class="fw-bold">
-                                Address
-                            </span>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-12 col-sm-6">
-                                <div class="mb-3">
-                                    <label class="form-label form-label-bold">
-                                        Billing Address
-                                    </label>
-                                    <input type="text" class="form-control" id="customer-billing-address" placeholder="Billing Address">
-                                </div>
-
-                                <div class="mb-3">
-                                    <label class="form-label form-label-bold">
-                                        Street
-                                    </label>
-                                    <input type="text" class="form-control" id="customer-billing-street" placeholder="Street">
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-12 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label form-label-bold">
-                                                City
-                                            </label>
-                                            <input type="text" class="form-control" id="customer-billing-city" placeholder="City">
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label class="form-label form-label-bold">
-                                                Country
-                                            </label>
-                                            <input type="text" class="form-control" id="customer-billing-country" placeholder="Country">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label form-label-bold">
-                                                Province
-                                            </label>
-                                            <input type="text" class="form-control" id="customer-billing-province" placeholder="Province">
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label class="form-label form-label-bold">
-                                                ZIP Code
-                                            </label>
-                                            <input type="text" class="form-control" id="customer-zip-code" placeholder="ZIP Code">
-                                        </div>
-                                    </div>
-
-                                    <div class="d-flex align-items-center gap-2">
-                                        <input type="checkbox" class="address-checkboxes" />
-                                        <label>
-                                            Detail
-                                        </label>
-                                    </div>
-                                </div>
+                        <div class="my-4 row">
+                            <div class="d-flex align-items-center gap-1" style="font-size: 20px;">
+                                <i class='bx bx-info-circle fw-bold'></i>
+                                <span class="fw-bold">
+                                    Basic Information
+                                </span>
                             </div>
 
                             <div class="col-12 col-sm-6">
                                 <div class="mb-3">
                                     <label class="form-label form-label-bold">
-                                        Billing Address
+                                        Fax
                                     </label>
-                                    <input type="text" class="form-control" id="customer-billing-address" placeholder="Billing Address">
+                                    <input type="tel" class="form-control" id="customer-fax" placeholder="Fax">
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label form-label-bold">
-                                        Street
+                                        Currency default
                                     </label>
-                                    <input type="text" class="form-control" id="customer-street" placeholder="Street">
+                                    <select class="form-select">
+                                        <option value="" hidden>Currency default</option>
+                                        <option value="IDR">IDR</option>
+                                        <option value="USD">USD</option>
+                                        <option value="SGD">SGD</option>
+                                    </select>
                                 </div>
 
-                                <div class="row">
-                                    <div class="col-12 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label form-label-bold">
-                                                City
-                                            </label>
-                                            <input type="text" class="form-control" id="customer-city" placeholder="City">
-                                        </div>
+                                <div class="mb-3">
+                                    <label asp-for="Customer.Phone" class="form-label form-label-bold">
+                                        Phone
+                                    </label>
+                                    <input asp-for="Customer.Phone" type="tel" class="form-control" id="customer-phone" placeholder="Phone">
+                                </div>
 
-                                        <div class="mb-3">
-                                            <label class="form-label form-label-bold">
-                                                Country
-                                            </label>
-                                            <input type="text" class="form-control" id="customer-country" placeholder="Country">
-                                        </div>
-                                    </div>
+                                <div class="mb-3">
+                                    <label class="form-label form-label-bold">
+                                        Mobile
+                                    </label>
+                                    <input type="tel" class="form-control" id="customer-mobile" placeholder="Mobile">
+                                </div>
 
-                                    <div class="col-12 col-sm-6">
-                                        <div class="mb-3">
-                                            <label class="form-label form-label-bold">
-                                                Province
-                                            </label>
-                                            <input type="text" class="form-control" id="customer-province" placeholder="Province">
-                                        </div>
+                                <div class="mb-3">
+                                    <label class="form-label form-label-bold">
+                                        Account Receivable
+                                    </label>
+                                    <input type="text" class="form-control" id="customer-account-receivable" placeholder="Account Receivable">
+                                </div>
+                            </div>
 
-                                        <div class="mb-3">
-                                            <label class="form-label form-label-bold">
-                                                ZIP Code
-                                            </label>
-                                            <input type="text" class="form-control" id="customer-zip-code" placeholder="ZIP Code">
-                                        </div>
-                                    </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="mb-3">
+                                    <label asp-for="Customer.Email" class="form-label form-label-bold">
+                                        Email
+                                    </label>
+                                    <input type="email" class="form-control" id="customer-email" placeholder="Email">
+                                </div>
 
-                                    <div class="d-flex align-items-center gap-2">
-                                        <input type="checkbox" class="address-checkboxes" />
-                                        <label>
-                                            Same With Billing Address
+                                <div class="mb-3">
+                                    <label class="form-label form-label-bold">
+                                        TOP
+                                    </label>
+                                    <select class="form-select">
+                                        <option value="" hidden>TOP</option>
+                                        <option value="30 days">30 days</option>
+                                        <option value="45 days">45 days</option>
+                                        <option value="60 days">60 days</option>
+                                        <option value="65 days">65 days</option>
+                                        <option value="90 days">90 days</option>
+                                        <option value="Cash in Advance">Cash in Advance</option>
+                                        <option value="Cash before Delivery">Cash before Delivery</option>
+                                        <option value="Cash on Delivery">Cash on Delivery</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label form-label-bold">
+                                        NPWP
+                                    </label>
+                                    <input type="text" class="form-control" id="customer-npwp" placeholder="NPWP">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label form-label-bold">
+                                        Account Payable
+                                    </label>
+                                    <input type="text" class="form-control" id="customer-account-payable" placeholder="Account Payable">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="formFile" class="form-label form-label-bold">Attachment</label>
+                                <input class="form-control" type="file" id="formFile" name="attachment">
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="d-flex align-items-center gap-1" style="font-size: 20px;">
+                                <span class="fw-bold">
+                                    Address
+                                </span>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12 col-sm-6">
+                                    <div class="mb-3">
+                                        <label class="form-label form-label-bold">
+                                            Billing Address
                                         </label>
+                                        <input type="text" class="form-control" id="customer-billing-address" placeholder="Billing Address">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label form-label-bold">
+                                            Street
+                                        </label>
+                                        <input type="text" class="form-control" id="customer-billing-street" placeholder="Street">
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-12 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label form-label-bold">
+                                                    City
+                                                </label>
+                                                <input type="text" class="form-control" id="customer-billing-city" placeholder="City">
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label form-label-bold">
+                                                    Country
+                                                </label>
+                                                <input type="text" class="form-control" id="customer-billing-country" placeholder="Country">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label form-label-bold">
+                                                    Province
+                                                </label>
+                                                <input type="text" class="form-control" id="customer-billing-province" placeholder="Province">
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label form-label-bold">
+                                                    ZIP Code
+                                                </label>
+                                                <input type="text" class="form-control" id="customer-billing-zip-code" placeholder="ZIP Code">
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex align-items-center gap-2">
+                                            <input type="checkbox" class="address-checkboxes" />
+                                            <label>
+                                                Detail
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-sm-6">
+                                    <div class="mb-3">
+                                        <label class="form-label form-label-bold">
+                                            Shipping Address
+                                        </label>
+                                        <input type="text" class="form-control" id="customer-shipping-address" placeholder="Billing Address">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label form-label-bold">
+                                            Street
+                                        </label>
+                                        <input type="text" class="form-control" id="customer-shipping-street" placeholder="Street">
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-12 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label form-label-bold">
+                                                    City
+                                                </label>
+                                                <input type="text" class="form-control" id="customer-shipping-city" placeholder="City">
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label form-label-bold">
+                                                    Country
+                                                </label>
+                                                <input type="text" class="form-control" id="customer-shipping-country" placeholder="Country">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 col-sm-6">
+                                            <div class="mb-3">
+                                                <label class="form-label form-label-bold">
+                                                    Province
+                                                </label>
+                                                <input type="text" class="form-control" id="customer-shipping-province" placeholder="Province">
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label form-label-bold">
+                                                    ZIP Code
+                                                </label>
+                                                <input type="text" class="form-control" id="customer-shipping-zip-code" placeholder="ZIP Code">
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex align-items-center gap-2">
+                                            <input type="checkbox" class="address-checkboxes" />
+                                            <label>
+                                                Same With Billing Address
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
 
         <form asp-action="Create" method="post" enctype="multipart/form-data">
             <div class="row justify-content-center">
@@ -264,7 +276,7 @@
                             <div class="mb-3">
                                 <label asp-for="Customer.CompanyName" class="form-label form-label-bold">Company Name</label>
                                 <select asp-for="CustomerID" asp-items="ViewBag.Customers" class="form-select">
-                                    <option value="">-- Select Company --</option>
+                                    <option value="" hidden></option>
                                 </select>
                             </div>
 
@@ -288,14 +300,14 @@
                             <div class="mb-3">
                                 <label asp-for="AssignedTo" class="form-label form-label-bold">Resource</label>
                                 <select asp-for="AssignedTo" asp-items="ViewBag.Users" class="form-select">
-                                    <option value="">-- Select Resource --</option>
+                                    <option value="" hidden></option>
                                 </select>
                             </div>
 
                             <div class="mb-3">
                                 <label asp-for="Category" class="form-label form-label-bold">Category</label>
                                 <select asp-for="Category" class="form-select" required>
-                                    <option value="">-- Select Category --</option>
+                                    <option value="" hidden></option>
                                     <option value="Project">Project</option>
                                     <option value="Mid Project">Mid Project</option>
                                     <option value="Non-Project">Non-Project</option>
@@ -305,7 +317,7 @@
                             <div class="mb-3">
                                 <label for="opportunity" class="form-label form-label-bold">Opportunity</label>
                                 <select id="opportunity" class="form-select">
-                                    <option value="">-- Select Opportunity --</option>
+                                    <option value="" hidden></option>
                                     <option value="General">General</option>
                                     <option value="Bundle Installation">Bundle Installation</option>
                                     <option value="Professional Service">Professional Service</option>

@@ -20,6 +20,22 @@ body {
     overscroll-behavior: none;
 }
 
+body.popup-active::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #bfbfbf;
+    opacity: 0.7;
+    z-index: 999;
+}
+
+body.popup-active {
+    overflow: hidden;
+}
+
 .wrapper {
     display: flex;
     align-items: stretch;
@@ -399,4 +415,39 @@ tr.highlight th {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+.add-customer-form-pop-up {
+    justify-content: center;
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1000;
+    box-shadow: 2px 2px 5px 5px rgba(0,0,0,0.15);
+    border-radius: 7px;
+    background: #fff;
+    overflow-y: scroll;
+    width: 80vw;
+    height: 80vh;
+    display: none;
+    transition: top 0ms ease-in-out 200ms, opacity 200ms ease-in-out 0ms, transform 20ms ease-in-out 0ms;
+}
+
+.add-customer-form-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 15px;
+    height: 15px;
+    background: #888;
+    color: #eee;
+    text-align: center;
+    line-height: 15px;
+    border-radius: 15px;
+    cursor: pointer;
+}
+
+.add-customer-form-pop-up.active {
+    display: block;
+    transition: top 0ms ease-in-out 0ms, opacity 200ms ease-in-out 0ms, transform 20ms ease-in-out 0ms;
 }

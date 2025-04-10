@@ -15,3 +15,13 @@ hamburger.addEventListener("click", function () {
     toggler.classList.toggle("bx-chevrons-left");
 })
 
+document.querySelector("#create-customer-option").addEventListener("click", function () {
+    document.querySelector(".add-customer-form-pop-up").classList.add("active")
+    document.body.classList.add("popup-active")
+})
+
+document.querySelector(".add-customer-form-close-btn").addEventListener("click", function () {
+    document.querySelector(".add-customer-form-pop-up").classList.remove("active")
+    document.body.classList.remove("popup-active")
+})
+
