@@ -392,7 +392,7 @@ tr.highlight th {
     font-size: 17px;
 }
 
-.address-checkboxes {
+.customer-address-checkboxes {
     appearance: none;
     width: 20px;
     height: 20px;
@@ -401,13 +401,13 @@ tr.highlight th {
     cursor: pointer;
 }
 
-.address-checkboxes:checked {
+.customer-address-checkboxes:checked {
     background-color: #39c337;
     border: 0px solid #39c337;
     position: relative;
 }
 
-.address-checkboxes:checked::after {
+.customer-address-checkboxes:checked::after {
     content: '\2714';
     font-size: 14px;
     color: #fcffff;
@@ -450,4 +450,32 @@ tr.highlight th {
 .add-customer-form-pop-up.active {
     display: block;
     transition: top 0ms ease-in-out 0ms, opacity 200ms ease-in-out 0ms, transform 20ms ease-in-out 0ms;
+}
+
+.customer-address-details {
+    display: none;
+}
+
+.customer-address-details.active {
+    display: block;
+    transition: top 0ms ease-in-out 0ms, opacity 200ms ease-in-out 0ms, transform 20ms ease-in-out 0ms;
+}
+
+.customer-contact-role-btn {
+    width: 110px;
+    border: 1px solid #afafaf;
+    border-radius: 3px;
+    color: #b0b0b0
+}
+
+#customer-end-user-contact-btn:focus, #customer-purchasing-contact-btn:focus, #customer-it-engineer-contact-btn:focus {
+    border: 2px solid #000;
+    color: #000;
+    font-weight: 500;
+}
+
+.add-customer-contact-btn {
+    width: 43px;
+    border-radius: 3px;
+    font-weight: 500;
 }

@@ -6,8 +6,8 @@
 
 <main class="content mt-3 mx-md-5">
     <div class="container d-flex flex-column align-items-center">
-        <div class="header mt-4 mb-4" style="font-size: 29px;">
-            <a class="text-decoration-none" asp-controller="RFQ" asp-action="Index"><span class="text-danger fw-bold">RFQ</span></a> &gt; <span class="tes fw-bold text-decoration">Create RFQ</span>
+        <div class="header mt-4 mb-4 w-100" style="font-size: 29px;">
+            <a class="text-decoration-none" asp-controller="RFQ" asp-action="Index"><span class="text-danger fw-bold">RFQ</span></a>&nbsp;&gt;&nbsp;<span class="tes fw-bold text-decoration">Create RFQ</span>
             <span class="float-sm-end fw-bold">@ViewBag.RFQCode</span>
         </div>
 
@@ -17,13 +17,13 @@
             </button>
         </div>
 
-        <div class="add-customer-form-pop-up p-4">
+        <div class="add-customer-form-pop-up px-5 py-3">
             <div class="add-customer-form-close-btn">
                 &times;
             </div>
 
             <form asp-action="AddCustomer" method="post" enctype="multipart/form-data" class="add-customer-form">
-                <div class="my-4 row justify-content-center">
+                <div class="row justify-content-center">
                     <div class="col-12">
                         <div class="mb-3">
                             <label asp-for="Customer.CompanyName" class="form-label form-label-bold">
@@ -32,15 +32,15 @@
                             <input asp-for="Customer.CompanyName" class="form-control" placeholder="Company Name" required />
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-5">
                             <label class="form-label form-label-bold">
                                 Profile Picture
                             </label>
                             <input class="form-control" type="file" id="customer-profile-picture" name="attachment">
                         </div>
 
-                        <div class="my-4 row">
-                            <div class="d-flex align-items-center gap-1" style="font-size: 20px;">
+                        <div class="mb-5 row">
+                            <div class="mb-1 d-flex align-items-center gap-1" style="font-size: 20px;">
                                 <i class='bx bx-info-circle fw-bold'></i>
                                 <span class="fw-bold">
                                     Basic Information
@@ -129,14 +129,14 @@
                                 </div>
                             </div>
 
-                            <div class="mb-3">
+                            <div class="">
                                 <label for="formFile" class="form-label form-label-bold">Attachment</label>
                                 <input class="form-control" type="file" id="formFile" name="attachment">
                             </div>
                         </div>
 
-                        <div>
-                            <div class="d-flex align-items-center gap-1" style="font-size: 20px;">
+                        <div class="mb-5">
+                            <div class="mb-1 d-flex align-items-center gap-1" style="font-size: 20px;">
                                 <span class="fw-bold">
                                     Address
                                 </span>
@@ -160,14 +160,14 @@
 
                                     <div class="row">
                                         <div class="col-12 col-sm-6">
-                                            <div class="mb-3">
+                                            <div class="customer-address-details mb-3">
                                                 <label class="form-label form-label-bold">
                                                     City
                                                 </label>
                                                 <input type="text" class="form-control" id="customer-billing-city" placeholder="City">
                                             </div>
 
-                                            <div class="mb-3">
+                                            <div class="customer-address-details mb-3">
                                                 <label class="form-label form-label-bold">
                                                     Country
                                                 </label>
@@ -176,14 +176,14 @@
                                         </div>
 
                                         <div class="col-12 col-sm-6">
-                                            <div class="mb-3">
+                                            <div class="customer-address-details mb-3">
                                                 <label class="form-label form-label-bold">
                                                     Province
                                                 </label>
                                                 <input type="text" class="form-control" id="customer-billing-province" placeholder="Province">
                                             </div>
 
-                                            <div class="mb-3">
+                                            <div class="customer-address-details mb-3">
                                                 <label class="form-label form-label-bold">
                                                     ZIP Code
                                                 </label>
@@ -192,7 +192,7 @@
                                         </div>
 
                                         <div class="d-flex align-items-center gap-2">
-                                            <input type="checkbox" class="address-checkboxes" />
+                                            <input type="checkbox" class="customer-address-checkboxes" id="customer-address-details-checkbox" />
                                             <label>
                                                 Detail
                                             </label>
@@ -205,7 +205,7 @@
                                         <label class="form-label form-label-bold">
                                             Shipping Address
                                         </label>
-                                        <input type="text" class="form-control" id="customer-shipping-address" placeholder="Billing Address">
+                                        <input type="text" class="form-control" id="customer-shipping-address" placeholder="Shipping Address">
                                     </div>
 
                                     <div class="mb-3">
@@ -217,14 +217,14 @@
 
                                     <div class="row">
                                         <div class="col-12 col-sm-6">
-                                            <div class="mb-3">
+                                            <div class="customer-address-details mb-3">
                                                 <label class="form-label form-label-bold">
                                                     City
                                                 </label>
                                                 <input type="text" class="form-control" id="customer-shipping-city" placeholder="City">
                                             </div>
 
-                                            <div class="mb-3">
+                                            <div class="customer-address-details mb-3">
                                                 <label class="form-label form-label-bold">
                                                     Country
                                                 </label>
@@ -233,14 +233,14 @@
                                         </div>
 
                                         <div class="col-12 col-sm-6">
-                                            <div class="mb-3">
+                                            <div class="customer-address-details mb-3">
                                                 <label class="form-label form-label-bold">
                                                     Province
                                                 </label>
                                                 <input type="text" class="form-control" id="customer-shipping-province" placeholder="Province">
                                             </div>
 
-                                            <div class="mb-3">
+                                            <div class="customer-address-details mb-3">
                                                 <label class="form-label form-label-bold">
                                                     ZIP Code
                                                 </label>
@@ -249,13 +249,50 @@
                                         </div>
 
                                         <div class="d-flex align-items-center gap-2">
-                                            <input type="checkbox" class="address-checkboxes" />
+                                            <input type="checkbox" class="customer-address-checkboxes" id="match-customer-billing-address-checkbox" />
                                             <label>
                                                 Same With Billing Address
                                             </label>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-5">
+                            <div class="d-flex align-items-center gap-1" style="font-size: 20px;">
+                                <i class='bx bx-info-circle fw-bold'></i>
+                                <span class="fw-bold">
+                                    Bank Information
+                                </span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="mb-3 d-flex">
+                                <div>
+                                    <button type="button" class="customer-contact-role-btn bg-white" id="customer-end-user-contact-btn">
+                                        End User
+                                    </button>
+                                </div>
+
+                                <div>
+                                    <button type="button" class="customer-contact-role-btn bg-white" id="customer-purchasing-contact-btn">
+                                        Purchasing
+                                    </button>
+                                </div>
+
+                                <div>
+                                    <button type="button" class="customer-contact-role-btn bg-white" id="customer-it-engineer-contact-btn">
+                                        IT Engineer
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <button type="button" class="add-customer-contact-btn bg-white border-1">
+                                    Add
+                                </button>
                             </div>
                         </div>
                     </div>
