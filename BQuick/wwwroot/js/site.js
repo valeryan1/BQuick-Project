@@ -17,12 +17,12 @@ hamburger.addEventListener("click", function () {
 
 document.querySelector("#create-customer-option").addEventListener("click", function () {
     document.querySelector(".add-customer-form-pop-up").classList.add("active")
-    document.body.classList.add("popup-active")
+    document.body.classList.add("pop-up-active")
 })
 
 document.querySelector(".add-customer-form-close-btn").addEventListener("click", function () {
     document.querySelector(".add-customer-form-pop-up").classList.remove("active")
-    document.body.classList.remove("popup-active")
+    document.body.classList.remove("pop-up-active")
 })
 
 var customerAddressDetailsCheckbox = document.querySelector("#customer-address-details-checkbox")
@@ -71,27 +71,63 @@ customerAddressFields.forEach(field => {
     document.getElementById(`customer-billing-${field}`).addEventListener("input", updateCustomerShippingAddress)
 })
 
-const customerContactRoleButtons = document.querySelectorAll('.customer-contact-role-btn')
-const customerEndUserContactButton = document.getElementById('customer-end-user-contact-btn')
+const customerContactRoleButtons = document.querySelectorAll(".customer-contact-role-btn")
+const customerEndUserContactButton = document.getElementById("customer-end-user-contact-btn")
 
 function setActiveCustomerContactRoleButton(activeCustomerContactRoleButton) {
     customerContactRoleButtons.forEach(button => {
-        button.style.border = '1px solid #afafaf'
-        button.style.color = '#b0b0b0'
-        button.style.fontWeight = 'normal'
+        button.style.border = "1px solid #afafaf"
+        button.style.color = "#b0b0b0"
+        button.style.fontWeight = "normal"
     })
 
-    activeCustomerContactRoleButton.style.border = '2px solid #000'
-    activeCustomerContactRoleButton.style.color = '#000'
-    activeCustomerContactRoleButton.style.fontWeight = '500'
+    activeCustomerContactRoleButton.style.border = "2px solid #000"
+    activeCustomerContactRoleButton.style.color = "#000"
+    activeCustomerContactRoleButton.style.fontWeight = "500"
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener("DOMContentLoaded", function () {
     setActiveCustomerContactRoleButton(customerEndUserContactButton)
+
+    const customerContactRoleValue = customerEndUserContactButton.getAttribute("value")
+    document.getElementById("customer-contact-role-information-title").textContent = customerContactRoleValue
+
+    document.querySelector("#customer-contact-form-open-chevron").classList.add("hide")
+    document.querySelector("#customer-contact-form-close-chevron").classList.remove("hide")
+
+
+    document.querySelector(".show-customer-contact-form-pop-up").classList.add("active")
 })
 
 customerContactRoleButtons.forEach(button => {
-    button.addEventListener('click', function () {
+    button.addEventListener("click", function () {
         setActiveCustomerContactRoleButton(this)
+
+        const customerContactRoleValue = this.getAttribute("value")
+        document.getElementById("customer-contact-role-information-title").textContent = customerContactRoleValue
     })
+})
+
+document.querySelector("#add-customer-contact-btn").addEventListener("click", function () {
+    document.querySelector(".add-customer-contact-form-pop-up").classList.add("active")
+    document.querySelector(".add-customer-contact-btn-container").classList.add("hide")
+})
+
+document.querySelector(".add-customer-contact-form-close-btn").addEventListener("click", function () {
+    document.querySelector(".add-customer-contact-form-pop-up").classList.remove("active")
+    document.querySelector(".add-customer-contact-btn-container").classList.remove("hide")
+})
+
+document.querySelector("#customer-contact-form-open-chevron").addEventListener("click", function () {
+    document.querySelector("#customer-contact-form-open-chevron").classList.add("hide")
+    document.querySelector("#customer-contact-form-close-chevron").classList.remove("hide")
+
+    document.querySelector(".show-customer-contact-form-pop-up").classList.add("active")
+})
+
+document.querySelector("#customer-contact-form-close-chevron").addEventListener("click", function () {
+    document.querySelector("#customer-contact-form-close-chevron").classList.add("hide")
+    document.querySelector("#customer-contact-form-open-chevron").classList.remove("hide")
+
+    document.querySelector(".show-customer-contact-form-pop-up").classList.remove("active")
 })

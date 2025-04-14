@@ -20,7 +20,7 @@ body {
     overscroll-behavior: none;
 }
 
-body.popup-active::before {
+body.pop-up-active::before {
     content: "";
     position: fixed;
     top: 0;
@@ -32,7 +32,7 @@ body.popup-active::before {
     z-index: 999;
 }
 
-body.popup-active {
+body.pop-up-active {
     overflow: hidden;
 }
 
@@ -433,20 +433,6 @@ tr.highlight th {
     transition: top 0ms ease-in-out 200ms, opacity 200ms ease-in-out 0ms, transform 20ms ease-in-out 0ms;
 }
 
-.add-customer-form-close-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 15px;
-    height: 15px;
-    background: #888;
-    color: #eee;
-    text-align: center;
-    line-height: 15px;
-    border-radius: 15px;
-    cursor: pointer;
-}
-
 .add-customer-form-pop-up.active {
     display: block;
     transition: top 0ms ease-in-out 0ms, opacity 200ms ease-in-out 0ms, transform 20ms ease-in-out 0ms;
@@ -466,8 +452,53 @@ tr.highlight th {
     border-radius: 3px;
 }
 
-.add-customer-contact-btn {
+#add-customer-contact-btn {
     width: 43px;
     border-radius: 3px;
     font-weight: 500;
+}
+
+.add-customer-contact-btn-container {
+    display: block;
+    transition: top 0ms ease-in-out 0ms, opacity 200ms ease-in-out 0ms, transform 20ms ease-in-out 0ms;
+}
+
+.add-customer-contact-btn-container.hide {
+    display: none;
+    transition: top 0ms ease-in-out 200ms, opacity 200ms ease-in-out 0ms, transform 20ms ease-in-out 0ms;
+}
+
+.add-customer-contact-form-pop-up {
+    justify-content: center;
+    display: none;
+    transition: top 0ms ease-in-out 200ms, opacity 200ms ease-in-out 0ms, transform 20ms ease-in-out 0ms;
+}
+
+.add-customer-contact-form-pop-up.active {
+    display: block;
+    transition: top 0ms ease-in-out 0ms, opacity 200ms ease-in-out 0ms, transform 20ms ease-in-out 0ms;
+}
+
+#customer-contact-form-open-chevron, #customer-contact-form-close-chevron {
+    position: absolute;
+    right: 60px;
+    cursor: pointer;
+    display: block;
+    transition: top 0ms ease-in-out 0ms, opacity 200ms ease-in-out 0ms, transform 20ms ease-in-out 0ms;
+}
+
+#customer-contact-form-open-chevron.hide, #customer-contact-form-close-chevron.hide {
+    display: none;
+    transition: top 0ms ease-in-out 200ms, opacity 200ms ease-in-out 0ms, transform 20ms ease-in-out 0ms;
+}
+
+.show-customer-contact-form-pop-up {
+    display: block;
+    transition: top 0ms ease-in-out 0ms, opacity 200ms ease-in-out 0ms, transform 20ms ease-in-out 0ms;
+}
+
+.show-customer-contact-form-pop-up.active {
+    justify-content: center;
+    display: none;
+    transition: top 0ms ease-in-out 200ms, opacity 200ms ease-in-out 0ms, transform 20ms ease-in-out 0ms;
 }
