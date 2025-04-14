@@ -463,15 +463,7 @@ tr.highlight th {
 
 .customer-contact-role-btn {
     width: 110px;
-    border: 1px solid #afafaf;
     border-radius: 3px;
-    color: #b0b0b0
-}
-
-#customer-end-user-contact-btn:focus, #customer-purchasing-contact-btn:focus, #customer-it-engineer-contact-btn:focus {
-    border: 2px solid #000;
-    color: #000;
-    font-weight: 500;
 }
 
 .add-customer-contact-btn {
