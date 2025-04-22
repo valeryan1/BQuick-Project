@@ -1,48 +1,38 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BQuick.Models
 {
-    public class RFQItem
+    public class ItemVendor
     {
-        public RFQItem()
-        {
-            RFQItemAddOns = new HashSet<RFQItemAddOn>();
-        }
-
         [Key]
-        public int RFQItemID { get; set; }
-
-        public int RFQID { get; set; }
+        public int ItemVendorID { get; set; }
 
         public int ItemID { get; set; }
 
-        [StringLength(500)]
-        public string Description { get; set; }
-
-        [Required]
-        public int Quantity { get; set; } = 1;
+        public int VendorID { get; set; }
 
         [Required, Column(TypeName = "decimal(18,2)")]
-        public decimal UnitPrice { get; set; } = 0;
+        public decimal UnitPrice { get; set; }
 
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal Discount { get; set; } = 0;
+        [StringLength(10)]
+        public string Currency { get; set; } = "IDR";
 
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal Tax { get; set; } = 0;
+        public int? LeadTime { get; set; }
 
-        [Required, Column(TypeName = "decimal(18,2)")]
-        public decimal TotalPrice { get; set; } = 0;
-
-        public int? DeliveryLeadTime { get; set; }
+        public int MinimumOrderQuantity { get; set; } = 1;
 
         public int? WarrantyPeriod { get; set; }
 
         [StringLength(20)]
         public string WarrantyUnit { get; set; }
+
+        public DateTime? PriceStartDate { get; set; }
+
+        public DateTime? PriceEndDate { get; set; }
+
+        public bool IsPreferred { get; set; } = false;
 
         [StringLength(500)]
         public string Notes { get; set; }
@@ -56,18 +46,16 @@ namespace BQuick.Models
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
 
         // Navigation properties
-        [ForeignKey("RFQID")]
-        public virtual RFQ RFQ { get; set; }
-
         [ForeignKey("ItemID")]
         public virtual Item Item { get; set; }
+
+        [ForeignKey("VendorID")]
+        public virtual Vendor Vendor { get; set; }
 
         [ForeignKey("CreatedByID")]
         public virtual User CreatedBy { get; set; }
 
         [ForeignKey("ModifiedByID")]
         public virtual User ModifiedBy { get; set; }
-
-        public virtual ICollection<RFQItemAddOn> RFQItemAddOns { get; set; }
     }
 }

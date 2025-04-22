@@ -1,25 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BQuick.Models
 {
-    public class SurveyForm
+    public class SurveyResult
     {
         [Key]
-        public int FormID { get; set; }
+        public int ResultID { get; set; }
 
         public int SurveyID { get; set; }
 
-        [Required, StringLength(255)]
-        public string FormTitle { get; set; }
-
         [Required]
-        public string FormContent { get; set; }
+        public string ResultContent { get; set; }
 
-        [StringLength(50)]
-        public string FormType { get; set; }
+        [StringLength(255)]
+        public string Conclusion { get; set; }
+
+        [StringLength(255)]
+        public string Recommendation { get; set; }
 
         public int CreatedByID { get; set; }
 

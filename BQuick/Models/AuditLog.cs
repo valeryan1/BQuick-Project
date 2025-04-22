@@ -1,33 +1,37 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BQuick.Models
 {
     public class AuditLog
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int LogID { get; set; }
 
-        [ForeignKey("User")]
         public int UserID { get; set; }
-        public virtual User User { get; set; }
 
-        [Required]
-        [StringLength(50)]
+        [Required, StringLength(50)]
         public string Action { get; set; }
 
+        [Required, StringLength(50)]
+        public string EntityType { get; set; }
+
+        public int? EntityID { get; set; }
+
         [Required]
+        public string Details { get; set; }
+
         [StringLength(50)]
-        public string TableName { get; set; }
+        public string IPAddress { get; set; }
 
-        public int? RecordID { get; set; }
+        [StringLength(255)]
+        public string UserAgent { get; set; }
 
-        public string OldValue { get; set; }
+        public DateTime LogDate { get; set; } = DateTime.Now;
 
-        public string NewValue { get; set; }
-
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public DateTime LoggedAt { get; set; }
+        // Navigation properties
+        [ForeignKey("UserID")]
+        public virtual User User { get; set; }
     }
 }

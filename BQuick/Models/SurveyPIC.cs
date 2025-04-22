@@ -1,42 +1,35 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BQuick.Models
 {
-    public class SurveyForm
+    public class SurveyPIC
     {
         [Key]
-        public int FormID { get; set; }
+        public int SurveyPICID { get; set; }
 
         public int SurveyID { get; set; }
 
-        [Required, StringLength(255)]
-        public string FormTitle { get; set; }
+        public int UserID { get; set; }
 
-        [Required]
-        public string FormContent { get; set; }
+        [StringLength(100)]
+        public string Role { get; set; }
 
-        [StringLength(50)]
-        public string FormType { get; set; }
+        public bool IsLeader { get; set; } = false;
 
         public int CreatedByID { get; set; }
 
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 
-        public int ModifiedByID { get; set; }
-
-        public DateTime ModifiedDate { get; set; } = DateTime.Now;
-
         // Navigation properties
         [ForeignKey("SurveyID")]
         public virtual Survey Survey { get; set; }
 
+        [ForeignKey("UserID")]
+        public virtual User User { get; set; }
+
         [ForeignKey("CreatedByID")]
         public virtual User CreatedBy { get; set; }
-
-        [ForeignKey("ModifiedByID")]
-        public virtual User ModifiedBy { get; set; }
     }
 }

@@ -1,52 +1,80 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace BQuick.Models
 {
     public class User
     {
+        public User()
+        {
+            UserDepartments = new HashSet<UserDepartment>();
+            Subordinates = new HashSet<User>();
+            CreatedCompanies = new HashSet<Company>();
+            ModifiedCompanies = new HashSet<Company>();
+            AssignedRFQsAsAdminSales = new HashSet<RFQ>();
+            AssignedRFQsAsSales = new HashSet<RFQ>();
+            AssignedRFQsAsBusinessDevelopment = new HashSet<RFQ>();
+            AssignedRFQsAsPreSalesSupport = new HashSet<RFQ>();
+            AssignedRFQsAsPMO = new HashSet<RFQ>();
+        }
+
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int UserID { get; set; }
 
-        [Required]
-        [StringLength(50)]
+        [Required, StringLength(50)]
         public string Username { get; set; }
 
-        [Required]
-        [StringLength(255)]
+        [Required, StringLength(255)]
         public string Password { get; set; }
 
-        [Required]
-        [StringLength(100)]
-        [EmailAddress]
-        public string Email { get; set; }
-
-        [Required]
-        [StringLength(100)]
+        [Required, StringLength(100)]
         public string FullName { get; set; }
 
-        [Required]
-        [StringLength(20)]
+        [Required, StringLength(100), EmailAddress]
+        public string Email { get; set; }
+
+        [Required, StringLength(50)]
         public string Role { get; set; }
 
-        [Required]
-        [StringLength(50)]
+        [StringLength(100)]
+        public string Specialization { get; set; }
+
+        [Required, StringLength(100)]
         public string Department { get; set; }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public DateTime CreatedAt { get; set; }
+        [Required, StringLength(100)]
+        public string Division { get; set; }
 
-        public DateTime? LastLogin { get; set; }
+        public int? ReportsToID { get; set; }
 
-        public ICollection<RFQ> CreatedRFQs { get; set; }
-        public ICollection<RFQ> AssignedRFQs { get; set; }
+        public bool IsActive { get; set; } = true;
 
-        public ICollection<Survey> AssignedSurveys { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
 
-        public ICollection<MeetingParticipant> MeetingParticipations { get; set; }
+        public DateTime? LastLoginDate { get; set; }
 
-        public ICollection<QuotationApproval> QuotationApprovals { get; set; }
+        public int? ModifiedByID { get; set; }
 
+        public DateTime ModifiedDate { get; set; } = DateTime.Now;
+
+        // Navigation properties
+        [ForeignKey("ReportsToID")]
+        public virtual User Manager { get; set; }
+
+        [ForeignKey("ModifiedByID")]
+        public virtual User ModifiedBy { get; set; }
+
+        public virtual ICollection<UserDepartment> UserDepartments { get; set; }
+        public virtual ICollection<User> Subordinates { get; set; }
+        public virtual ICollection<Company> CreatedCompanies { get; set; }
+        public virtual ICollection<Company> ModifiedCompanies { get; set; }
+        public virtual ICollection<RFQ> AssignedRFQsAsAdminSales { get; set; }
+        public virtual ICollection<RFQ> AssignedRFQsAsSales { get; set; }
+        public virtual ICollection<RFQ> AssignedRFQsAsBusinessDevelopment { get; set; }
+        public virtual ICollection<RFQ> AssignedRFQsAsPreSalesSupport { get; set; }
+        public virtual ICollection<RFQ> AssignedRFQsAsPMO { get; set; }
     }
 }

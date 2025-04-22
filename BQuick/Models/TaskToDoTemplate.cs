@@ -5,21 +5,29 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BQuick.Models
 {
-    public class SurveyForm
+    public class TaskToDoTemplate
     {
+        public TaskToDoTemplate()
+        {
+            TaskToDos = new HashSet<TaskToDo>();
+        }
+
         [Key]
-        public int FormID { get; set; }
+        public int TemplateID { get; set; }
 
-        public int SurveyID { get; set; }
+        [Required, StringLength(100)]
+        public string TemplateName { get; set; }
 
-        [Required, StringLength(255)]
-        public string FormTitle { get; set; }
+        [Required, StringLength(50)]
+        public string TaskType { get; set; }
 
-        [Required]
-        public string FormContent { get; set; }
+        [StringLength(255)]
+        public string Description { get; set; }
 
         [StringLength(50)]
-        public string FormType { get; set; }
+        public string Department { get; set; }
+
+        public bool IsActive { get; set; } = true;
 
         public int CreatedByID { get; set; }
 
@@ -30,13 +38,12 @@ namespace BQuick.Models
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
 
         // Navigation properties
-        [ForeignKey("SurveyID")]
-        public virtual Survey Survey { get; set; }
-
         [ForeignKey("CreatedByID")]
         public virtual User CreatedBy { get; set; }
 
         [ForeignKey("ModifiedByID")]
         public virtual User ModifiedBy { get; set; }
+
+        public virtual ICollection<TaskToDo> TaskToDos { get; set; }
     }
 }

@@ -90,9 +90,9 @@
                         <td>@rfq.RFQCode</td>
                         <td>@rfq.RequestDate.ToShortDateString()</td>
                         <td>@rfq.DueDate.ToShortDateString()</td>
-                        <td>@rfq.Customer.CustomerCode</td>
+                        <td>@rfq.Company.CompanyCode</td>
                         <td>@rfq.RFQName</td>
-                        <td>@rfq.Currency@rfq.TotalBudget</td>
+                        <td>@rfq.Budget</td>
                         <td class="d-flex justify-content-center">
                             @switch (rfq.Status)
                             {

@@ -1,25 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BQuick.Models
 {
-    public class SurveyForm
+    public class RFQNotesItem
     {
         [Key]
-        public int FormID { get; set; }
+        public int NotesItemID { get; set; }
 
-        public int SurveyID { get; set; }
+        public int RFQID { get; set; }
 
-        [Required, StringLength(255)]
-        public string FormTitle { get; set; }
+        [StringLength(255)]
+        public string ItemName { get; set; }
 
-        [Required]
-        public string FormContent { get; set; }
+        [StringLength(500)]
+        public string ItemDescription { get; set; }
+
+        public int Quantity { get; set; } = 1;
 
         [StringLength(50)]
-        public string FormType { get; set; }
+        public string UoM { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? Budget { get; set; }
+
+        public int? Leadtime { get; set; }
 
         public int CreatedByID { get; set; }
 
@@ -30,8 +36,8 @@ namespace BQuick.Models
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
 
         // Navigation properties
-        [ForeignKey("SurveyID")]
-        public virtual Survey Survey { get; set; }
+        [ForeignKey("RFQID")]
+        public virtual RFQ RFQ { get; set; }
 
         [ForeignKey("CreatedByID")]
         public virtual User CreatedBy { get; set; }

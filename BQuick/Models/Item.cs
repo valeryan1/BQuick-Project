@@ -1,45 +1,100 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BQuick.Models
 {
     public class Item
     {
+        public Item()
+        {
+            ItemImages = new HashSet<ItemImage>();
+            ItemVendors = new HashSet<ItemVendor>();
+            RFQItems = new HashSet<RFQItem>();
+        }
+
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ItemID { get; set; }
 
-        [Required]
-        [StringLength(20)]
+        [Required, StringLength(50)]
         public string ItemCode { get; set; }
 
-        [Required]
-        [StringLength(100)]
+        [Required, StringLength(255)]
         public string ItemName { get; set; }
 
         public string Description { get; set; }
 
-        [Required]
-        [StringLength(50)]
+        [Required, StringLength(50)]
         public string Category { get; set; }
 
         [StringLength(50)]
-        public string SubCategory { get; set; }
+        public string ItemType { get; set; }
+
+        [StringLength(100)]
+        public string Manufacturer { get; set; }
+
+        [StringLength(100)]
+        public string ModelNumber { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal UnitPrice { get; set; } = 0;
+
+        [StringLength(10)]
+        public string Currency { get; set; } = "IDR";
+
+        public int? LeadTime { get; set; }
+
+        public bool IsEOS { get; set; } = false;
+
+        public bool IsEOL { get; set; } = false;
+
+        public DateTime? EOSDate { get; set; }
+
+        public DateTime? EOLDate { get; set; }
+
+        public int StockQty { get; set; } = 0;
+
+        public int MinimumStockLevel { get; set; } = 0;
+
+        public bool IsTKDN { get; set; } = false;
+
+        [Column(TypeName = "decimal(5,2)")]
+        public decimal? TKDNPercentage { get; set; }
+
+        [StringLength(100)]
+        public string CertificateNo { get; set; }
+
+        [StringLength(50)]
+        public string ShipmentMethod { get; set; }
+
+        public int? WarrantyPeriod { get; set; }
 
         [StringLength(20)]
-        public string UnitOfMeasure { get; set; }
+        public string WarrantyUnit { get; set; }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public DateTime CreatedAt { get; set; }
+        public string TechnicalSpecification { get; set; }
 
-        [ForeignKey("CreatedBy")]
-        public int CreatedBy { get; set; }
-        public virtual User User { get; set; }
+        [StringLength(50)]
+        public string UoM { get; set; }
 
-        public ICollection<RFQItem> RFQItems { get; set; }
+        public int CreatedByID { get; set; }
 
-        public ICollection<QuotationItem> QuotationItems { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
 
-        public ICollection<VendorItem> VendorItems { get; set; }
+        public int ModifiedByID { get; set; }
+
+        public DateTime ModifiedDate { get; set; } = DateTime.Now;
+
+        // Navigation properties
+        [ForeignKey("CreatedByID")]
+        public virtual User CreatedBy { get; set; }
+
+        [ForeignKey("ModifiedByID")]
+        public virtual User ModifiedBy { get; set; }
+
+        public virtual ICollection<ItemImage> ItemImages { get; set; }
+        public virtual ICollection<ItemVendor> ItemVendors { get; set; }
+        public virtual ICollection<RFQItem> RFQItems { get; set; }
     }
 }

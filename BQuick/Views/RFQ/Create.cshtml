@@ -22,10 +22,10 @@
                 <div class="row justify-content-center">
                     <div class="col-12">
                         <div class="mb-3">
-                            <label asp-for="Customer.CompanyName" class="form-label form-label-bold">
+                            <label class="form-label form-label-bold">
                                 Company Name
                             </label>
-                            <input asp-for="Customer.CompanyName" class="form-control" placeholder="Company Name" required />
+                            <input class="form-control" placeholder="Company Name" required />
                         </div>
 
                         <div class="mb-5">
@@ -64,10 +64,10 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label asp-for="Customer.Phone" class="form-label form-label-bold">
+                                    <label class="form-label form-label-bold">
                                         Phone
                                     </label>
-                                    <input asp-for="Customer.Phone" type="tel" class="form-control" id="customer-phone" placeholder="Phone">
+                                    <input type="tel" class="form-control" id="customer-phone" placeholder="Phone">
                                 </div>
 
                                 <div class="mb-3">
@@ -87,7 +87,7 @@
 
                             <div class="col-12 col-sm-6">
                                 <div class="mb-3">
-                                    <label asp-for="Customer.Email" class="form-label form-label-bold">
+                                    <label class="form-label form-label-bold">
                                         Email
                                     </label>
                                     <input type="email" class="form-control" id="customer-email" placeholder="Email">
@@ -418,15 +418,15 @@
                     <div class="row">
                         <div class="col-12 col-sm-6">
                             <div class="mb-3">
-                                <label asp-for="Customer.CompanyName" class="form-label form-label-bold">Company Name</label>
-                                <select asp-for="CustomerID" asp-items="ViewBag.Customers" class="form-select">
+                                <label class="form-label form-label-bold">Company Name</label>
+                                <select asp-items="ViewBag.Customers" class="form-select">
                                     <option value="" hidden></option>
                                 </select>
                             </div>
 
                             <div class="mb-3">
-                                <label asp-for="Customer.ContactPerson" class="form-label form-label-bold">End User</label>
-                                <input asp-for="Customer.ContactPerson" class="form-control" />
+                                <label class="form-label form-label-bold">End User</label>
+                                <input class="form-control" />
                             </div>
 
                             <div class="mb-3">
@@ -442,8 +442,8 @@
 
                         <div class="col-12 col-sm-6">
                             <div class="mb-3">
-                                <label asp-for="AssignedTo" class="form-label form-label-bold">Resource</label>
-                                <select asp-for="AssignedTo" asp-items="ViewBag.Users" class="form-select">
+                                <label class="form-label form-label-bold">Resource</label>
+                                <select asp-items="ViewBag.Users" class="form-select">
                                     <option value="" hidden></option>
                                 </select>
                             </div>
@@ -476,8 +476,8 @@
                     <div class="row">
                         <div class="col-12 col-sm-6">
                             <div class="mb-3">
-                                <label asp-for="TotalBudget" class="form-label form-label-bold">Budget</label>
-                                <input asp-for="TotalBudget" class="form-control" type="number" min="0">
+                                <label class="form-label form-label-bold">Budget</label>
+                                <input class="form-control" type="number" min="0">
                             </div>
                         </div>
 

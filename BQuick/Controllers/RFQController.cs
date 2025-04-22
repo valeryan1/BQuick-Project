@@ -19,16 +19,16 @@ namespace BQuick.Controllers
 
         public async Task<IActionResult> Index()
         {
-            return View(await _context.RFQs.Include(r => r.Customer).ToListAsync());
+            return View(await _context.RFQs.Include(r => r.Company).ToListAsync());
         }
 
         public IActionResult Create()
         {
-            ViewBag.RFQCode = GenerateRFQCode();
+            //ViewBag.RFQCode = GenerateRFQCode();
 
-            ViewBag.Customers = new SelectList(_context.Customers, "CustomerID", "CompanyName");
+            //ViewBag.Customers = new SelectList(_context.Customers, "CustomerID", "CompanyName");
 
-            ViewBag.Users = new SelectList(_context.Users, "UserID", "FullName");
+            //ViewBag.Users = new SelectList(_context.Users, "UserID", "FullName");
 
             return View();
         }

@@ -1,25 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BQuick.Models
 {
-    public class SurveyForm
+    public class MeetingMinute
     {
         [Key]
-        public int FormID { get; set; }
+        public int MinuteID { get; set; }
 
-        public int SurveyID { get; set; }
-
-        [Required, StringLength(255)]
-        public string FormTitle { get; set; }
+        public int MeetingID { get; set; }
 
         [Required]
-        public string FormContent { get; set; }
+        public string MinuteContent { get; set; }
+
+        [StringLength(255)]
+        public string ActionItem { get; set; }
+
+        public int? AssignedToID { get; set; }
+
+        public DateTime? DueDate { get; set; }
 
         [StringLength(50)]
-        public string FormType { get; set; }
+        public string Status { get; set; }
 
         public int CreatedByID { get; set; }
 
@@ -30,8 +33,11 @@ namespace BQuick.Models
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
 
         // Navigation properties
-        [ForeignKey("SurveyID")]
-        public virtual Survey Survey { get; set; }
+        [ForeignKey("MeetingID")]
+        public virtual Meeting Meeting { get; set; }
+
+        [ForeignKey("AssignedToID")]
+        public virtual User AssignedTo { get; set; }
 
         [ForeignKey("CreatedByID")]
         public virtual User CreatedBy { get; set; }
