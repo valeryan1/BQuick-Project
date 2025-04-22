@@ -63,7 +63,7 @@ namespace BQuick.Models
         public decimal Budget { get; set; } = 0;
 
         [Required, StringLength(50)]
-        public string Status { get; set; }
+        public string Status { get; set; } // Example: "Waiting Purc;Waiting Discuss"
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal EstimatedValue { get; set; } = 0;

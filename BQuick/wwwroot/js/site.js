@@ -1,19 +1,34 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-
-// Write your JavaScript code.
-
-// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-
-// Write your JavaScript code.
-const hamburger = document.querySelector(".toggle-btn")
+﻿const hamburger = document.querySelector(".toggle-btn")
 const toggler = document.querySelector("#icon")
 hamburger.addEventListener("click", function () {
     document.querySelector("#sidebar").classList.toggle("expand")
     toggler.classList.toggle("bx-chevrons-right")
     toggler.classList.toggle("bx-chevrons-left")
 })
+
+function searchRFQ() {
+    const input = document.getElementById("searchInput").value.toUpperCase();
+    const table = document.querySelector(".table");
+    const trs = table.getElementsByTagName("tr");
+
+    for (let i = 1; i < trs.length; i++) { // Mulai dari 1 untuk skip header
+        let tds = trs[i].getElementsByTagName("td");
+        let rowContains = false;
+
+        for (let j = 0; j < tds.length; j++) {
+            let cell = tds[j];
+            if (cell) {
+                let text = cell.textContent || cell.innerText;
+                if (text.toUpperCase().indexOf(input) > -1) {
+                    rowContains = true;
+                    break;
+                }
+            }
+        }
+
+        trs[i].style.display = rowContains ? "" : "none";
+    }
+}
 
 document.querySelector("#create-customer-option").addEventListener("click", function () {
     document.querySelector(".add-customer-form-pop-up").classList.add("active")

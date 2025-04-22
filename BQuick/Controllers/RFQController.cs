@@ -7,7 +7,6 @@ using System.Diagnostics;
 
 namespace BQuick.Controllers
 {
-
     public class RFQController : Controller
     {
         public readonly BQuickDbContext _context;
@@ -19,7 +18,10 @@ namespace BQuick.Controllers
 
         public async Task<IActionResult> Index()
         {
-            return View(await _context.RFQs.Include(r => r.Company).ToListAsync());
+            var rfqs = await _context.RFQs
+                .Include(r => r.Company)
+                .ToListAsync();
+            return View(rfqs); // Passes a List<RFQ> to the view
         }
 
         public IActionResult Create()
@@ -54,5 +56,4 @@ namespace BQuick.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
-
 }
