@@ -31,8 +31,11 @@ function searchRFQ() {
 }
 
 document.querySelector("#create-customer-option").addEventListener("click", function () {
-    document.querySelector(".add-customer-form-pop-up").classList.add("active")
-    document.body.classList.add("pop-up-active")
+    const modal = document.querySelector(".add-customer-form-pop-up");
+    modal.classList.add("active");
+    document.body.classList.add("pop-up-active");
+    
+    modal.scrollTop = 0;
 })
 
 document.querySelector(".add-customer-form-close-btn").addEventListener("click", function () {
@@ -110,7 +113,6 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelector("#customer-contact-form-open-chevron").classList.add("hide")
     document.querySelector("#customer-contact-form-close-chevron").classList.remove("hide")
 
-
     document.querySelector(".show-customer-contact-form-pop-up").classList.add("active")
 })
 
@@ -145,4 +147,22 @@ document.querySelector("#customer-contact-form-close-chevron").addEventListener(
     document.querySelector("#customer-contact-form-open-chevron").classList.remove("hide")
 
     document.querySelector(".show-customer-contact-form-pop-up").classList.remove("active")
+})
+
+document.querySelector("#request-item-to-purchasing-option").addEventListener("click", function () {
+    const modal = document.querySelector(".request-item-to-purchasing-form-pop-up");
+    modal.classList.add("active");
+    document.body.classList.add("pop-up-active");
+    
+    modal.scrollTop = 0;
+})
+
+document.querySelector(".request-item-to-purchasing-form-close-btn").addEventListener("click", function () {
+    document.querySelector(".request-item-to-purchasing-form-pop-up").classList.remove("active")
+    document.body.classList.remove("pop-up-active")
+})
+
+document.querySelector(".request-item-to-purchasing-form-cancel-btn").addEventListener("click", function () {
+    document.querySelector(".request-item-to-purchasing-form-pop-up").classList.remove("active")
+    document.body.classList.remove("pop-up-active")
 })

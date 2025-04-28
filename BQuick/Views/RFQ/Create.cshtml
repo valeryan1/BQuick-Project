@@ -407,6 +407,82 @@
             </form>
         </div>
 
+        <div>
+            <button id="request-item-to-purchasing-option">
+                Request to Purchasing (Temporary Button)
+            </button>
+        </div>
+
+        <div class="request-item-to-purchasing-form-pop-up px-5 py-3">
+            <form asp-action="RequestItemToPurchasing" method="post" enctype="multipart/form-data" class="request-item-to-purchasing-form">
+                <div class="mb-4 d-flex" style="font-size: 25px;">
+                    <span class="fw-bold">
+                        Request to Purchasing
+                    </span>
+
+                    <div class="request-item-to-purchasing-form-close-btn">
+                        <i class='bx bx-x fw-bold' style="border: 1px solid #000; border-radius: 3px;"></i>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center">
+                    <div class="col-12">
+                        <div class="mb-3">
+                            <label class="form-label form-label-bold">
+                                Item Name
+                            </label>
+                            <input class="form-control" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label form-label-bold">
+                                Item Description
+                            </label>
+                            <input class="form-control" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label form-label-bold">
+                                Quantity
+                            </label>
+                            <input type="number" min="1" class="form-control" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label form-label-bold">
+                                UoM
+                            </label>
+                            <input class="form-control" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label form-label-bold">
+                                Detail
+                            </label>
+                            <input class="form-control" required />
+                        </div>
+
+                        <div class="mb-5">
+                            <label class="form-label form-label-bold">
+                                Attachment
+                            </label>
+                            <input class="form-control" type="file" id="request-item-to-purchasing-attachment" name="attachment">
+                        </div>
+
+                        <div class="d-flex justify-content-center gap-2">
+                            <button class="btn btn-danger request-item-to-purchasing-form-cancel-btn">
+                                Cancel
+                            </button>
+
+                            <button class="btn btn-success">
+                                Sent
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
         <form asp-action="Create" method="post" enctype="multipart/form-data">
             <div class="row justify-content-center">
                 <div class="col-12">

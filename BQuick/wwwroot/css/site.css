@@ -373,10 +373,6 @@ tr.highlight th {
     background-color: #ff00c4;
 }
 
-#waiting-purc-and-discuss {
-    background: linear-gradient(to bottom, #ff8600 50%, #004eec 50%);
-}
-
 #ready-to-submit {
     background-color: #ffc000;
 }
@@ -417,7 +413,7 @@ tr.highlight th {
     transform: translate(-50%, -50%);
 }
 
-.add-customer-form-pop-up {
+.add-customer-form-pop-up, .request-item-to-purchasing-form-pop-up {
     justify-content: center;
     position: fixed;
     top: 50%;
@@ -433,7 +429,7 @@ tr.highlight th {
     transition: top 0ms ease-in-out 200ms, opacity 200ms ease-in-out 0ms, transform 20ms ease-in-out 0ms;
 }
 
-.add-customer-form-pop-up.active {
+.add-customer-form-pop-up.active, .request-item-to-purchasing-form-pop-up.active {
     display: block;
     transition: top 0ms ease-in-out 0ms, opacity 200ms ease-in-out 0ms, transform 20ms ease-in-out 0ms;
 }
@@ -501,4 +497,10 @@ tr.highlight th {
     justify-content: center;
     display: none;
     transition: top 0ms ease-in-out 200ms, opacity 200ms ease-in-out 0ms, transform 20ms ease-in-out 0ms;
+}
+
+.request-item-to-purchasing-form-close-btn {
+    position: absolute;
+    right: 12px;
+    cursor: pointer;
 }
