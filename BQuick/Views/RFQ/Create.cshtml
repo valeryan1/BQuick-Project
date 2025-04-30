@@ -1,4 +1,4 @@
-﻿@model BQuick.Models.RFQ
+﻿@* @model BQuick.Models.RFQ *@
 
 @{
     ViewData["Title"] = "Create RFQ";
@@ -8,7 +8,8 @@
     <div class="container d-flex flex-column align-items-center">
         <div class="header mt-4 mb-4 w-100" style="font-size: 29px;">
             <a class="text-decoration-none" asp-controller="RFQ" asp-action="Index"><span class="text-danger fw-bold">RFQ</span></a>&nbsp;&gt;&nbsp;<span class="tes fw-bold text-decoration">Create RFQ</span>
-            <span class="float-sm-end fw-bold">@ViewBag.RFQCode</span>
+            <span class="float-sm-end fw-bold">RFQYY0000</span>
+            @* <span class="float-sm-end fw-bold">@ViewBag.RFQCode</span> *@
         </div>
 
         <div>
@@ -18,7 +19,7 @@
         </div>
 
         <div class="add-customer-form-pop-up px-5 py-3">
-            <form asp-action="AddCustomer" method="post" enctype="multipart/form-data" class="add-customer-form">
+            <form method="post" enctype="multipart/form-data" class="add-customer-form">
                 <div class="row justify-content-center">
                     <div class="col-12">
                         <div class="mb-3">
@@ -414,7 +415,7 @@
         </div>
 
         <div class="request-item-to-purchasing-form-pop-up px-5 py-3">
-            <form asp-action="RequestItemToPurchasing" method="post" enctype="multipart/form-data" class="request-item-to-purchasing-form">
+            <form method="post" enctype="multipart/form-data" class="request-item-to-purchasing-form">
                 <div class="mb-4 d-flex" style="font-size: 25px;">
                     <span class="fw-bold">
                         Request to Purchasing
@@ -484,132 +485,257 @@
         </div>
 
         <form asp-action="Create" method="post" enctype="multipart/form-data">
-            <div class="row justify-content-center">
+            <div class="row">
                 <div class="col-12">
-                    <div class="my-4">
-                        <label asp-for="RFQName" class="form-label form-label-bold">RFQ Name</label>
-                        <input asp-for="RFQName" class="form-control" required />
+                    <div class="input-field my-4 mb-5">
+                        <input type="text" class="input-float" style="width:80%" id="rfq-name" placeholder="" required spellcheck="false">
+                        <label>RFQ Name</label>
                     </div>
 
-                    <div class="row">
+                    <div class="row mx-md-4">
                         <div class="col-12 col-sm-6">
                             <div class="mb-3">
-                                <label class="form-label form-label-bold">Company Name</label>
-                                <select asp-items="ViewBag.Customers" class="form-select">
-                                    <option value="" hidden></option>
-                                </select>
-                            </div>
+                                <div class="d-flex align-items-center">
+                                    <div class="sejajar" style="width: 146px">
+                                        <label for="company-name" class="form-label form-label-bold">Company Name</label>
+                                    </div>
+                                    <div class="wrapp" style="width: 70%;">
+                                        <div class="select-btn">
+                                            <span>Company Name</span>
+                                            <i class='bx bx-chevron-down'></i>
+                                        </div>
+                                        <div class="content-search">
+                                            <div class="search">
+                                                <i class="bx bx-search-alt-2"></i>
+                                                <input type="text" placeholder="Search" />
+                                            </div>
 
-                            <div class="mb-3">
-                                <label class="form-label form-label-bold">End User</label>
-                                <input class="form-control" />
-                            </div>
+                                            <ul class="option">
 
-                            <div class="mb-3">
-                                <label asp-for="RequestDate" class="form-label form-label-bold">Request Date</label>
-                                <input asp-validation-for="RequestDate" class="form-control" type="date" required />
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-
                             <div class="mb-3">
-                                <label asp-for="DueDate" class="form-label form-label-bold">Due Date</label>
-                                <input asp-for="DueDate" class="form-control" type="date" required />
+                                <div class="d-flex align-items-center">
+                                    <div class="sejajar" style="width: 146px">
+                                        <label for="end-user" class="form-label form-label-bold">End User</label>
+                                    </div>
+                                    <input type="text" class="form-control1" style="width:70%" id="end-user">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="sejajar" style="width: 146px">
+                                        <label for="request-date" class="form-label form-label-bold">Request Date</label>
+                                    </div>
+                                    <input type='date' class="form-control1" style="width:70%" id='request-date'>
+                                </div>
+                            </div>
+                            <div class='mb-3'>
+                                <div class='d-flex align-items-center'>
+                                    <div class="sejajar" style="width: 146px">
+                                        <label for='due-date' class='form-label form-label-bold'>Due Date</label>
+                                    </div>
+                                    <input type='date' class="form-control1" style="width:70%" id='due-date'>
+                                </div>
                             </div>
                         </div>
-
                         <div class="col-12 col-sm-6">
                             <div class="mb-3">
-                                <label class="form-label form-label-bold">Resource</label>
-                                <select asp-items="ViewBag.Users" class="form-select">
-                                    <option value="" hidden></option>
-                                </select>
+                                <div class="d-flex align-items-center">
+                                    <div class="sejajar" style="width: 146px">
+                                        <label for="resource" class="form-label form-label-bold">Resource</label>
+                                    </div>
+                                    <input type="text" class="form-control1" style="width:70%" id="resource">
+                                </div>
                             </div>
-
                             <div class="mb-3">
-                                <label asp-for="Category" class="form-label form-label-bold">Category</label>
-                                <select asp-for="Category" class="form-select" required>
-                                    <option value="" hidden></option>
-                                    <option value="Project">Project</option>
-                                    <option value="Mid Project">Mid Project</option>
-                                    <option value="Non-Project">Non-Project</option>
-                                </select>
+                                <div class="d-flex align-items-center">
+                                    <div class="sejajar" style="width: 146px">
+                                        <label for="category" class="form-label form-label-bold">Category</label>
+                                    </div>
+                                    <input type="text" class="form-control1" style="width:70%" id=“category”>
+                                </div>
                             </div>
-
-                            <div class="mb-3">
-                                <label for="opportunity" class="form-label form-label-bold">Opportunity</label>
-                                <select id="opportunity" class="form-select">
-                                    <option value="" hidden></option>
-                                    <option value="General">General</option>
-                                    <option value="Bundle Installation">Bundle Installation</option>
-                                    <option value="Professional Service">Professional Service</option>
-                                    <option value="Service Center">Service Center</option>
-                                </select>
+                            <div class=“mb-3”>
+                                <div class="d-flex align-items-center">
+                                    <div class="sejajar" style="width: 146px">
+                                        <label for=“opportunity” class="form-label form-label-bold">Opportunity</label>
+                                    </div>
+                                    <input type="text" class="form-control1" style="width:70%" id="opportunity">
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <h5 class="fw-bold underline mt-5 mb-4">Notes</h5>
-
-                    <div class="row">
+                    <h5 class="note-title underline">Notes</h5>
+                    <div class="row mx-md-4">
                         <div class="col-12 col-sm-6">
                             <div class="mb-3">
-                                <label class="form-label form-label-bold">Budget</label>
-                                <input class="form-control" type="number" min="0">
+                                <div class="d-flex align-items-center">
+                                    <div class="sejajar" style="width: 190px">
+                                        <label for="budget" class="form-label form-label-bold pe-4">Budget (IDR)</label>
+                                    </div>
+                                    <input type="number" class="form-control1" style="width:50%" id="budget">
+                                </div>
                             </div>
                         </div>
-
                         <div class="col-12 col-sm-6">
                             <div class="mb-3">
-                                <label for="leadtime" class="form-label form-label-bold">Leadtime</label>
-                                <input type="text" class="form-control" id="leadtime">
+                                <div class="d-flex align-items-center">
+                                    <div class="sejajar" style="width: 146px">
+                                        <label for="leadtime" class="form-label form-label-bold">Leadtime</label>
+                                    </div>
+                                    <input type='text' class='form-control1' style='width:100%' id='leadtime'>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <table class="table">
-                        <thead>
+                    <div class="tabel-item col-12">
+                        <table class="table item">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Item Name</th>
+                                    <th>Item Description</th>
+                                    <th>Qty</th>
+                                    <th>UoM</th>
+                                    <th>Budget</th>
+                                    <th>Leadtime</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="itemTableBody">
+                                <tr>
+                                    <td>1.</td>
+                                    <td class="name"><input type='text' class='size form-control1'></td>
+                                    <td class="desc"><input type='text' class='size form-control1'></td>
+                                    <td class="qty"><input type='number' class='size form-control1' value="0"></td>
+                                    <td class="uom"><input type='text' class='size tengah form-control1'></td>
+                                    <td class="budget"><input type='number' class='size form-control1'></td>
+                                    <td class="leadtime"><input type='text' class='size tengah form-control1'></td>
+                                    <td class="delete"><button onclick="removeRow(this)" class="btn"><i class='bx bx-trash'></i></button>
+                                </tr>
+                                <!-- Baris akan ditambahkan di sini -->
+                            </tbody>
+
+                        </table>
+                    </div>
+                    <button type="button" id="addRowBtn" class="btn btn-dark mb-5 mt-1">Add Row</button>
+
+                    <hr>
+
+                    <div class="wrapper-2 my-4">
+                        <div class= "form-upload">
+                            <input class="file-input" type="file" name="file" hidden>
+                            <div class="rounding"><i class="fa-solid fa-paperclip"></i></div>
+                            <div class="desc">
+                                <p class="mt-3">Attachment <span class="attachment-count">0</span></p>
+
+                                <p class="description">Drop files here. You can upload maximum 5 files, 5MB Each</p>
+                            </div>
+                        </div>
+
+                        <div id="attached-files" style="display: none;">
+                            <!-- File info divs will be added here dynamically -->
+                        </div>
+                        <section class="progress-area"></section>
+                        <section class="uploaded-area"></section>
+                    </div>
+                </div>
+
+                <div class="col-12 mb-5">
+                    <h4 class="delegation-title underline">Delegation</h4>
+                </div>
+
+                <div class="tabel item-list col-12">
+                    <h5 class="item-list-title underline">Item List</h5>
+                    <table class="table item-list">
+                        <thead class="table-light">
                             <tr>
                                 <th>No</th>
                                 <th>Item Name</th>
                                 <th>Item Description</th>
                                 <th>Qty</th>
                                 <th>UoM</th>
-                                <th>Budget</th>
-                                <th>Leadtime</th>
+                                <th>U/Price</th>
+                                <th>Notes</th>
+                                <th>Details</th>
+                                <th>Our Warranty</th>
+                                <th>Amount</th>
                                 <th></th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="itemListTableBody">
                             <tr>
-                                <td>1</td>
-                                <td><input type="text" class="form-control" name="RFQItems[0].Item.ItemName"></td>
-                                <td><input type="text" class="form-control" name="RFQItems[0].Item.Description"></td>
-                                <td><input type="number" class="form-control" name="RFQItems[0].Quantity" value="1" min="1"></td>
-                                <td><input type="text" class="form-control" name="RFQItems[0].Item.UnitOfMeasure"></td>
-                                <td><input type="number" class="form-control" name="RFQItems[0].UnitPrice" step="1" min="0"></td>
-                                <td><input type="text" class="form-control" name="RFQItems[0].Leadtime"></td>
-                                <td><button type="button" class="btn btn-danger btn-sm remove-item"><i class="bx bx-trash text-white"></i></button></td>
+                                <td>1.</td>
+                                <td class="name"><input type='text' class='size form-control1'></td>
+                                <td class="desc"><input type='text' class='size form-control1'></td>
+                                <td class="qty"><input type='number' class='size form-control1' value="0"></td>
+                                <td class="uom"><input type='text' class='size tengah form-control1'></td>
+                                <td class="price"><input type='number' class='size form-control1'></td>
+                                <td class="notes"><input type='text' class='size form-control1'></td>
+                                <td class="details"><input type='text' class='size form-control1'></td>
+                                <td class="warranty"><input type='text' class='size form-control1'></td>
+                                <td class="amount"><input type='number' class='size form-control1'></td>
+                                <td class="delete"><button onclick="removeRowItemList(this)" class="btn"><i class='bx bx-trash'></i></button></td>
                             </tr>
+                            <!-- Baris akan ditambahkan di sini -->
                         </tbody>
                     </table>
-                    <button type="button" class="btn btn-primary" id="addItem">Add Item</button>
 
-                    <hr>
-
-                    <div class="mb-3">
-                        <label for="formFile" class="form-label form-label-bold">Attachment</label>
-                        <input class="form-control" type="file" id="formFile" name="attachment">
-                    </div>
+                    <button type="button" id="addRowBtnItem" class="btn btn-dark mb-5 mt-1">Add Item</button>
                 </div>
 
-                <div>
-                    <button type="button" class="btn btn-primary">Delegation</button>
-                    <button type="button" class="btn btn-primary">Item List</button>
+                <div class="tabel req-item col-12">
+                    <h5 class="item-list-title underline">Request Item to Purchasing</h5>
+                    <table class="table item-list">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Action</th>
+                                <th>No</th>
+                                <th>Req Code</th>
+                                <th>Item Name</th>
+                                <th>Item Description</th>
+                                <th>Qty</th>
+                                <th>UoM</th>
+                                <th>Reason for Request</th>
+                                <th>Notes (Internal)</th>
+                                <th>PIC</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="reqTableBody">
+                            <tr>
+                                <td class="action"><button onclick="" class="btn"><i class='bx bx-plus-circle'></i></button></td>
+                                <td class="nomor" style="padding: 14px 9px;">1</td>
+                                <td class="reqCode"><input type='text' class='tengah size form-control1'></td>
+                                <td class="name"><input type='text' class='size form-control1'></td>
+                                <td class="desc"><input type='text' class='size form-control1'></td>
+                                <td class="qty"><input type='number' class='size form-control1' value="0"></td>
+                                <td class="uom"><input type='text' class='size tengah form-control1'></td>
+                                <td class="reason"><input type='text' class='size form-control1'></td>
+                                <td class="notes"><input type='text' class='size form-control1'></td>
+                                <td class="pic"><input type='text' class='size form-control1'></td>
+                                <td class="status"><input type='text' class='size form-control1'></td>
+
+                                <td class="delete"><button onclick="removeRowReq(this)" class="btn"><i class='bx bx-trash'></i></button></td>
+                            </tr>
+                            <!-- Baris akan ditambahkan di sini -->
+                        </tbody>
+                    </table>
+
+                    <button type="button" id="addRowBtnReq" class="btn btn-dark mb-5 mt-1">Add Item</button>
                 </div>
 
-                <div class="col-sm-4">
-                    <div class="card mt-2 border-0">
+                <div class="col-12 ">
+                    <div class="card mt-2">
                         <div class="card-body text-center">
-                            <button type="button" class="btn btn-success">Save</button>
+                            <button type="button" class="btn btn-dark">Save</button>
                             <button type="button" class="btn btn-danger">Discard</button>
                         </div>
                     </div>

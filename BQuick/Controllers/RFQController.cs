@@ -21,22 +21,13 @@ namespace BQuick.Controllers
             var rfqs = await _context.RFQs
                 .Include(r => r.Company)
                 .ToListAsync();
-            return View(rfqs); // Passes a List<RFQ> to the view
+            return View(rfqs);
         }
 
         public IActionResult Create()
         {
             //ViewBag.RFQCode = GenerateRFQCode();
 
-            //ViewBag.Customers = new SelectList(_context.Customers, "CustomerID", "CompanyName");
-
-            //ViewBag.Users = new SelectList(_context.Users, "UserID", "FullName");
-
-            return View();
-        }
-
-        public IActionResult AddCustomer()
-        {
             return View();
         }
 

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<BQuick.Models.RFQ>
+﻿@* @model IEnumerable<BQuick.Models.RFQ> *@
 
 @{
     ViewData["Title"] = "RFQ";
@@ -6,7 +6,7 @@
 
 <main class="content-div px-1 py-4 mx-3">
     <div class="container-fluid mt-4">
-        <div class="header mt-4 mb-4 w-100" style="font-size: 29px;">
+        <div class="header mb-4 w-100" style="font-size: 29px;">
             <a class="text-decoration-none" asp-controller="RFQ" asp-action="Index"><span class="text-danger fw-bold">RFQ</span></a>&nbsp;&gt;&nbsp;<span class="tes fw-bold text-decoration">Quotation</span>
         </div>
         
@@ -96,7 +96,7 @@
                     <td>IDR100000000</td>
                     <td class="d-flex justify-content-center align-items-center flex-column gap-1"><span id="ready-to-submit" class="rounded-pill status">Ready to Submit</span></td>
                 </tr>
-                @if (Model != null && Model.Any())
+                @* @if (Model != null && Model.Any())
                 {
                     @foreach (var item in Model)
                     {
@@ -120,7 +120,7 @@
                             </td>
                         </tr>
                     }
-                }
+                } *@
             </tbody>
         </table>
     </div>
