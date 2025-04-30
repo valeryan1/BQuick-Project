@@ -550,7 +550,6 @@ table.table.item {
 .content-search {
     display: none;
     margin-top: 6px;
-    padding: 3px;
     background: #fff;
     border-radius: 5px;
     border: solid 1.5px #8e8e8e;
@@ -607,26 +606,11 @@ table.table.item {
     border-radius: 5px;
 }
 
-.content .option {
+.content-search .option {
     margin-top: 10px;
-    max-height: 250px;
+    max-height: 235px;
     overflow-y: auto;
     padding-left: 1rem;
-}
-
-.option::-webkit-scrollbar {
-    width: 8px;
-}
-
-.option::-webkit-scrollbar-thumb {
-    background: #f1f1f1;
-    border-radius: 25px;
-    width: 70px;
-}
-
-.option::-webkit-scrollbar-track {
-    background: #ccc;
-    border-radius: 25px;
 }
 
 .option li {
@@ -709,7 +693,6 @@ table.table.item {
     top: 0;
     left: 15px;
     font-size: 13px;
-    padding: 0 6px;
     color: #151c28;
     background-color: #fff;
     font-weight: 460;
@@ -717,8 +700,8 @@ table.table.item {
 
 .input-float:focus {
     border: solid 1px #808080;
-    outline: 0;
-    box-shadow: 0 0 0 .10rem rgba(13, 110, 253, .25);
+    outline: none;
+    box-shadow: 0 0 0 0.1rem rgba(13, 110, 253, .25);
     border-radius: 5px;
 }
 

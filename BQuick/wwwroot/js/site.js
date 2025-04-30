@@ -7,35 +7,346 @@ hamburger.addEventListener("click", function () {
 })
 
 function searchRFQ() {
-    const input = document.getElementById("searchInput").value.toUpperCase();
-    const table = document.querySelector(".table");
-    const trs = table.getElementsByTagName("tr");
+    const input = document.getElementById("searchInput").value.toUpperCase()
+    const table = document.querySelector(".table")
+    const trs = table.getElementsByTagName("tr")
 
     for (let i = 1; i < trs.length; i++) { // Mulai dari 1 untuk skip header
-        let tds = trs[i].getElementsByTagName("td");
-        let rowContains = false;
+        let tds = trs[i].getElementsByTagName("td")
+        let rowContains = false
 
         for (let j = 0; j < tds.length; j++) {
-            let cell = tds[j];
+            let cell = tds[j]
             if (cell) {
-                let text = cell.textContent || cell.innerText;
+                let text = cell.textContent || cell.innerText
                 if (text.toUpperCase().indexOf(input) > -1) {
-                    rowContains = true;
-                    break;
+                    rowContains = true
+                    break
                 }
             }
         }
 
-        trs[i].style.display = rowContains ? "" : "none";
+        trs[i].style.display = rowContains ? "" : "none"
+    }
+}
+
+// Title = Menambahkan row input pada tabel 
+const addRowBtn = document.getElementById('addRowBtn')
+const itemTableBody = document.getElementById('itemTableBody')
+
+// Fungsi untuk menambah baris baru
+addRowBtn.addEventListener('click', () => {
+    const rowCount = itemTableBody.children.length + 1 // Hitung nomor urut
+
+    // Buat elemen tr dan td
+    const newRow = document.createElement('tr')
+
+    newRow.innerHTML = `
+        <td>${rowCount}.</td> 
+        <td class="name"><input type='text' class='size form-control1'></td> 
+        <td class="desc"><input type='text' class='size form-control1'></td> 
+        <td class="qty"><input type='number' class='size form-control1' value="0"></td> 
+        <td class="uom"><input type='text' class='size tengah form-control1'></td> 
+        <td class="budget"><input type='number' class='size form-control1'></td> 
+        <td class="leadtime"><input type='text' class='size tengah form-control1'></td>
+        <td class="delete"><button onclick="removeRow(this)" class="btn"><i class='bx bx-trash' ></i></button>`
+
+    // Tambahkan baris baru ke tbody
+    itemTableBody.appendChild(newRow)
+})
+
+function removeRow(button) {
+    const row = button.parentNode.parentNode // Dapatkan elemen tr dari tombol hapus
+    itemTableBody.removeChild(row) // Hapus baris dari tbody
+
+    // Perbarui nomor urut setelah menghapus baris
+    const rows = itemTableBody.getElementsByTagName('tr')
+    for (let i = 0; i < rows.length; i++) {
+        rows[i].getElementsByTagName('td')[0].innerText = i + 1
+    }
+}
+
+// Title = Search Company name
+const wrapper = document.querySelector(".wrapp"),
+    selectBtn = wrapper.querySelector(".select-btn"),
+    searchInp = wrapper.querySelector("input"),
+    options = wrapper.querySelector(".option")
+
+let companies = [
+    "PT. Accenture",
+    "PT. Adhya Tirta Batam",
+    "PT. Agiva Indonesia",
+    "PT. Pelangi Fortuna Global",
+    "PT. Indoshipsupply",
+    "PT. Bintan Sukses Ancol",
+    "PT. Citra Maritime",
+    "PT. Bintai Kindenko Engineering Indonesia",
+    "PT. Karya Abadi",
+    "PT. Digital Solutions",
+    "PT. Nusantara Shipping",
+    "PT. Mandiri Sejahtera",
+    "PT. Pertiwi",
+    "PT. Megah",
+    "PT. Maju Sejahtera",
+    "PT. Harmoni",
+    "PT. Prima",
+    "PT. Sentosa",
+    "PT. Nusantara",
+    "PT. Satu",
+    "PT. Global Investama",
+    "PT. Intertech",
+    "PT. Jaya Abadi"
+]
+
+function addCompany(selectedCompany) {
+    options.innerHTML = ""
+    companies.forEach(Company => {
+        let isSelected = Company == selectedCompany ? "selected" : ""
+        let li = `<li onclick="updateName(this)" class="${isSelected}">${Company}</li>`
+        options.insertAdjacentHTML("beforeend", li)
+    })
+}
+addCompany()
+
+function updateName(selectedLi) {
+    searchInp.value = ""
+    addCompany(selectedLi.innerText)
+    wrapper.classList.remove("active")
+    selectBtn.firstElementChild.innerText = selectedLi.innerText
+}
+
+searchInp.addEventListener("keyup", () => {
+    let arr = []
+    let searchWord = searchInp.value.toLowerCase()
+    arr = companies.filter(data => {
+        return data.toLowerCase().includes(searchWord)
+    }).map(data => {
+        let isSelected = data == selectBtn.firstElementChild.innerText ? "selected" : ""
+        return `<li onclick="updateName(this)" class="${isSelected}">${data}</li>`
+    }).join("")
+    options.innerHTML = arr ? arr : `<p style="margin-top: 10px;">Oops! Company not found</p>`
+})
+
+selectBtn.addEventListener("click", () => wrapper.classList.toggle("active"))
+
+document.addEventListener("DOMContentLoaded", function () {
+    const requestDateInput = document.getElementById('request-date');
+    const dueDateInput = document.getElementById('due-date');
+
+    requestDateInput.addEventListener('change', function () {
+        const requestDateValue = this.value;
+        if (requestDateValue) {
+            const requestDate = new Date(requestDateValue);
+            requestDate.setDate(requestDate.getDate() + 2);
+
+            const year = requestDate.getFullYear();
+            const month = String(requestDate.getMonth() + 1).padStart(2, '0');
+            const day = String(requestDate.getDate()).padStart(2, '0');
+            const dueDateValue = `${year}-${month}-${day}`;
+
+            dueDateInput.value = dueDateValue;
+        } else {
+            dueDateInput.value = '';
+        }
+    });
+});
+
+let uploadedFiles = []
+const form = document.querySelector('.form-upload'),
+    fileInput = document.querySelector(".file-input"),
+    attachedFilesContainer = document.getElementById('attached-files'),
+    uploadedArea = document.querySelector(".uploaded-area"),
+    attachmentCount = document.querySelector('.attachment-count')
+
+
+form.addEventListener("click", () => {
+    fileInput.click()
+})
+
+let nameOfFile
+fileInput.onchange = ({ target }) => {
+    let file = target.files[0]
+    if (file) {
+        let fileName = file.name
+        if (fileName.length >= 20) {
+            let splitName = fileName.split('.')
+            fileName = splitName[0].substring(0, 21) + "... ." + splitName[1]
+        }
+        nameOfFile = fileName
+    }
+}
+
+function createFileInfo(file) {
+    let iconClass = 'fas fa-file'
+    if (file.type.startsWith('image/')) {
+        iconClass = 'fas fa-file-image'
+    } else if (file.type.startsWith('application/pdf')) {
+        iconClass = 'fas fa-file-pdf'
+    } else if (file.type.startsWith('application/msword') || file.type.startsWith('application/vnd.openxmlformats-officedocument.wordprocessingml.document')) {
+        iconClass = 'fas fa-file-word'
+    }
+
+    let fileTotal = Math.floor(file.size / 1024)
+    let fileSize
+    (fileTotal < 1000) ? fileSize = fileTotal + " KB" : fileSize = (file.size / (1024 * 1024)).toFixed(2) + " MB"
+    const fileInfo = document.createElement('div')
+    fileInfo.classList.add('row')
+    fileInfo.innerHTML = `
+                <div class="content upload">
+                                  <i class="${iconClass}"></i>
+                                  <div class="details">
+                                    <span class="name">${nameOfFile}</span>
+                                    <span class="size">${fileSize}</span>
+                                  </div>
+                                  <div class="button-function">
+                                    <button class="delete-button float-end me-1"><i class="fas fa-times"></i></button>
+                                    <button class="download-button float-end me-1"><i class="fas fa-download"></i></button> 
+                                  </div>
+                                </div>
+            `
+
+    const downloadBtn = fileInfo.querySelector('.download-button')
+    downloadBtn.addEventListener('click', () => {
+        const url = URL.createObjectURL(file)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = file.name
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+    })
+
+    const deleteBtn = fileInfo.querySelector('.delete-button')
+    deleteBtn.addEventListener('click', () => {
+        const fileIndex = uploadedFiles.indexOf(file)
+        if (fileIndex > -1) {
+            uploadedFiles.splice(fileIndex, 1)
+        }
+        attachedFilesContainer.removeChild(fileInfo)
+        updateCount()
+    })
+
+    return fileInfo
+}
+
+function updateCount() {
+    attachmentCount.textContent = uploadedFiles.length
+    if (uploadedFiles.length > 0) {
+        attachedFilesContainer.style.display = 'block'
+    } else {
+        attachedFilesContainer.style.display = 'none'
+    }
+}
+
+fileInput.addEventListener('change', () => {
+    const currentCount = uploadedFiles.length
+    if (currentCount >= 5) {
+        alert('Maksimum 5 berkas diperbolehkan.')
+        return
+    }
+    const newFiles = Array.from(fileInput.files)
+    const maxToAdd = 5 - currentCount
+    const filesToAdd = newFiles.slice(0, maxToAdd)
+    if (filesToAdd.length < newFiles.length) {
+        alert(`Hanya ${maxToAdd} berkas lagi yang dapat ditambahkan. ${maxToAdd} berkas pertama akan ditambahkan.`)
+    }
+    filesToAdd.forEach((file) => {
+        uploadedFiles.push(file)
+        const fileInfo = createFileInfo(file)
+        attachedFilesContainer.appendChild(fileInfo)
+    })
+    updateCount()
+    fileInput.value = ''
+})
+
+// Title = Menambahkan row input pada tabel
+const addRowBtnItem = document.getElementById('addRowBtnItem')
+const itemlistTableBody = document.getElementById('itemListTableBody')
+
+// Fungsi untuk menambah baris baru
+addRowBtnItem.addEventListener('click', () => {
+    const rowCount2 = itemListTableBody.children.length + 1 // Hitung nomor urut
+
+    // Buat elemen tr dan td
+    const newRow = document.createElement('tr')
+
+    newRow.innerHTML = `
+                        <td>${rowCount2}</td> 
+                        <td class="name"><input type='text' class='size form-control1'></td>
+                        <td class="desc"><input type='text' class='size form-control1'></td>
+                        <td class="qty"><input type='number' class='size form-control1' value="0"></td>
+                        <td class="uom"><input type='text' class='size tengah form-control1'></td>
+						<td class="price"><input type='number' class='size form-control1'></td>
+						<td class="notes"><input type='text' class='size form-control1'></td>
+						<td class="details"><input type='text' class='size form-control1'></td>
+						<td class="warranty"><input type='text' class='size form-control1'></td>
+						<td class="amount"><input type='number' class='size form-control1'></td>
+                        <td class="delete"><button onclick="removeRowItemList(this)" class="btn"><i class='bx bx-trash'></i></button>`
+
+    // Tambahkan baris baru ke tbody
+    itemListTableBody.appendChild(newRow)
+})
+
+function removeRowItemList(button) {
+    const row = button.parentNode.parentNode // Dapatkan elemen tr dari tombol hapus
+    itemListTableBody.removeChild(row) // Hapus baris dari tbody
+
+    // Perbarui nomor urut setelah menghapus baris
+    const rows = itemListTableBody.getElementsByTagName('tr')
+    for (let i = 0; i < rows.length; i++) {
+        rows[i].getElementsByTagName('td')[0].innerText = i + 1
+    }
+}
+
+// Title = Menambahkan row input pada tabel Request
+const addRowBtnReq = document.getElementById('addRowBtnReq')
+const reqTableBody = document.getElementById('reqTableBody')
+
+// Fungsi untuk menambah baris baru
+addRowBtnReq.addEventListener('click', () => {
+    const rowCount2 = reqTableBody.children.length + 1 // Hitung nomor urut
+
+    // Buat elemen tr dan td
+    const newRow = document.createElement('tr')
+
+    newRow.innerHTML = `
+                            <td class="action"><button onclick="" class="btn"><i class='bx bx-plus-circle'></i></button></td>
+                            <td class="nomor" style="padding: 14px 9px;">${rowCount2}</td>
+                            <td class="reqCode"><input type='text' class='tengah size form-control1'></td>
+                            <td class="name"><input type='text' class='size form-control1'></td>
+                            <td class="desc"><input type='text' class='size form-control1'></td>
+                            <td class="qty"><input type='number' class='size form-control1' value="0"></td>
+                            <td class="uom"><input type='text' class='size tengah form-control1'></td>
+							<td class="reason"><input type='text' class='size form-control1'></td>
+							<td class="notes"><input type='text' class='size form-control1'></td>
+							<td class="pic"><input type='text' class='size form-control1'></td>
+							<td class="status"><input type='text' class='size form-control1'></td>
+
+                            <td class="delete"><button onclick="removeRowReq(this)" class="btn"><i class='bx bx-trash'></i></button></td>`
+
+
+    // Tambahkan baris baru ke tbody
+    reqTableBody.appendChild(newRow)
+})
+
+function removeRowReq(button) {
+    const row = button.parentNode.parentNode // Dapatkan elemen tr dari tombol hapus
+    reqTableBody.removeChild(row) // Hapus baris dari tbody
+
+    // Perbarui nomor urut setelah menghapus baris
+    const rows = reqTableBody.getElementsByTagName('tr')
+    for (let i = 0; i < rows.length; i++) {
+        rows[i].getElementsByTagName('td')[1].innerText = i + 1
     }
 }
 
 document.querySelector("#create-customer-option").addEventListener("click", function () {
-    const modal = document.querySelector(".add-customer-form-pop-up");
-    modal.classList.add("active");
-    document.body.classList.add("pop-up-active");
+    const modal = document.querySelector(".add-customer-form-pop-up")
+    modal.classList.add("active")
+    document.body.classList.add("pop-up-active")
     
-    modal.scrollTop = 0;
+    modal.scrollTop = 0
 })
 
 document.querySelector(".add-customer-form-close-btn").addEventListener("click", function () {
@@ -150,11 +461,11 @@ document.querySelector("#customer-contact-form-close-chevron").addEventListener(
 })
 
 document.querySelector("#request-item-to-purchasing-option").addEventListener("click", function () {
-    const modal = document.querySelector(".request-item-to-purchasing-form-pop-up");
-    modal.classList.add("active");
-    document.body.classList.add("pop-up-active");
+    const modal = document.querySelector(".request-item-to-purchasing-form-pop-up")
+    modal.classList.add("active")
+    document.body.classList.add("pop-up-active")
     
-    modal.scrollTop = 0;
+    modal.scrollTop = 0
 })
 
 document.querySelector(".request-item-to-purchasing-form-close-btn").addEventListener("click", function () {
@@ -166,326 +477,3 @@ document.querySelector(".request-item-to-purchasing-form-cancel-btn").addEventLi
     document.querySelector(".request-item-to-purchasing-form-pop-up").classList.remove("active")
     document.body.classList.remove("pop-up-active")
 })
-
-// Title = Menambahkan row input pada tabel 
-const addRowBtn = document.getElementById('addRowBtn');
-const itemTableBody = document.getElementById('itemTableBody');
-
-// Fungsi untuk menambah baris baru
-addRowBtn.addEventListener('click', () => {
-    const rowCount = itemTableBody.children.length + 1; // Hitung nomor urut
-
-    // Buat elemen tr dan td
-    const newRow = document.createElement('tr');
-
-    newRow.innerHTML = `
-        <td>${rowCount}.</td> 
-        <td class="name"><input type='text' class='size form-control1'></td> 
-        <td class="desc"><input type='text' class='size form-control1'></td> 
-        <td class="qty"><input type='number' class='size form-control1' value="0"></td> 
-        <td class="uom"><input type='text' class='size tengah form-control1'></td> 
-        <td class="budget"><input type='number' class='size form-control1'></td> 
-        <td class="leadtime"><input type='text' class='size tengah form-control1'></td>
-        <td class="delete"><button onclick="removeRow(this)" class="btn"><i class='bx bx-trash' ></i></button>`;
-
-    // Tambahkan baris baru ke tbody
-    itemTableBody.appendChild(newRow);
-});
-
-function removeRow(button) {
-    const row = button.parentNode.parentNode; // Dapatkan elemen tr dari tombol hapus
-    itemTableBody.removeChild(row); // Hapus baris dari tbody
-
-    // Perbarui nomor urut setelah menghapus baris
-    const rows = itemTableBody.getElementsByTagName('tr');
-    for (let i = 0; i < rows.length; i++) {
-        rows[i].getElementsByTagName('td')[0].innerText = i + 1;
-    }
-}
-
-// Title = Search Company name
-const wrapper = document.querySelector(".wrapp"),
-    selectBtn = wrapper.querySelector(".select-btn"),
-    searchInp = wrapper.querySelector("input"),
-    options = wrapper.querySelector(".option");
-
-let companies = [
-    "PT. Accenture", 
-    "PT. Adhya Tirta Batam", 
-    "PT. Agiva Indonesia", 
-    "PT. Pelangi Fortuna Global",
-    "PT. Indoshipsupply",
-    "PT. Bintan Sukses Ancol",
-    "PT. Citra Maritime",
-    "PT. Bintai Kindenko Engineering Indonesia",
-    "PT. Karya Abadi",
-    "PT. Digital Solutions",
-    "PT. Nusantara Shipping",
-    "PT. Mandiri Sejahtera",
-    "PT. Pertiwi",
-    "PT. Megah",
-    "PT. Maju Sejahtera",
-    "PT. Harmoni",
-    "PT. Prima",
-    "PT. Sentosa",
-    "PT. Nusantara",
-    "PT. Satu",
-    "PT. Global Investama",
-    "PT. Intertech",
-    "PT. Jaya Abadi"
-];
-
-function addCompany(selectedCompany) {
-    options.innerHTML = "";
-    companies.forEach(Company => {
-        let isSelected = Company == selectedCompany ? "selected" : "";
-        let li = `<li onclick="updateName(this)" class="${isSelected}">${Company}</li>`;
-        options.insertAdjacentHTML("beforeend", li);
-    });
-}
-addCompany();
-
-function updateName(selectedLi) {
-    searchInp.value = "";
-    addCompany(selectedLi.innerText);
-    wrapper.classList.remove("active");
-    selectBtn.firstElementChild.innerText = selectedLi.innerText;
-}
-
-searchInp.addEventListener("keyup", () => {
-    let arr = [];
-    let searchWord = searchInp.value.toLowerCase();
-    arr = companies.filter(data => {
-        return data.toLowerCase().includes(searchWord);
-    }).map(data => {
-        let isSelected = data == selectBtn.firstElementChild.innerText ? "selected" : "";
-        return `<li onclick="updateName(this)" class="${isSelected}">${data}</li>`;
-    }).join("");
-    options.innerHTML = arr ? arr : `<p style="margin-top: 10px;">Oops! Company not found</p>`;
-});
-
-selectBtn.addEventListener("click", () => wrapper.classList.toggle("active"));
-
-
-let uploadedFiles = [];
-const form = document.querySelector('.form-upload'),
-    fileInput = document.querySelector(".file-input"),
-    attachedFilesContainer = document.getElementById('attached-files'),
-    uploadedArea = document.querySelector(".uploaded-area"),
-    attachmentCount = document.querySelector('.attachment-count');
-
-
-form.addEventListener("click", () => {
-    fileInput.click();
-});
-
-let nameOfFile;
-fileInput.onchange = ({ target }) => {
-    let file = target.files[0];
-    if (file) {
-        let fileName = file.name;
-        if (fileName.length >= 20) {
-            let splitName = fileName.split('.');
-            fileName = splitName[0].substring(0, 21) + "... ." + splitName[1];
-        }
-        //uploadFile(fileName);
-        nameOfFile = fileName;
-    }
-}
-
-function createFileInfo(file) {
-    let iconClass = 'fas fa-file';
-    if (file.type.startsWith('image/')) {
-        iconClass = 'fas fa-file-image';
-    } else if (file.type.startsWith('application/pdf')) {
-        iconClass = 'fas fa-file-pdf';
-    } else if (file.type.startsWith('application/msword') || file.type.startsWith('application/vnd.openxmlformats-officedocument.wordprocessingml.document')) {
-        iconClass = 'fas fa-file-word';
-    }
-
-    let fileTotal = Math.floor(file.size / 1024);
-    let fileSize;
-    (fileTotal < 1000) ? fileSize = fileTotal + " KB" : fileSize = (file.size / (1024 * 1024)).toFixed(2) + " MB";
-    const fileInfo = document.createElement('div');
-    fileInfo.classList.add('row');
-    fileInfo.innerHTML = `
-                <div class="content upload">
-                                  <i class="${iconClass}"></i>
-                                  <div class="details">
-                                    <span class="name">${nameOfFile}</span>
-                                    <span class="size">${fileSize}</span>
-                                  </div>
-                                  <div class="button-function">
-                                    <button class="delete-button float-end me-1"><i class="fas fa-times"></i></button>
-                                    <button class="download-button float-end me-1"><i class="fas fa-download"></i></button> 
-                                  </div>
-                                </div>
-            `;
-
-    /*    let uploadedHTML = `   <div class="row">
-                                    <div class="content upload">
-                                      <i class="${iconClass}"></i>
-                                      <div class="details">
-                                        <span class="name">${nameOfFile}</span>
-                                        <span class="size">${fileSize}</span>
-                                      </div>
-                                      <div class="button-function">
-                                        <button class="delete-button float-end me-1"><i class="fas fa-times"></i></button>
-                                        <button class="download-button float-end me-1"><i class="fas fa-download"></i></button> 
-                                      </div>
-                                    </div>
-                                  </div>`;
-    
-        uploadedArea.insertAdjacentHTML("afterbegin", uploadedHTML);*/
-
-    const downloadBtn = fileInfo.querySelector('.download-button');
-    downloadBtn.addEventListener('click', () => {
-        const url = URL.createObjectURL(file);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = file.name;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    });
-
-    const deleteBtn = fileInfo.querySelector('.delete-button');
-    deleteBtn.addEventListener('click', () => {
-        const fileIndex = uploadedFiles.indexOf(file);
-        if (fileIndex > -1) {
-            uploadedFiles.splice(fileIndex, 1);
-        }
-        attachedFilesContainer.removeChild(fileInfo);
-        updateCount();
-    });
-
-    return fileInfo;
-}
-
-function updateCount() {
-    attachmentCount.textContent = uploadedFiles.length;
-    if (uploadedFiles.length > 0) {
-        attachedFilesContainer.style.display = 'block';
-    } else {
-        attachedFilesContainer.style.display = 'none';
-    }
-}
-
-
-
-fileInput.addEventListener('change', () => {
-    const currentCount = uploadedFiles.length;
-    if (currentCount >= 5) {
-        alert('Maksimum 5 berkas diperbolehkan.');
-        return;
-    }
-    const newFiles = Array.from(fileInput.files);
-    const maxToAdd = 5 - currentCount;
-    const filesToAdd = newFiles.slice(0, maxToAdd);
-    if (filesToAdd.length < newFiles.length) {
-        alert(`Hanya ${maxToAdd} berkas lagi yang dapat ditambahkan. ${maxToAdd} berkas pertama akan ditambahkan.`);
-    }
-    filesToAdd.forEach((file) => {
-        uploadedFiles.push(file);
-        const fileInfo = createFileInfo(file);
-        attachedFilesContainer.appendChild(fileInfo);
-    });
-    updateCount();
-    fileInput.value = '';
-});
-
-// Title = Menambahkan row input pada tabel
-const addRowBtnItem = document.getElementById('addRowBtnItem');
-const itemlistTableBody = document.getElementById('itemListTableBody');
-
-// Fungsi untuk menambah baris baru
-addRowBtnItem.addEventListener('click', () => {
-    const rowCount2 = itemListTableBody.children.length + 1; // Hitung nomor urut
-
-    // Buat elemen tr dan td
-    const newRow = document.createElement('tr');
-
-    newRow.innerHTML = `
-                        <td>${rowCount2}</td> 
-                        <td class="name"><input type='text' class='size form-control1'></td>
-                        <td class="desc"><input type='text' class='size form-control1'></td>
-                        <td class="qty"><input type='number' class='size form-control1' value="0"></td>
-                        <td class="uom"><input type='text' class='size tengah form-control1'></td>
-						<td class="price"><input type='number' class='size form-control1'></td>
-						<td class="notes"><input type='text' class='size form-control1'></td>
-						<td class="details"><input type='text' class='size form-control1'></td>
-						<td class="warranty"><input type='text' class='size form-control1'></td>
-						<td class="amount"><input type='number' class='size form-control1'></td>
-                        <td class="delete"><button onclick="removeRowItemList(this)" class="btn"><i class='bx bx-trash'></i></button>`;
-
-    // Tambahkan baris baru ke tbody
-    itemListTableBody.appendChild(newRow);
-
-
-});
-
-function removeRowItemList(button) {
-    const row = button.parentNode.parentNode; // Dapatkan elemen tr dari tombol hapus
-    itemListTableBody.removeChild(row); // Hapus baris dari tbody
-
-    // Perbarui nomor urut setelah menghapus baris
-    const rows = itemListTableBody.getElementsByTagName('tr');
-    for (let i = 0; i < rows.length; i++) {
-        rows[i].getElementsByTagName('td')[0].innerText = i + 1;
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-// Title = Menambahkan row input pada tabel Request
-const addRowBtnReq = document.getElementById('addRowBtnReq');
-const reqTableBody = document.getElementById('reqTableBody');
-
-// Fungsi untuk menambah baris baru
-addRowBtnReq.addEventListener('click', () => {
-    const rowCount2 = reqTableBody.children.length + 1; // Hitung nomor urut
-
-    // Buat elemen tr dan td
-    const newRow = document.createElement('tr');
-
-    newRow.innerHTML = `
-                            <td class="action"><button onclick="" class="btn"><i class='bx bx-plus-circle'></i></button></td>
-                            <td class="nomor" style="padding: 14px 9px;">${rowCount2}</td>
-                            <td class="reqCode"><input type='text' class='tengah size form-control1'></td>
-                            <td class="name"><input type='text' class='size form-control1'></td>
-                            <td class="desc"><input type='text' class='size form-control1'></td>
-                            <td class="qty"><input type='number' class='size form-control1' value="0"></td>
-                            <td class="uom"><input type='text' class='size tengah form-control1'></td>
-							<td class="reason"><input type='text' class='size form-control1'></td>
-							<td class="notes"><input type='text' class='size form-control1'></td>
-							<td class="pic"><input type='text' class='size form-control1'></td>
-							<td class="status"><input type='text' class='size form-control1'></td>
-
-                            <td class="delete"><button onclick="removeRowReq(this)" class="btn"><i class='bx bx-trash'></i></button></td>`;
-
-
-    // Tambahkan baris baru ke tbody
-    reqTableBody.appendChild(newRow);
-
-
-});
-
-function removeRowReq(button) {
-    const row = button.parentNode.parentNode; // Dapatkan elemen tr dari tombol hapus
-    reqTableBody.removeChild(row); // Hapus baris dari tbody
-
-    // Perbarui nomor urut setelah menghapus baris
-    const rows = reqTableBody.getElementsByTagName('tr');
-    for (let i = 0; i < rows.length; i++) {
-        rows[i].getElementsByTagName('td')[1].innerText = i + 1;
-    }
-}
