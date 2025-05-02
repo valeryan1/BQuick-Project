@@ -7,7 +7,7 @@
 <main class="content-div px-1 py-4 mx-3">
     <div class="container">
         <div class="header mt-4 mb-4 w-100" style="font-size: 29px;">
-            <a class="text-decoration-none" asp-controller="RFQ" asp-action="Index"><span class="text-danger fw-bold">RFQ</span></a>&nbsp;&gt;&nbsp;<span class="tes fw-bold text-decoration">Create RFQ</span>
+            <a class="text-decoration-none" asp-controller="RFQ" asp-action="Index"><span class="text-danger fw-bold rfq-link">RFQ</span></a>&nbsp;<span class="fw-bold">&gt;</span>&nbsp;<span class="tes fw-bold text-decoration">Create RFQ</span>
             <span class="float-sm-end fw-bold">RFQYY0000</span>
             @* <span class="float-sm-end fw-bold">@ViewBag.RFQCode</span> *@
         </div>
@@ -492,14 +492,14 @@
                         <label>RFQ Name</label>
                     </div>
 
-                    <div class="row mt-5 mx-1">
+                    <div class="row mt-5 mb-4 mx-1">
                         <div class="col-12 col-sm-6">
                             <div class="mb-3">
                                 <div class="d-flex align-items-center">
                                     <div class="sejajar" style="width: 146px">
-                                        <label for="company-name" class="form-label form-label-bold">Company Name</label>
+                                        <label for="company-name" class="form-label form-label-bold mb-0">Company Name</label>
                                     </div>
-                                    <div class="wrapp" style="width: 70%;">
+                                    <div class="wrapp company-dropdown" style="width: 70%;">
                                         <div class="select-btn">
                                             <span></span>
                                             <i class='bx bx-chevron-down'></i>
@@ -510,7 +510,7 @@
                                                 <input type="text" placeholder="Search" />
                                             </div>
 
-                                            <ul class="option">
+                                            <ul class="option" style="margin-bottom: 10px;">
 
                                             </ul>
                                         </div>
@@ -521,27 +521,27 @@
                             <div class="mb-3">
                                 <div class="d-flex align-items-center">
                                     <div class="sejajar" style="width: 146px">
-                                        <label for="end-user" class="form-label form-label-bold">End User</label>
+                                        <label for="end-user" class="form-label form-label-bold mb-0">End User</label>
                                     </div>
-                                    <input type="text" class="form-control1" style="width:70%" id="end-user">
+                                    <input type="text" class="form-control1 mb-0" style="width:70%" id="end-user">
                                 </div>
                             </div>
 
                             <div class="mb-3">
                                 <div class="d-flex align-items-center">
                                     <div class="sejajar" style="width: 146px">
-                                        <label for="request-date" class="form-label form-label-bold">Request Date</label>
+                                        <label for="request-date" class="form-label form-label-bold mb-0">Request Date</label>
                                     </div>
-                                    <input type='date' class="form-control1" style="width:70%" id='request-date'>
+                                    <input type='date' class="form-control1 mb-0" style="width:70%" id='request-date'>
                                 </div>
                             </div>
 
                             <div class='mb-3'>
                                 <div class='d-flex align-items-center'>
                                     <div class="sejajar" style="width: 146px">
-                                        <label for='due-date' class='form-label form-label-bold'>Due Date</label>
+                                        <label for='due-date' class='form-label form-label-bold mb-0'>Due Date</label>
                                     </div>
-                                    <input type='date' class="form-control1" style="width:70%" id='due-date'>
+                                    <input type='date' class="form-control1 mb-0" style="width:70%" id='due-date'>
                                 </div>
                             </div>
                         </div>
@@ -550,32 +550,103 @@
                             <div class="mb-3">
                                 <div class="d-flex align-items-center">
                                     <div class="sejajar" style="width: 146px">
-                                        <label for="resource" class="form-label form-label-bold">Resource</label>
+                                        <label for="resource" class="form-label form-label-bold mb-0">Resource</label>
                                     </div>
-                                    <input type="text" class="form-control1" style="width:70%" id="resource">
+                                    <div class="wrapp resource-dropdown" style="width: 70%;">
+                                        <div class="select-btn">
+                                            <span></span>
+                                            <i class='bx bx-chevron-down'></i>
+                                        </div>
+                                        <div class="content-search">
+                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
+                                                <li onclick="updateResource(this)">Email</li>
+                                                <li onclick="updateResource(this)">Whatsapp</li>
+                                                <li onclick="updateResource(this)">Telephone</li>
+                                                <li class="has-sub" id="resource-personal-option">
+                                                    Personal
+                                                    <ul class="sub-option" id="resource-personal-sub-dropdown">
+                                                        <li class="has-sub" id="resource-personal-email">
+                                                            Email
+                                                            <ul class="sub-option second-level">
+                                                                <li onclick="updateResourcePersonalUser(this)">Seheni</li>
+                                                                <li onclick="updateResourcePersonalUser(this)">Nadya</li>
+                                                                <li onclick="updateResourcePersonalUser(this)">Meli</li>
+                                                                <li onclick="updateResourcePersonalUser(this)">Elpera</li>
+                                                            </ul>
+                                                        </li>
+                                                        <li class="has-sub" id="resource-personal-phone">
+                                                            Phone
+                                                            <ul class="sub-option second-level">
+                                                                <li onclick="updateResourcePersonalUser(this)">Seheni</li>
+                                                                <li onclick="updateResourcePersonalUser(this)">Nadya</li>
+                                                                <li onclick="updateResourcePersonalUser(this)">Meli</li>
+                                                                <li onclick="updateResourcePersonalUser(this)">Elpera</li>
+                                                            </ul>
+                                                        </li>
+                                                        <li class="has-sub" id="resource-personal-direct">
+                                                            Direct
+                                                            <ul class="sub-option second-level">
+                                                                <li onclick="updateResourcePersonalUser(this)">Seheni</li>
+                                                                <li onclick="updateResourcePersonalUser(this)">Nadya</li>
+                                                                <li onclick="updateResourcePersonalUser(this)">Meli</li>
+                                                                <li onclick="updateResourcePersonalUser(this)">Elpera</li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="mb-3">
                                 <div class="d-flex align-items-center">
                                     <div class="sejajar" style="width: 146px">
-                                        <label for="category" class="form-label form-label-bold">Category</label>
+                                        <label for="category" class="form-label form-label-bold mb-0">Category</label>
                                     </div>
-                                    <input type="text" class="form-control1" style="width:70%" id=“category”>
+                                    <div class="wrapp project-type-dropdown" style="width: 70%;">
+                                        <div class="select-btn">
+                                            <span></span>
+                                            <i class='bx bx-chevron-down'></i>
+                                        </div>
+                                        <div class="content-search">
+                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
+                                                <li>Project</li>
+                                                <li>Mid Project</li>
+                                                <li>Non-Project</li>
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+
                             <div class=“mb-3”>
                                 <div class="d-flex align-items-center">
                                     <div class="sejajar" style="width: 146px">
-                                        <label for=“opportunity” class="form-label form-label-bold">Opportunity</label>
+                                        <label for=“opportunity” class="form-label form-label-bold mb-0">Opportunity</label>
                                     </div>
-                                    <input type="text" class="form-control1" style="width:70%" id="opportunity">
+                                    <div class="wrapp" id="opportunity-dropdown" style="width: 70%;">
+                                        <div class="select-btn">
+                                            <span></span>
+                                            <i class='bx bx-chevron-down'></i>
+                                        </div>
+                                        <div class="content-search">
+                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
+                                                <li>General</li>
+                                                <li>Bundle Installation</li>
+                                                <li>Professional Service</li>
+                                                <li>Service Center</li>
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <h5 class="note-title underline">Notes</h5>
+                    <h5 class="note-title underline mb-4">Notes</h5>
                     <div class="row mx-md-4">
                         <div class="col-12 col-sm-6">
                             <div class="mb-3">
@@ -598,7 +669,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="tabel-item col-12">
                         <table class="table item">
                             <thead class="table-light">

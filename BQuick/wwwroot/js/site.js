@@ -67,10 +67,11 @@ function removeRow(button) {
 }
 
 // Title = Search Company name
-const wrapper = document.querySelector(".wrapp"),
-    selectBtn = wrapper.querySelector(".select-btn"),
-    searchInp = wrapper.querySelector("input"),
-    options = wrapper.querySelector(".option")
+const companyWrapper = document.querySelector(".wrapp.company-dropdown"),
+    companySelectBtn = companyWrapper.querySelector(".select-btn"),
+    companySearchInp = companyWrapper.querySelector("input"),
+    companyOptions = companyWrapper.querySelector(".option")
+
 
 let companies = [
     "PT. Accenture",
@@ -99,57 +100,151 @@ let companies = [
 ]
 
 function addCompany(selectedCompany) {
-    options.innerHTML = ""
+    companyOptions.innerHTML = ""
     companies.forEach(Company => {
         let isSelected = Company == selectedCompany ? "selected" : ""
         let li = `<li onclick="updateName(this)" class="${isSelected}">${Company}</li>`
-        options.insertAdjacentHTML("beforeend", li)
+        companyOptions.insertAdjacentHTML("beforeend", li)
     })
 }
 addCompany()
 
 function updateName(selectedLi) {
-    searchInp.value = ""
+    companySearchInp.value = ""
     addCompany(selectedLi.innerText)
-    wrapper.classList.remove("active")
-    selectBtn.firstElementChild.innerText = selectedLi.innerText
+    companyWrapper.classList.remove("active")
+    companySelectBtn.firstElementChild.innerText = selectedLi.innerText
 }
 
-searchInp.addEventListener("keyup", () => {
+companySearchInp.addEventListener("keyup", () => {
     let arr = []
-    let searchWord = searchInp.value.toLowerCase()
+    let searchWord = companySearchInp.value.toLowerCase()
     arr = companies.filter(data => {
         return data.toLowerCase().includes(searchWord)
     }).map(data => {
-        let isSelected = data == selectBtn.firstElementChild.innerText ? "selected" : ""
+        let isSelected = data == companySelectBtn.firstElementChild.innerText ? "selected" : ""
         return `<li onclick="updateName(this)" class="${isSelected}">${data}</li>`
     }).join("")
-    options.innerHTML = arr ? arr : `<p style="margin-top: 10px;">Oops! Company not found</p>`
+    companyOptions.innerHTML = arr ? arr : `<p style="margin-top: 10px;">Oops! Company not found</p>`
 })
 
-selectBtn.addEventListener("click", () => wrapper.classList.toggle("active"))
+companySelectBtn.addEventListener("click", function (e) {
+    e.stopPropagation();
+    companyWrapper.classList.toggle("active")
+})
+
+companySearchInp.addEventListener("click", function (e) {
+    e.stopPropagation()
+})
+
+const resourceWrapper = document.querySelector('.wrapp.resource-dropdown')
+const resourceSelectBtn = resourceWrapper.querySelector('.select-btn')
+const resourceOptions = resourceWrapper.querySelectorAll('.option > li:not(.has-sub)')
+const personalOption = document.getElementById('resource-personal-option')
+const personalSubDropdown = document.getElementById('resource-personal-sub-dropdown')
+
+resourceSelectBtn.addEventListener("click", function (e) {
+    e.stopPropagation()
+    resourceWrapper.classList.toggle("active")
+})
+
+resourceOptions.forEach(option => {
+    option.addEventListener('click', function (e) {
+        e.stopPropagation()
+        resourceSelectBtn.firstElementChild.innerText = this.innerText
+        resourceWrapper.classList.remove("active")
+        document.querySelectorAll('.option .has-sub').forEach(el => el.classList.remove('active'))
+    })
+})
+
+personalOption.addEventListener('click', function (e) {
+    e.stopPropagation()
+    document.querySelectorAll('.option > .has-sub').forEach(li => {
+        if (li !== personalOption) li.classList.remove('active')
+    })
+    personalOption.classList.toggle('active')
+})
+
+document.querySelectorAll('#resource-personal-sub-dropdown > .has-sub').forEach(parent => {
+    parent.addEventListener('click', function (e) {
+        e.stopPropagation()
+        document.querySelectorAll('#resource-personal-sub-dropdown > .has-sub').forEach(li => {
+            if (li !== this) li.classList.remove('active')
+        })
+        this.classList.toggle('active')
+    })
+})
+
+function updateResourcePersonalUser(selectedLi) {
+    const parentType = selectedLi.parentElement.parentElement.firstChild.textContent.trim()
+    const user = selectedLi.textContent.trim()
+    resourceSelectBtn.firstElementChild.innerText = `Personal ${parentType} (${user})`
+    resourceWrapper.classList.remove("active")
+    document.querySelectorAll('.option .has-sub').forEach(el => el.classList.remove('active'))
+}
+
+const projectTypeWrapper = document.querySelector('.wrapp.project-type-dropdown')
+const projectTypeSelectBtn = projectTypeWrapper.querySelector('.select-btn')
+const projectTypeOptions = projectTypeWrapper.querySelectorAll('.option li')
+
+projectTypeSelectBtn.addEventListener("click", function (e) {
+    e.stopPropagation();
+    projectTypeWrapper.classList.toggle("active")
+})
+
+projectTypeOptions.forEach(option => {
+    option.addEventListener('click', function (e) {
+        e.stopPropagation()
+        projectTypeSelectBtn.firstElementChild.innerText = this.innerText
+        projectTypeWrapper.classList.remove("active")
+    })
+})
+
+const opportunityWrapper = document.getElementById('opportunity-dropdown');
+const opportunitySelectBtn = opportunityWrapper.querySelector('.select-btn');
+const opportunityOptions = opportunityWrapper.querySelectorAll('.option li');
+
+opportunitySelectBtn.addEventListener("click", function (e) {
+    e.stopPropagation();
+    opportunityWrapper.classList.toggle("active");
+})
+
+opportunityOptions.forEach(option => {
+    option.addEventListener('click', function (e) {
+        e.stopPropagation()
+        opportunitySelectBtn.firstElementChild.innerText = this.innerText
+        opportunityWrapper.classList.remove("active")
+    })
+})
+
+document.addEventListener('click', function (e) {
+    document.querySelectorAll('.wrapp').forEach(wrapper => {
+        wrapper.classList.remove('active')
+    })
+    document.querySelectorAll('.option .has-sub').forEach(el => el.classList.remove('active'))
+})
 
 document.addEventListener("DOMContentLoaded", function () {
-    const requestDateInput = document.getElementById('request-date');
-    const dueDateInput = document.getElementById('due-date');
+    const requestDateInput = document.getElementById('request-date')
+    const dueDateInput = document.getElementById('due-date')
 
     requestDateInput.addEventListener('change', function () {
-        const requestDateValue = this.value;
+        const requestDateValue = this.value
         if (requestDateValue) {
-            const requestDate = new Date(requestDateValue);
-            requestDate.setDate(requestDate.getDate() + 2);
+            const requestDate = new Date(requestDateValue)
+            requestDate.setDate(requestDate.getDate() + 2)
 
-            const year = requestDate.getFullYear();
-            const month = String(requestDate.getMonth() + 1).padStart(2, '0');
-            const day = String(requestDate.getDate()).padStart(2, '0');
-            const dueDateValue = `${year}-${month}-${day}`;
+            const year = requestDate.getFullYear()
+            const month = String(requestDate.getMonth() + 1).padStart(2, '0')
+            const day = String(requestDate.getDate()).padStart(2, '0')
+            const dueDateValue = `${year}-${month}-${day}`
 
-            dueDateInput.value = dueDateValue;
+            dueDateInput.value = dueDateValue
         } else {
-            dueDateInput.value = '';
+            dueDateInput.value = ''
         }
-    });
-});
+    })
+})
 
 let uploadedFiles = []
 const form = document.querySelector('.form-upload'),
@@ -157,7 +252,6 @@ const form = document.querySelector('.form-upload'),
     attachedFilesContainer = document.getElementById('attached-files'),
     uploadedArea = document.querySelector(".uploaded-area"),
     attachmentCount = document.querySelector('.attachment-count')
-
 
 form.addEventListener("click", () => {
     fileInput.click()

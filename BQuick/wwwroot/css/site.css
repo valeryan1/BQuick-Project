@@ -339,6 +339,10 @@ main .content-div {
     min-height: 100vh;
 }
 
+.rfq-link:hover {
+    text-decoration: underline;
+}
+
 .table > thead tr {
     color: #fff;
     text-align: left;
@@ -511,14 +515,58 @@ tr.highlight th {
 
 h5.note-title {
     font-weight: bold;
-    margin-top: 3rem;
-    margin-bottom: 3rem;
 }
 
-table.table.item {
-    margin-top: 4rem;
+.option {
+    position: relative;
 }
 
+.option .has-sub {
+    position: relative;
+}
+
+    .option .sub-option {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: #fff;
+        border: 1.5px solid #8e8e8e;
+        border-radius: 5px;
+        box-shadow: 0 0 2rem 0 rgba(33, 37, 41, .1);
+        z-index: 100;
+        padding-left: 0;
+        display: none;
+    }
+
+.option .sub-option li {
+    padding: 10px 15px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+        /* Sub-dropdown kedua (User) */
+        .option .sub-option .has-sub {
+            position: relative;
+        }
+
+        .option .sub-option.second-level {
+            left: 0;
+            top: 100%;
+            width: 100%;
+            position: absolute;
+            display: none;
+            z-index: 110;
+        }
+
+.option .has-sub.active > .sub-option {
+    display: block;
+}
+
+    /* Tampilkan sub-dropdown user saat hover/active */
+    .option .sub-option .has-sub.active > .second-level {
+        display: block;
+    }
 
 .option li, select-btn {
     display: flex;
@@ -629,6 +677,20 @@ table.table.item {
 
 .option li:hover, li.selected {
     background: #f2f2f2;
+}
+
+.wrapp.resource-personal-dropdown {
+    display: none;
+}
+
+.wrapp.resource-personal-dropdown.active {
+    display: block;
+}
+
+.wrapp.resource-dropdown .content-search,
+.wrapp.resource-dropdown .option,
+.wrapp.resource-dropdown .has-sub {
+    overflow: visible !important;
 }
 
 .form-control1 {
