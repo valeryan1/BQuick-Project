@@ -525,19 +525,19 @@ h5.note-title {
     position: relative;
 }
 
-    .option .sub-option {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        width: 100%;
-        background: #fff;
-        border: 1.5px solid #8e8e8e;
-        border-radius: 5px;
-        box-shadow: 0 0 2rem 0 rgba(33, 37, 41, .1);
-        z-index: 100;
-        padding-left: 0;
-        display: none;
-    }
+.option .sub-option {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    border: 1.5px solid #8e8e8e;
+    border-radius: 5px;
+    box-shadow: 0 0 2rem 0 rgba(33, 37, 41, .1);
+    z-index: 100;
+    padding-left: 0;
+    display: none;
+}
 
 .option .sub-option li {
     padding: 10px 15px;
@@ -545,28 +545,26 @@ h5.note-title {
     white-space: nowrap;
 }
 
-        /* Sub-dropdown kedua (User) */
-        .option .sub-option .has-sub {
-            position: relative;
-        }
+.option .sub-option .has-sub {
+    position: relative;
+}
 
-        .option .sub-option.second-level {
-            left: 0;
-            top: 100%;
-            width: 100%;
-            position: absolute;
-            display: none;
-            z-index: 110;
-        }
+.option .sub-option.second-level {
+    left: 0;
+    top: 100%;
+    width: 100%;
+    position: absolute;
+    display: none;
+    z-index: 110;
+}
 
 .option .has-sub.active > .sub-option {
     display: block;
 }
 
-    /* Tampilkan sub-dropdown user saat hover/active */
-    .option .sub-option .has-sub.active > .second-level {
-        display: block;
-    }
+.option .sub-option .has-sub.active > .second-level {
+    display: block;
+}
 
 .option li, select-btn {
     display: flex;
@@ -601,7 +599,8 @@ h5.note-title {
     background: #fff;
     border-radius: 5px;
     border: solid 1.5px #8e8e8e;
-    width: 30%;
+    width: 100%;
+    box-sizing: border-box;
     box-shadow: 0 0 2rem 0 rgba(33, 37, 41, .1);
 }
 
@@ -691,6 +690,22 @@ h5.note-title {
 .wrapp.resource-dropdown .option,
 .wrapp.resource-dropdown .has-sub {
     overflow: visible !important;
+}
+
+.wrapp {
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.select-btn,
+.content-search {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.content-search {
+    z-index: 1;
 }
 
 .form-control1 {

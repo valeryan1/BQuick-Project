@@ -1,4 +1,11 @@
-﻿const hamburger = document.querySelector(".toggle-btn")
+﻿function closeAllDropdowns() {
+    document.querySelectorAll('.wrapp').forEach(wrapper => {
+        wrapper.classList.remove('active')
+    })
+    document.querySelectorAll('.option .has-sub').forEach(el => el.classList.remove('active'))
+}
+
+const hamburger = document.querySelector(".toggle-btn")
 const toggler = document.querySelector("#icon")
 hamburger.addEventListener("click", function () {
     document.querySelector("#sidebar").classList.toggle("expand")
@@ -72,7 +79,6 @@ const companyWrapper = document.querySelector(".wrapp.company-dropdown"),
     companySearchInp = companyWrapper.querySelector("input"),
     companyOptions = companyWrapper.querySelector(".option")
 
-
 let companies = [
     "PT. Accenture",
     "PT. Adhya Tirta Batam",
@@ -129,8 +135,12 @@ companySearchInp.addEventListener("keyup", () => {
 })
 
 companySelectBtn.addEventListener("click", function (e) {
-    e.stopPropagation();
-    companyWrapper.classList.toggle("active")
+    e.stopPropagation()
+    const isActive = companyWrapper.classList.contains("active")
+    closeAllDropdowns()
+    if (!isActive) {
+        companyWrapper.classList.add("active")
+    }
 })
 
 companySearchInp.addEventListener("click", function (e) {
@@ -145,7 +155,11 @@ const personalSubDropdown = document.getElementById('resource-personal-sub-dropd
 
 resourceSelectBtn.addEventListener("click", function (e) {
     e.stopPropagation()
-    resourceWrapper.classList.toggle("active")
+    const isActive = resourceWrapper.classList.contains("active")
+    closeAllDropdowns()
+    if (!isActive) {
+        resourceWrapper.classList.add("active")
+    }
 })
 
 resourceOptions.forEach(option => {
@@ -188,8 +202,12 @@ const projectTypeSelectBtn = projectTypeWrapper.querySelector('.select-btn')
 const projectTypeOptions = projectTypeWrapper.querySelectorAll('.option li')
 
 projectTypeSelectBtn.addEventListener("click", function (e) {
-    e.stopPropagation();
-    projectTypeWrapper.classList.toggle("active")
+    e.stopPropagation()
+    const isActive = projectTypeWrapper.classList.contains("active")
+    closeAllDropdowns()
+    if (!isActive) {
+        projectTypeWrapper.classList.add("active")
+    }
 })
 
 projectTypeOptions.forEach(option => {
@@ -200,13 +218,17 @@ projectTypeOptions.forEach(option => {
     })
 })
 
-const opportunityWrapper = document.getElementById('opportunity-dropdown');
-const opportunitySelectBtn = opportunityWrapper.querySelector('.select-btn');
-const opportunityOptions = opportunityWrapper.querySelectorAll('.option li');
+const opportunityWrapper = document.getElementById('opportunity-dropdown')
+const opportunitySelectBtn = opportunityWrapper.querySelector('.select-btn')
+const opportunityOptions = opportunityWrapper.querySelectorAll('.option li')
 
 opportunitySelectBtn.addEventListener("click", function (e) {
-    e.stopPropagation();
-    opportunityWrapper.classList.toggle("active");
+    e.stopPropagation()
+    const isActive = opportunityWrapper.classList.contains("active")
+    closeAllDropdowns()
+    if (!isActive) {
+        opportunityWrapper.classList.add("active")
+    }
 })
 
 opportunityOptions.forEach(option => {
@@ -418,7 +440,6 @@ addRowBtnReq.addEventListener('click', () => {
 							<td class="status"><input type='text' class='size form-control1'></td>
 
                             <td class="delete"><button onclick="removeRowReq(this)" class="btn"><i class='bx bx-trash'></i></button></td>`
-
 
     // Tambahkan baris baru ke tbody
     reqTableBody.appendChild(newRow)
