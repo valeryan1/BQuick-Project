@@ -381,10 +381,16 @@ tr.highlight th {
     background-color: #ffc000;
 }
 
-.waiting-purc-and-discuss {
-    display: flex;
-    flex-direction: column;
-    font-size: 0.5rem;
+.table-sortable th {
+    cursor: pointer;
+}
+
+th.th-sort-asc::after {
+    content: " ▲";
+}
+
+th.th-sort-desc::after {
+    content: " ▼";
 }
 
 .form-label {

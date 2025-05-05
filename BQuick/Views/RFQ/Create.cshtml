@@ -12,12 +12,6 @@
             @* <span class="float-sm-end fw-bold">@ViewBag.RFQCode</span> *@
         </div>
 
-        @* <div>
-            <button id="create-customer-option">
-                Create Customer (Temporary Button)
-            </button>
-        </div>
-
         <div class="add-customer-form-pop-up px-5 py-3">
             <form method="post" enctype="multipart/form-data" class="add-customer-form">
                 <div class="row justify-content-center">
@@ -395,7 +389,7 @@
                         </div>
 
                         <div class="d-flex justify-content-center gap-2">
-                            <button class="btn btn-success">
+                            <button type="submit" class="btn btn-success add-customer-form-save-btn">
                                 Save
                             </button>
 
@@ -408,7 +402,7 @@
             </form>
         </div>
 
-        <div>
+        @* <div>
             <button id="request-item-to-purchasing-option">
                 Request to Purchasing (Temporary Button)
             </button>

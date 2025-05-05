@@ -73,6 +73,206 @@ function removeRow(button) {
     }
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+    function sortTableByColumn(table, column, asc = true) {
+        const dirModifier = asc ? 1 : -1
+        const tBody = table.tBodies[0]
+        const rows = Array.from(tBody.querySelectorAll("tr"))
+
+        const sortedRows = rows.sort((a, b) => {
+            const aText = a.querySelector(`td:nth-child(${column + 1})`).textContent.trim()
+            const bText = b.querySelector(`td:nth-child(${column + 1})`).textContent.trim()
+
+            const aVal = isNaN(aText) ? aText.toLowerCase() : parseFloat(aText)
+            const bVal = isNaN(bText) ? bText.toLowerCase() : parseFloat(bText)
+
+            if (aVal < bVal) return -1 * dirModifier
+            if (aVal > bVal) return 1 * dirModifier
+            return 0
+        })
+
+        while (tBody.firstChild) {
+            tBody.removeChild(tBody.firstChild)
+        }
+
+        tBody.append(...sortedRows)
+
+        table.querySelectorAll("th").forEach(th =>
+            th.classList.remove("th-sort-asc", "th-sort-desc")
+        )
+        const th = table.querySelector(`th:nth-child(${column + 1})`)
+        th.classList.toggle("th-sort-asc", asc)
+        th.classList.toggle("th-sort-desc", !asc)
+    }
+
+    document.querySelectorAll(".table-sortable th").forEach(headerCell => {
+        headerCell.addEventListener("click", () => {
+            const table = headerCell.closest("table")
+            const headerIndex = Array.from(headerCell.parentElement.children).indexOf(headerCell)
+            const currentIsAscending = headerCell.classList.contains("th-sort-asc")
+
+            sortTableByColumn(table, headerIndex, !currentIsAscending)
+        })
+    })
+})
+
+document.querySelectorAll(".add-customer-form-close-btn").forEach(btn => {
+    btn.addEventListener("click", function () {
+        document.querySelector(".add-customer-form-pop-up").classList.remove("active")
+        document.body.classList.remove("pop-up-active")
+    })
+})
+
+function getCompanyCode(name) {
+    return name
+        .split(/\s+/)
+        .map(w => w[0])
+        .filter(Boolean)
+        .join('')
+        .toUpperCase()
+}
+
+document.querySelectorAll(".add-customer-form-save-btn").forEach(btn => {
+    btn.addEventListener("click", function (e) {
+        e.preventDefault()
+
+        const modal = document.querySelector(".add-customer-form-pop-up")
+        const companyNameInput = modal.querySelector('input[placeholder="Company Name"]')
+        const companyName = companyNameInput ? companyNameInput.value.trim() : ""
+
+        if (!companyName) {
+            modal.classList.remove("active")
+            document.body.classList.remove("pop-up-active")
+            return
+        }
+
+        modal.classList.remove("active")
+        document.body.classList.remove("pop-up-active")
+
+        const companyWrapper = document.querySelector(".wrapp.company-dropdown")
+        const companySelectBtn = companyWrapper.querySelector(".select-btn")
+        const companySearchInp = companyWrapper.querySelector("input")
+        const companyOptions = companyWrapper.querySelector(".option")
+
+        if (!companies.includes(companyName)) {
+            companies.unshift(companyName)
+        }
+
+        const code = getCompanyCode(companyName)
+        companySelectBtn.firstElementChild.innerText = code ? `${companyName} (${code})` : companyName
+        companySearchInp.value = ""
+        addCompany(companyName)
+        companyWrapper.classList.remove("active")
+    })
+})
+
+var customerAddressDetailsCheckbox = document.querySelector("#customer-address-details-checkbox")
+if (customerAddressDetailsCheckbox) {
+    customerAddressDetailsCheckbox.addEventListener("change", function () {
+        const customerAddressDetails = document.querySelectorAll(".customer-address-details")
+        if (this.checked) {
+            customerAddressDetails.forEach(element => {
+                element.classList.add("active")
+            })
+        } else {
+            customerAddressDetails.forEach(element => {
+                element.classList.remove("active")
+            })
+        }
+    })
+}
+
+var matchCustomerBillingAddressCheckbox = document.getElementById("match-customer-billing-address-checkbox")
+var customerAddressFields = [
+    "address", "street", "city", "province", "country", "zip-code"
+]
+
+function updateCustomerShippingAddress() {
+    if (matchCustomerBillingAddressCheckbox.checked) {
+        customerAddressFields.forEach(field => {
+            var customerBillingAddressValue = document.getElementById(`customer-billing-${field}`).value
+            document.getElementById(`customer-shipping-${field}`).value = customerBillingAddressValue
+        })
+    }
+}
+
+matchCustomerBillingAddressCheckbox.addEventListener("change", function () {
+    if (this.checked) {
+        updateCustomerShippingAddress()
+        customerAddressFields.forEach(field => {
+            document.getElementById(`customer-shipping-${field}`).disabled = true
+        })
+    } else {
+        customerAddressFields.forEach(field => {
+            document.getElementById(`customer-shipping-${field}`).disabled = false
+        })
+    }
+})
+
+customerAddressFields.forEach(field => {
+    document.getElementById(`customer-billing-${field}`).addEventListener("input", updateCustomerShippingAddress)
+})
+
+const customerContactRoleButtons = document.querySelectorAll(".customer-contact-role-btn")
+const customerEndUserContactButton = document.getElementById("customer-end-user-contact-btn")
+
+function setActiveCustomerContactRoleButton(activeCustomerContactRoleButton) {
+    customerContactRoleButtons.forEach(button => {
+        button.style.border = "1px solid #afafaf"
+        button.style.color = "#b0b0b0"
+        button.style.fontWeight = "normal"
+    })
+
+    activeCustomerContactRoleButton.style.border = "2px solid #000"
+    activeCustomerContactRoleButton.style.color = "#000"
+    activeCustomerContactRoleButton.style.fontWeight = "500"
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    setActiveCustomerContactRoleButton(customerEndUserContactButton)
+
+    const customerContactRoleValue = customerEndUserContactButton.getAttribute("value")
+    document.getElementById("customer-contact-role-information-title").textContent = customerContactRoleValue
+
+    document.querySelector("#customer-contact-form-open-chevron").classList.add("hide")
+    document.querySelector("#customer-contact-form-close-chevron").classList.remove("hide")
+
+    document.querySelector(".show-customer-contact-form-pop-up").classList.add("active")
+})
+
+customerContactRoleButtons.forEach(button => {
+    button.addEventListener("click", function () {
+        setActiveCustomerContactRoleButton(this)
+
+        const customerContactRoleValue = this.getAttribute("value")
+        document.getElementById("customer-contact-role-information-title").textContent = customerContactRoleValue
+    })
+})
+
+document.querySelector("#add-customer-contact-btn").addEventListener("click", function () {
+    document.querySelector(".add-customer-contact-form-pop-up").classList.add("active")
+    document.querySelector(".add-customer-contact-btn-container").classList.add("hide")
+})
+
+document.querySelector(".add-customer-contact-form-close-btn").addEventListener("click", function () {
+    document.querySelector(".add-customer-contact-form-pop-up").classList.remove("active")
+    document.querySelector(".add-customer-contact-btn-container").classList.remove("hide")
+})
+
+document.querySelector("#customer-contact-form-open-chevron").addEventListener("click", function () {
+    document.querySelector("#customer-contact-form-open-chevron").classList.add("hide")
+    document.querySelector("#customer-contact-form-close-chevron").classList.remove("hide")
+
+    document.querySelector(".show-customer-contact-form-pop-up").classList.add("active")
+})
+
+document.querySelector("#customer-contact-form-close-chevron").addEventListener("click", function () {
+    document.querySelector("#customer-contact-form-close-chevron").classList.add("hide")
+    document.querySelector("#customer-contact-form-open-chevron").classList.remove("hide")
+
+    document.querySelector(".show-customer-contact-form-pop-up").classList.remove("active")
+})
+
 // Title = Search Company name
 const companyWrapper = document.querySelector(".wrapp.company-dropdown"),
     companySelectBtn = companyWrapper.querySelector(".select-btn"),
@@ -119,19 +319,39 @@ function updateName(selectedLi) {
     companySearchInp.value = ""
     addCompany(selectedLi.innerText)
     companyWrapper.classList.remove("active")
-    companySelectBtn.firstElementChild.innerText = selectedLi.innerText
+    const code = getCompanyCode(selectedLi.innerText)
+    companySelectBtn.firstElementChild.innerText = code ? `${selectedLi.innerText} (${code})` : selectedLi.innerText
+}
+
+function createCompanyOption(name) {
+    companyWrapper.classList.remove("active")
+    companySearchInp.value = ""
+    addCompany(name)
+
+    const modal = document.querySelector(".add-customer-form-pop-up")
+    modal.classList.add("active")
+    document.body.classList.add("pop-up-active")
+
+    const companyNameInput = modal.querySelector('input[placeholder="Company Name"]')
+    if (companyNameInput) {
+        companyNameInput.value = name
+    }
 }
 
 companySearchInp.addEventListener("keyup", () => {
-    let arr = []
-    let searchWord = companySearchInp.value.toLowerCase()
-    arr = companies.filter(data => {
-        return data.toLowerCase().includes(searchWord)
+    let searchWord = companySearchInp.value.trim()
+    let arr = companies.filter(data => {
+        return data.toLowerCase().includes(searchWord.toLowerCase())
     }).map(data => {
         let isSelected = data == companySelectBtn.firstElementChild.innerText ? "selected" : ""
         return `<li onclick="updateName(this)" class="${isSelected}">${data}</li>`
-    }).join("")
-    companyOptions.innerHTML = arr ? arr : `<p style="margin-top: 10px;">Oops! Company not found</p>`
+    })
+
+    if (searchWord.length > 0) {
+        arr.unshift(`<li class="create-option"onclick="createCompanyOption('${searchWord}')">Create "${searchWord}"</li>`)
+    }
+
+    companyOptions.innerHTML = arr.length > 0 ? arr.join("") : `<p style="margin-top: 10px;">Oops! Company not found</p>`
 })
 
 companySelectBtn.addEventListener("click", function (e) {
@@ -455,125 +675,6 @@ function removeRowReq(button) {
         rows[i].getElementsByTagName('td')[1].innerText = i + 1
     }
 }
-
-document.querySelector("#create-customer-option").addEventListener("click", function () {
-    const modal = document.querySelector(".add-customer-form-pop-up")
-    modal.classList.add("active")
-    document.body.classList.add("pop-up-active")
-    
-    modal.scrollTop = 0
-})
-
-document.querySelector(".add-customer-form-close-btn").addEventListener("click", function () {
-    document.querySelector(".add-customer-form-pop-up").classList.remove("active")
-    document.body.classList.remove("pop-up-active")
-})
-
-var customerAddressDetailsCheckbox = document.querySelector("#customer-address-details-checkbox")
-customerAddressDetailsCheckbox.addEventListener("change", function () {
-    const customerAddressDetails = document.querySelectorAll(".customer-address-details")
-
-    if (this.checked) {
-        customerAddressDetails.forEach(element => {
-            element.classList.add("active")
-        })
-    } else {
-        customerAddressDetails.forEach(element => {
-            element.classList.remove("active")
-        })
-    }
-})
-
-var matchCustomerBillingAddressCheckbox = document.getElementById("match-customer-billing-address-checkbox")
-var customerAddressFields = [
-    "address", "street", "city", "province", "country", "zip-code"
-]
-
-function updateCustomerShippingAddress() {
-    if (matchCustomerBillingAddressCheckbox.checked) {
-        customerAddressFields.forEach(field => {
-            var customerBillingAddressValue = document.getElementById(`customer-billing-${field}`).value
-            document.getElementById(`customer-shipping-${field}`).value = customerBillingAddressValue
-        })
-    }
-}
-
-matchCustomerBillingAddressCheckbox.addEventListener("change", function () {
-    if (this.checked) {
-        updateCustomerShippingAddress()
-        customerAddressFields.forEach(field => {
-            document.getElementById(`customer-shipping-${field}`).disabled = true
-        })
-    } else {
-        customerAddressFields.forEach(field => {
-            document.getElementById(`customer-shipping-${field}`).disabled = false
-        })
-    }
-})
-
-customerAddressFields.forEach(field => {
-    document.getElementById(`customer-billing-${field}`).addEventListener("input", updateCustomerShippingAddress)
-})
-
-const customerContactRoleButtons = document.querySelectorAll(".customer-contact-role-btn")
-const customerEndUserContactButton = document.getElementById("customer-end-user-contact-btn")
-
-function setActiveCustomerContactRoleButton(activeCustomerContactRoleButton) {
-    customerContactRoleButtons.forEach(button => {
-        button.style.border = "1px solid #afafaf"
-        button.style.color = "#b0b0b0"
-        button.style.fontWeight = "normal"
-    })
-
-    activeCustomerContactRoleButton.style.border = "2px solid #000"
-    activeCustomerContactRoleButton.style.color = "#000"
-    activeCustomerContactRoleButton.style.fontWeight = "500"
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-    setActiveCustomerContactRoleButton(customerEndUserContactButton)
-
-    const customerContactRoleValue = customerEndUserContactButton.getAttribute("value")
-    document.getElementById("customer-contact-role-information-title").textContent = customerContactRoleValue
-
-    document.querySelector("#customer-contact-form-open-chevron").classList.add("hide")
-    document.querySelector("#customer-contact-form-close-chevron").classList.remove("hide")
-
-    document.querySelector(".show-customer-contact-form-pop-up").classList.add("active")
-})
-
-customerContactRoleButtons.forEach(button => {
-    button.addEventListener("click", function () {
-        setActiveCustomerContactRoleButton(this)
-
-        const customerContactRoleValue = this.getAttribute("value")
-        document.getElementById("customer-contact-role-information-title").textContent = customerContactRoleValue
-    })
-})
-
-document.querySelector("#add-customer-contact-btn").addEventListener("click", function () {
-    document.querySelector(".add-customer-contact-form-pop-up").classList.add("active")
-    document.querySelector(".add-customer-contact-btn-container").classList.add("hide")
-})
-
-document.querySelector(".add-customer-contact-form-close-btn").addEventListener("click", function () {
-    document.querySelector(".add-customer-contact-form-pop-up").classList.remove("active")
-    document.querySelector(".add-customer-contact-btn-container").classList.remove("hide")
-})
-
-document.querySelector("#customer-contact-form-open-chevron").addEventListener("click", function () {
-    document.querySelector("#customer-contact-form-open-chevron").classList.add("hide")
-    document.querySelector("#customer-contact-form-close-chevron").classList.remove("hide")
-
-    document.querySelector(".show-customer-contact-form-pop-up").classList.add("active")
-})
-
-document.querySelector("#customer-contact-form-close-chevron").addEventListener("click", function () {
-    document.querySelector("#customer-contact-form-close-chevron").classList.add("hide")
-    document.querySelector("#customer-contact-form-open-chevron").classList.remove("hide")
-
-    document.querySelector(".show-customer-contact-form-pop-up").classList.remove("active")
-})
 
 document.querySelector("#request-item-to-purchasing-option").addEventListener("click", function () {
     const modal = document.querySelector(".request-item-to-purchasing-form-pop-up")
