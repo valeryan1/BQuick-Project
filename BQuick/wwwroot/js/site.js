@@ -1,695 +1,705 @@
-﻿function closeAllDropdowns() {
+﻿// =======================
+// Helper Functions
+// =======================
+
+// Tutup semua dropdown custom
+function closeAllDropdowns() {
     document.querySelectorAll('.wrapp').forEach(wrapper => {
-        wrapper.classList.remove('active')
-    })
-    document.querySelectorAll('.option .has-sub').forEach(el => el.classList.remove('active'))
+        wrapper.classList.remove('active');
+    });
+    document.querySelectorAll('.option .has-sub').forEach(el => el.classList.remove('active'));
 }
 
-const hamburger = document.querySelector(".toggle-btn")
-const toggler = document.querySelector("#icon")
-hamburger.addEventListener("click", function () {
-    document.querySelector("#sidebar").classList.toggle("expand")
-    toggler.classList.toggle("bx-chevrons-right")
-    toggler.classList.toggle("bx-chevrons-left")
-})
-
-function searchRFQ() {
-    const input = document.getElementById("searchInput").value.toUpperCase()
-    const table = document.querySelector(".table")
-    const trs = table.getElementsByTagName("tr")
-
-    for (let i = 1; i < trs.length; i++) { // Mulai dari 1 untuk skip header
-        let tds = trs[i].getElementsByTagName("td")
-        let rowContains = false
-
-        for (let j = 0; j < tds.length; j++) {
-            let cell = tds[j]
-            if (cell) {
-                let text = cell.textContent || cell.innerText
-                if (text.toUpperCase().indexOf(input) > -1) {
-                    rowContains = true
-                    break
-                }
-            }
-        }
-
-        trs[i].style.display = rowContains ? "" : "none"
-    }
-}
-
-// Title = Menambahkan row input pada tabel 
-const addRowBtn = document.getElementById('addRowBtn')
-const itemTableBody = document.getElementById('itemTableBody')
-
-// Fungsi untuk menambah baris baru
-addRowBtn.addEventListener('click', () => {
-    const rowCount = itemTableBody.children.length + 1 // Hitung nomor urut
-
-    // Buat elemen tr dan td
-    const newRow = document.createElement('tr')
-
-    newRow.innerHTML = `
-        <td>${rowCount}.</td> 
-        <td class="name"><input type='text' class='size form-control1'></td> 
-        <td class="desc"><input type='text' class='size form-control1'></td> 
-        <td class="qty"><input type='number' class='size form-control1' value="0"></td> 
-        <td class="uom"><input type='text' class='size tengah form-control1'></td> 
-        <td class="budget"><input type='number' class='size form-control1'></td> 
-        <td class="leadtime"><input type='text' class='size tengah form-control1'></td>
-        <td class="delete"><button onclick="removeRow(this)" class="btn"><i class='bx bx-trash' ></i></button>`
-
-    // Tambahkan baris baru ke tbody
-    itemTableBody.appendChild(newRow)
-})
-
-function removeRow(button) {
-    const row = button.parentNode.parentNode // Dapatkan elemen tr dari tombol hapus
-    itemTableBody.removeChild(row) // Hapus baris dari tbody
-
-    // Perbarui nomor urut setelah menghapus baris
-    const rows = itemTableBody.getElementsByTagName('tr')
-    for (let i = 0; i < rows.length; i++) {
-        rows[i].getElementsByTagName('td')[0].innerText = i + 1
-    }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-    function sortTableByColumn(table, column, asc = true) {
-        const dirModifier = asc ? 1 : -1
-        const tBody = table.tBodies[0]
-        const rows = Array.from(tBody.querySelectorAll("tr"))
-
-        const sortedRows = rows.sort((a, b) => {
-            const aText = a.querySelector(`td:nth-child(${column + 1})`).textContent.trim()
-            const bText = b.querySelector(`td:nth-child(${column + 1})`).textContent.trim()
-
-            const aVal = isNaN(aText) ? aText.toLowerCase() : parseFloat(aText)
-            const bVal = isNaN(bText) ? bText.toLowerCase() : parseFloat(bText)
-
-            if (aVal < bVal) return -1 * dirModifier
-            if (aVal > bVal) return 1 * dirModifier
-            return 0
-        })
-
-        while (tBody.firstChild) {
-            tBody.removeChild(tBody.firstChild)
-        }
-
-        tBody.append(...sortedRows)
-
-        table.querySelectorAll("th").forEach(th =>
-            th.classList.remove("th-sort-asc", "th-sort-desc")
-        )
-        const th = table.querySelector(`th:nth-child(${column + 1})`)
-        th.classList.toggle("th-sort-asc", asc)
-        th.classList.toggle("th-sort-desc", !asc)
-    }
-
-    document.querySelectorAll(".table-sortable th").forEach(headerCell => {
-        headerCell.addEventListener("click", () => {
-            const table = headerCell.closest("table")
-            const headerIndex = Array.from(headerCell.parentElement.children).indexOf(headerCell)
-            const currentIsAscending = headerCell.classList.contains("th-sort-asc")
-
-            sortTableByColumn(table, headerIndex, !currentIsAscending)
-        })
-    })
-})
-
-document.querySelectorAll(".add-customer-form-close-btn").forEach(btn => {
-    btn.addEventListener("click", function () {
-        document.querySelector(".add-customer-form-pop-up").classList.remove("active")
-        document.body.classList.remove("pop-up-active")
-    })
-})
-
+// Untuk generate kode perusahaan dari nama
 function getCompanyCode(name) {
     return name
         .split(/\s+/)
         .map(w => w[0])
         .filter(Boolean)
         .join('')
-        .toUpperCase()
+        .toUpperCase();
 }
 
-document.querySelectorAll(".add-customer-form-save-btn").forEach(btn => {
-    btn.addEventListener("click", function (e) {
-        e.preventDefault()
-
-        const modal = document.querySelector(".add-customer-form-pop-up")
-        const companyNameInput = modal.querySelector('input[placeholder="Company Name"]')
-        const companyName = companyNameInput ? companyNameInput.value.trim() : ""
-
-        if (!companyName) {
-            modal.classList.remove("active")
-            document.body.classList.remove("pop-up-active")
-            return
-        }
-
-        modal.classList.remove("active")
-        document.body.classList.remove("pop-up-active")
-
-        const companyWrapper = document.querySelector(".wrapp.company-dropdown")
-        const companySelectBtn = companyWrapper.querySelector(".select-btn")
-        const companySearchInp = companyWrapper.querySelector("input")
-        const companyOptions = companyWrapper.querySelector(".option")
-
-        if (!companies.includes(companyName)) {
-            companies.unshift(companyName)
-        }
-
-        const code = getCompanyCode(companyName)
-        companySelectBtn.firstElementChild.innerText = code ? `${companyName} (${code})` : companyName
-        companySearchInp.value = ""
-        addCompany(companyName)
-        companyWrapper.classList.remove("active")
-    })
-})
-
-var customerAddressDetailsCheckbox = document.querySelector("#customer-address-details-checkbox")
-if (customerAddressDetailsCheckbox) {
-    customerAddressDetailsCheckbox.addEventListener("change", function () {
-        const customerAddressDetails = document.querySelectorAll(".customer-address-details")
-        if (this.checked) {
-            customerAddressDetails.forEach(element => {
-                element.classList.add("active")
-            })
-        } else {
-            customerAddressDetails.forEach(element => {
-                element.classList.remove("active")
-            })
-        }
-    })
-}
-
-var matchCustomerBillingAddressCheckbox = document.getElementById("match-customer-billing-address-checkbox")
-var customerAddressFields = [
-    "address", "street", "city", "province", "country", "zip-code"
-]
-
-function updateCustomerShippingAddress() {
-    if (matchCustomerBillingAddressCheckbox.checked) {
-        customerAddressFields.forEach(field => {
-            var customerBillingAddressValue = document.getElementById(`customer-billing-${field}`).value
-            document.getElementById(`customer-shipping-${field}`).value = customerBillingAddressValue
-        })
-    }
-}
-
-matchCustomerBillingAddressCheckbox.addEventListener("change", function () {
-    if (this.checked) {
-        updateCustomerShippingAddress()
-        customerAddressFields.forEach(field => {
-            document.getElementById(`customer-shipping-${field}`).disabled = true
-        })
-    } else {
-        customerAddressFields.forEach(field => {
-            document.getElementById(`customer-shipping-${field}`).disabled = false
-        })
-    }
-})
-
-customerAddressFields.forEach(field => {
-    document.getElementById(`customer-billing-${field}`).addEventListener("input", updateCustomerShippingAddress)
-})
-
-const customerContactRoleButtons = document.querySelectorAll(".customer-contact-role-btn")
-const customerEndUserContactButton = document.getElementById("customer-end-user-contact-btn")
-
-function setActiveCustomerContactRoleButton(activeCustomerContactRoleButton) {
-    customerContactRoleButtons.forEach(button => {
-        button.style.border = "1px solid #afafaf"
-        button.style.color = "#b0b0b0"
-        button.style.fontWeight = "normal"
-    })
-
-    activeCustomerContactRoleButton.style.border = "2px solid #000"
-    activeCustomerContactRoleButton.style.color = "#000"
-    activeCustomerContactRoleButton.style.fontWeight = "500"
-}
-
+// =======================
+// DOMContentLoaded Wrapper
+// =======================
 document.addEventListener("DOMContentLoaded", function () {
-    setActiveCustomerContactRoleButton(customerEndUserContactButton)
 
-    const customerContactRoleValue = customerEndUserContactButton.getAttribute("value")
-    document.getElementById("customer-contact-role-information-title").textContent = customerContactRoleValue
-
-    document.querySelector("#customer-contact-form-open-chevron").classList.add("hide")
-    document.querySelector("#customer-contact-form-close-chevron").classList.remove("hide")
-
-    document.querySelector(".show-customer-contact-form-pop-up").classList.add("active")
-})
-
-customerContactRoleButtons.forEach(button => {
-    button.addEventListener("click", function () {
-        setActiveCustomerContactRoleButton(this)
-
-        const customerContactRoleValue = this.getAttribute("value")
-        document.getElementById("customer-contact-role-information-title").textContent = customerContactRoleValue
-    })
-})
-
-document.querySelector("#add-customer-contact-btn").addEventListener("click", function () {
-    document.querySelector(".add-customer-contact-form-pop-up").classList.add("active")
-    document.querySelector(".add-customer-contact-btn-container").classList.add("hide")
-})
-
-document.querySelector(".add-customer-contact-form-close-btn").addEventListener("click", function () {
-    document.querySelector(".add-customer-contact-form-pop-up").classList.remove("active")
-    document.querySelector(".add-customer-contact-btn-container").classList.remove("hide")
-})
-
-document.querySelector("#customer-contact-form-open-chevron").addEventListener("click", function () {
-    document.querySelector("#customer-contact-form-open-chevron").classList.add("hide")
-    document.querySelector("#customer-contact-form-close-chevron").classList.remove("hide")
-
-    document.querySelector(".show-customer-contact-form-pop-up").classList.add("active")
-})
-
-document.querySelector("#customer-contact-form-close-chevron").addEventListener("click", function () {
-    document.querySelector("#customer-contact-form-close-chevron").classList.add("hide")
-    document.querySelector("#customer-contact-form-open-chevron").classList.remove("hide")
-
-    document.querySelector(".show-customer-contact-form-pop-up").classList.remove("active")
-})
-
-// Title = Search Company name
-const companyWrapper = document.querySelector(".wrapp.company-dropdown"),
-    companySelectBtn = companyWrapper.querySelector(".select-btn"),
-    companySearchInp = companyWrapper.querySelector("input"),
-    companyOptions = companyWrapper.querySelector(".option")
-
-let companies = [
-    "PT. Accenture",
-    "PT. Adhya Tirta Batam",
-    "PT. Agiva Indonesia",
-    "PT. Pelangi Fortuna Global",
-    "PT. Indoshipsupply",
-    "PT. Bintan Sukses Ancol",
-    "PT. Citra Maritime",
-    "PT. Bintai Kindenko Engineering Indonesia",
-    "PT. Karya Abadi",
-    "PT. Digital Solutions",
-    "PT. Nusantara Shipping",
-    "PT. Mandiri Sejahtera",
-    "PT. Pertiwi",
-    "PT. Megah",
-    "PT. Maju Sejahtera",
-    "PT. Harmoni",
-    "PT. Prima",
-    "PT. Sentosa",
-    "PT. Nusantara",
-    "PT. Satu",
-    "PT. Global Investama",
-    "PT. Intertech",
-    "PT. Jaya Abadi"
-]
-
-function addCompany(selectedCompany) {
-    companyOptions.innerHTML = ""
-    companies.forEach(Company => {
-        let isSelected = Company == selectedCompany ? "selected" : ""
-        let li = `<li onclick="updateName(this)" class="${isSelected}">${Company}</li>`
-        companyOptions.insertAdjacentHTML("beforeend", li)
-    })
-}
-addCompany()
-
-function updateName(selectedLi) {
-    companySearchInp.value = ""
-    addCompany(selectedLi.innerText)
-    companyWrapper.classList.remove("active")
-    const code = getCompanyCode(selectedLi.innerText)
-    companySelectBtn.firstElementChild.innerText = code ? `${selectedLi.innerText} (${code})` : selectedLi.innerText
-}
-
-function createCompanyOption(name) {
-    companyWrapper.classList.remove("active")
-    companySearchInp.value = ""
-    addCompany(name)
-
-    const modal = document.querySelector(".add-customer-form-pop-up")
-    modal.classList.add("active")
-    document.body.classList.add("pop-up-active")
-
-    const companyNameInput = modal.querySelector('input[placeholder="Company Name"]')
-    if (companyNameInput) {
-        companyNameInput.value = name
-    }
-}
-
-companySearchInp.addEventListener("keyup", () => {
-    let searchWord = companySearchInp.value.trim()
-    let arr = companies.filter(data => {
-        return data.toLowerCase().includes(searchWord.toLowerCase())
-    }).map(data => {
-        let isSelected = data == companySelectBtn.firstElementChild.innerText ? "selected" : ""
-        return `<li onclick="updateName(this)" class="${isSelected}">${data}</li>`
-    })
-
-    if (searchWord.length > 0) {
-        arr.unshift(`<li class="create-option"onclick="createCompanyOption('${searchWord}')">Create "${searchWord}"</li>`)
+    // =======================
+    // Sidebar Toggle
+    // =======================
+    const hamburger = document.querySelector(".toggle-btn");
+    const toggler = document.querySelector("#icon");
+    if (hamburger && toggler) {
+        hamburger.addEventListener("click", function () {
+            document.querySelector("#sidebar").classList.toggle("expand");
+            toggler.classList.toggle("bx-chevrons-right");
+            toggler.classList.toggle("bx-chevrons-left");
+        });
     }
 
-    companyOptions.innerHTML = arr.length > 0 ? arr.join("") : `<p style="margin-top: 10px;">Oops! Company not found</p>`
-})
+    // =======================
+    // Add Customer Form Popup
+    // =======================
+    const addBtn = document.getElementById('add-customer-contact-btn');
+    const formPopUp = document.querySelector('.add-customer-contact-form-pop-up');
+    const closeChevron = document.getElementById('customer-contact-form-open-chevron');
 
-companySelectBtn.addEventListener("click", function (e) {
-    e.stopPropagation()
-    const isActive = companyWrapper.classList.contains("active")
-    closeAllDropdowns()
-    if (!isActive) {
-        companyWrapper.classList.add("active")
+    // Awal: form pop-up disembunyikan, tombol Add tampil
+    if (formPopUp) formPopUp.style.display = 'none';
+    if (addBtn) addBtn.style.display = 'block';
+
+    // Saat tombol Add diklik: tampilkan form pop-up, tombol Add hilang
+    if (addBtn && formPopUp) {
+        addBtn.addEventListener('click', function () {
+            formPopUp.style.display = 'block';
+            addBtn.style.display = 'none';
+        });
     }
-})
 
-companySearchInp.addEventListener("click", function (e) {
-    e.stopPropagation()
-})
-
-const resourceWrapper = document.querySelector('.wrapp.resource-dropdown')
-const resourceSelectBtn = resourceWrapper.querySelector('.select-btn')
-const resourceOptions = resourceWrapper.querySelectorAll('.option > li:not(.has-sub)')
-const personalOption = document.getElementById('resource-personal-option')
-const personalSubDropdown = document.getElementById('resource-personal-sub-dropdown')
-
-resourceSelectBtn.addEventListener("click", function (e) {
-    e.stopPropagation()
-    const isActive = resourceWrapper.classList.contains("active")
-    closeAllDropdowns()
-    if (!isActive) {
-        resourceWrapper.classList.add("active")
+    // Saat Chevron diklik: sembunyikan form pop-up, tombol Add tampil lagi
+    if (closeChevron && formPopUp && addBtn) {
+        closeChevron.addEventListener('click', function () {
+            formPopUp.style.display = 'none';
+            addBtn.style.display = 'block';
+        });
     }
-})
 
-resourceOptions.forEach(option => {
-    option.addEventListener('click', function (e) {
-        e.stopPropagation()
-        resourceSelectBtn.firstElementChild.innerText = this.innerText
-        resourceWrapper.classList.remove("active")
-        document.querySelectorAll('.option .has-sub').forEach(el => el.classList.remove('active'))
-    })
-})
+    const infoPopUp = document.querySelector('.show-customer-contact-information-form-pop-up');
+    const closeBtn = document.getElementById('customer-contact-information-form-open-minus');
+    const openChevron = document.getElementById('customer-contact-information-form-close-chevron');
 
-personalOption.addEventListener('click', function (e) {
-    e.stopPropagation()
-    document.querySelectorAll('.option > .has-sub').forEach(li => {
-        if (li !== personalOption) li.classList.remove('active')
-    })
-    personalOption.classList.toggle('active')
-})
+    // By default, tampilkan pop-up dan sembunyikan chevron open
+    if (infoPopUp) infoPopUp.classList.add('active');
+    if (openChevron) openChevron.style.display = 'none';
 
-document.querySelectorAll('#resource-personal-sub-dropdown > .has-sub').forEach(parent => {
-    parent.addEventListener('click', function (e) {
-        e.stopPropagation()
-        document.querySelectorAll('#resource-personal-sub-dropdown > .has-sub').forEach(li => {
-            if (li !== this) li.classList.remove('active')
-        })
-        this.classList.toggle('active')
-    })
-})
-
-function updateResourcePersonalUser(selectedLi) {
-    const parentType = selectedLi.parentElement.parentElement.firstChild.textContent.trim()
-    const user = selectedLi.textContent.trim()
-    resourceSelectBtn.firstElementChild.innerText = `Personal ${parentType} (${user})`
-    resourceWrapper.classList.remove("active")
-    document.querySelectorAll('.option .has-sub').forEach(el => el.classList.remove('active'))
-}
-
-const projectTypeWrapper = document.querySelector('.wrapp.project-type-dropdown')
-const projectTypeSelectBtn = projectTypeWrapper.querySelector('.select-btn')
-const projectTypeOptions = projectTypeWrapper.querySelectorAll('.option li')
-
-projectTypeSelectBtn.addEventListener("click", function (e) {
-    e.stopPropagation()
-    const isActive = projectTypeWrapper.classList.contains("active")
-    closeAllDropdowns()
-    if (!isActive) {
-        projectTypeWrapper.classList.add("active")
+    // Saat klik minus, sembunyikan pop-up dan tampilkan chevron open
+    if (closeBtn && infoPopUp && openChevron) {
+        closeBtn.addEventListener('click', function () {
+            infoPopUp.classList.remove('active');
+            openChevron.style.display = 'inline-block';
+        });
     }
-})
 
-projectTypeOptions.forEach(option => {
-    option.addEventListener('click', function (e) {
-        e.stopPropagation()
-        projectTypeSelectBtn.firstElementChild.innerText = this.innerText
-        projectTypeWrapper.classList.remove("active")
-    })
-})
-
-const opportunityWrapper = document.getElementById('opportunity-dropdown')
-const opportunitySelectBtn = opportunityWrapper.querySelector('.select-btn')
-const opportunityOptions = opportunityWrapper.querySelectorAll('.option li')
-
-opportunitySelectBtn.addEventListener("click", function (e) {
-    e.stopPropagation()
-    const isActive = opportunityWrapper.classList.contains("active")
-    closeAllDropdowns()
-    if (!isActive) {
-        opportunityWrapper.classList.add("active")
+    // Saat klik chevron open, tampilkan pop-up dan sembunyikan chevron open
+    if (openChevron && infoPopUp) {
+        openChevron.addEventListener('click', function () {
+            infoPopUp.classList.add('active');
+            openChevron.style.display = 'none';
+        });
     }
-})
 
-opportunityOptions.forEach(option => {
-    option.addEventListener('click', function (e) {
-        e.stopPropagation()
-        opportunitySelectBtn.firstElementChild.innerText = this.innerText
-        opportunityWrapper.classList.remove("active")
-    })
-})
+    document.querySelectorAll(".add-customer-form-close-btn").forEach(btn => {
+        btn.addEventListener("click", function () {
+            const modal = document.querySelector(".add-customer-form-pop-up");
+            if (modal) modal.classList.remove("active");
+            document.body.classList.remove("pop-up-active");
+        });
+    });
 
-document.addEventListener('click', function (e) {
-    document.querySelectorAll('.wrapp').forEach(wrapper => {
-        wrapper.classList.remove('active')
-    })
-    document.querySelectorAll('.option .has-sub').forEach(el => el.classList.remove('active'))
-})
+    document.querySelectorAll(".add-customer-form-save-btn").forEach(btn => {
+        btn.addEventListener("click", function (e) {
+            e.preventDefault();
+            const modal = document.querySelector(".add-customer-form-pop-up");
+            if (!modal) return;
+            const companyNameInput = modal.querySelector('input[placeholder="Company Name"]');
+            const companyName = companyNameInput ? companyNameInput.value.trim() : "";
+            if (!companyName) {
+                modal.classList.remove("active");
+                document.body.classList.remove("pop-up-active");
+                return;
+            }
+            modal.classList.remove("active");
+            document.body.classList.remove("pop-up-active");
+            // Update dropdown company
+            if (window.companies && window.addCompany && window.companyWrapper) {
+                if (!companies.includes(companyName)) {
+                    companies.unshift(companyName);
+                }
+                const code = getCompanyCode(companyName);
+                companyWrapper.querySelector(".select-btn").firstElementChild.innerText = code ? `${companyName} (${code})` : companyName;
+                companyWrapper.querySelector("input").value = "";
+                addCompany(companyName);
+                companyWrapper.classList.remove("active");
+            }
+        });
+    });
 
-document.addEventListener("DOMContentLoaded", function () {
-    const requestDateInput = document.getElementById('request-date')
-    const dueDateInput = document.getElementById('due-date')
+    // =======================
+    // Address Checkbox Logic
+    // =======================
+    const customerAddressDetailsCheckbox = document.querySelector("#customer-address-details-checkbox");
+    if (customerAddressDetailsCheckbox) {
+        customerAddressDetailsCheckbox.addEventListener("change", function () {
+            const details = document.querySelectorAll(".customer-address-details");
+            details.forEach(element => {
+                if (this.checked) {
+                    element.classList.add("active");
+                } else {
+                    element.classList.remove("active");
+                }
+            });
+        });
+    }
 
-    requestDateInput.addEventListener('change', function () {
-        const requestDateValue = this.value
-        if (requestDateValue) {
-            const requestDate = new Date(requestDateValue)
-            requestDate.setDate(requestDate.getDate() + 2)
+    // Checkbox "Same With Billing Address"
+    const matchCustomerBillingAddressCheckbox = document.getElementById("match-customer-billing-address-checkbox");
+    const customerAddressFields = [
+        "address", "street", "city", "province", "country", "zip-code"
+    ];
 
-            const year = requestDate.getFullYear()
-            const month = String(requestDate.getMonth() + 1).padStart(2, '0')
-            const day = String(requestDate.getDate()).padStart(2, '0')
-            const dueDateValue = `${year}-${month}-${day}`
-
-            dueDateInput.value = dueDateValue
-        } else {
-            dueDateInput.value = ''
+    function updateCustomerShippingAddress() {
+        if (!matchCustomerBillingAddressCheckbox) return;
+        if (matchCustomerBillingAddressCheckbox.checked) {
+            customerAddressFields.forEach(field => {
+                const billing = document.getElementById(`customer-billing-${field}`);
+                const shipping = document.getElementById(`customer-shipping-${field}`);
+                if (billing && shipping) {
+                    shipping.value = billing.value;
+                }
+            });
         }
-    })
-})
+    }
 
-let uploadedFiles = []
-const form = document.querySelector('.form-upload'),
-    fileInput = document.querySelector(".file-input"),
-    attachedFilesContainer = document.getElementById('attached-files'),
-    uploadedArea = document.querySelector(".uploaded-area"),
-    attachmentCount = document.querySelector('.attachment-count')
+    if (matchCustomerBillingAddressCheckbox) {
+        matchCustomerBillingAddressCheckbox.addEventListener("change", function () {
+            customerAddressFields.forEach(field => {
+                const shipping = document.getElementById(`customer-shipping-${field}`);
+                if (shipping) {
+                    shipping.disabled = this.checked;
+                }
+            });
+            if (this.checked) updateCustomerShippingAddress();
+        });
 
-form.addEventListener("click", () => {
-    fileInput.click()
-})
+        customerAddressFields.forEach(field => {
+            const billing = document.getElementById(`customer-billing-${field}`);
+            if (billing) billing.addEventListener("input", updateCustomerShippingAddress);
+        });
+    }
 
-let nameOfFile
-fileInput.onchange = ({ target }) => {
-    let file = target.files[0]
-    if (file) {
-        let fileName = file.name
-        if (fileName.length >= 20) {
-            let splitName = fileName.split('.')
-            fileName = splitName[0].substring(0, 21) + "... ." + splitName[1]
+    // =======================
+    // Custom Dropdown Company
+    // =======================
+    window.companyWrapper = document.querySelector(".wrapp.company-dropdown");
+    if (companyWrapper) {
+        const companySelectBtn = companyWrapper.querySelector(".select-btn");
+        const companySearchInp = companyWrapper.querySelector("input");
+        const companyOptions = companyWrapper.querySelector(".option");
+
+        window.companies = [
+            "PT. Accenture", "PT. Adhya Tirta Batam", "PT. Agiva Indonesia", "PT. Pelangi Fortuna Global",
+            "PT. Indoshipsupply", "PT. Bintan Sukses Ancol", "PT. Citra Maritime", "PT. Bintai Kindenko Engineering Indonesia",
+            "PT. Karya Abadi", "PT. Digital Solutions", "PT. Nusantara Shipping", "PT. Mandiri Sejahtera", "PT. Pertiwi",
+            "PT. Megah", "PT. Maju Sejahtera", "PT. Harmoni", "PT. Prima", "PT. Sentosa", "PT. Nusantara",
+            "PT. Satu", "PT. Global Investama", "PT. Intertech", "PT. Jaya Abadi"
+        ];
+
+        window.addCompany = function (selectedCompany) {
+            companyOptions.innerHTML = "";
+            companies.forEach(Company => {
+                let isSelected = Company == selectedCompany ? "selected" : "";
+                let li = document.createElement("li");
+                li.textContent = Company;
+                li.className = isSelected;
+                li.onclick = function () { updateName(this); };
+                companyOptions.appendChild(li);
+            });
+        };
+
+        function updateName(selectedLi) {
+            companySearchInp.value = "";
+            addCompany(selectedLi.textContent);
+            companyWrapper.classList.remove("active");
+            const code = getCompanyCode(selectedLi.textContent);
+            companySelectBtn.firstElementChild.innerText = code ? `${selectedLi.textContent} (${code})` : selectedLi.textContent;
         }
-        nameOfFile = fileName
-    }
-}
 
-function createFileInfo(file) {
-    let iconClass = 'fas fa-file'
-    if (file.type.startsWith('image/')) {
-        iconClass = 'fas fa-file-image'
-    } else if (file.type.startsWith('application/pdf')) {
-        iconClass = 'fas fa-file-pdf'
-    } else if (file.type.startsWith('application/msword') || file.type.startsWith('application/vnd.openxmlformats-officedocument.wordprocessingml.document')) {
-        iconClass = 'fas fa-file-word'
-    }
-
-    let fileTotal = Math.floor(file.size / 1024)
-    let fileSize
-    (fileTotal < 1000) ? fileSize = fileTotal + " KB" : fileSize = (file.size / (1024 * 1024)).toFixed(2) + " MB"
-    const fileInfo = document.createElement('div')
-    fileInfo.classList.add('row')
-    fileInfo.innerHTML = `
-                <div class="content upload">
-                                  <i class="${iconClass}"></i>
-                                  <div class="details">
-                                    <span class="name">${nameOfFile}</span>
-                                    <span class="size">${fileSize}</span>
-                                  </div>
-                                  <div class="button-function">
-                                    <button class="delete-button float-end me-1"><i class="fas fa-times"></i></button>
-                                    <button class="download-button float-end me-1"><i class="fas fa-download"></i></button> 
-                                  </div>
-                                </div>
-            `
-
-    const downloadBtn = fileInfo.querySelector('.download-button')
-    downloadBtn.addEventListener('click', () => {
-        const url = URL.createObjectURL(file)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = file.name
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
-        URL.revokeObjectURL(url)
-    })
-
-    const deleteBtn = fileInfo.querySelector('.delete-button')
-    deleteBtn.addEventListener('click', () => {
-        const fileIndex = uploadedFiles.indexOf(file)
-        if (fileIndex > -1) {
-            uploadedFiles.splice(fileIndex, 1)
+        function createCompanyOption(name) {
+            companyWrapper.classList.remove("active");
+            companySearchInp.value = "";
+            addCompany(name);
+            const modal = document.querySelector(".add-customer-form-pop-up");
+            if (modal) {
+                modal.classList.add("active");
+                document.body.classList.add("pop-up-active");
+                const companyNameInput = modal.querySelector('input[placeholder="Company Name"]');
+                if (companyNameInput) companyNameInput.value = name;
+            }
         }
-        attachedFilesContainer.removeChild(fileInfo)
-        updateCount()
-    })
 
-    return fileInfo
-}
+        addCompany();
 
-function updateCount() {
-    attachmentCount.textContent = uploadedFiles.length
-    if (uploadedFiles.length > 0) {
-        attachedFilesContainer.style.display = 'block'
-    } else {
-        attachedFilesContainer.style.display = 'none'
+        companySearchInp.addEventListener("keyup", () => {
+            let searchWord = companySearchInp.value.trim();
+            let arr = companies.filter(data => {
+                return data.toLowerCase().includes(searchWord.toLowerCase());
+            }).map(data => {
+                let isSelected = data == companySelectBtn.firstElementChild.innerText ? "selected" : "";
+                let li = document.createElement("li");
+                li.textContent = data;
+                li.className = isSelected;
+                li.onclick = function () { updateName(this); };
+                return li;
+            });
+
+            companyOptions.innerHTML = "";
+            if (searchWord.length > 0) {
+                let createLi = document.createElement("li");
+                createLi.className = "create-option";
+                createLi.textContent = `Create "${searchWord}"`;
+                createLi.onclick = function () { createCompanyOption(searchWord); };
+                companyOptions.appendChild(createLi);
+            }
+            if (arr.length > 0) {
+                arr.forEach(li => companyOptions.appendChild(li));
+            } else {
+                let p = document.createElement("p");
+                p.style.marginTop = "10px";
+                p.textContent = "Oops! Company not found";
+                companyOptions.appendChild(p);
+            }
+        });
+
+        companySelectBtn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            const isActive = companyWrapper.classList.contains("active");
+            closeAllDropdowns();
+            if (!isActive) companyWrapper.classList.add("active");
+        });
+
+        companySearchInp.addEventListener("click", function (e) {
+            e.stopPropagation();
+        });
     }
-}
 
-fileInput.addEventListener('change', () => {
-    const currentCount = uploadedFiles.length
-    if (currentCount >= 5) {
-        alert('Maksimum 5 berkas diperbolehkan.')
-        return
+    // =======================
+    // Custom Dropdown Resource
+    // =======================
+    const resourceWrapper = document.querySelector('.wrapp.resource-dropdown');
+    if (resourceWrapper) {
+        const resourceSelectBtn = resourceWrapper.querySelector('.select-btn');
+        const resourceOptions = resourceWrapper.querySelectorAll('.option > li:not(.has-sub)');
+        const personalOption = document.getElementById('resource-personal-option');
+        const personalSubDropdown = document.getElementById('resource-personal-sub-dropdown');
+
+        if (resourceSelectBtn) {
+            resourceSelectBtn.addEventListener("click", function (e) {
+                e.stopPropagation();
+                const isActive = resourceWrapper.classList.contains("active");
+                closeAllDropdowns();
+                if (!isActive) resourceWrapper.classList.add("active");
+            });
+        }
+
+        resourceOptions.forEach(option => {
+            option.addEventListener('click', function (e) {
+                e.stopPropagation();
+                resourceSelectBtn.firstElementChild.innerText = this.innerText;
+                resourceWrapper.classList.remove("active");
+                document.querySelectorAll('.option .has-sub').forEach(el => el.classList.remove('active'));
+            });
+        });
+
+        if (personalOption) {
+            personalOption.addEventListener('click', function (e) {
+                e.stopPropagation();
+                document.querySelectorAll('.option > .has-sub').forEach(li => {
+                    if (li !== personalOption) li.classList.remove('active');
+                });
+                personalOption.classList.toggle('active');
+            });
+        }
+
+        document.querySelectorAll('#resource-personal-sub-dropdown > .has-sub').forEach(parent => {
+            parent.addEventListener('click', function (e) {
+                e.stopPropagation();
+                document.querySelectorAll('#resource-personal-sub-dropdown > .has-sub').forEach(li => {
+                    if (li !== this) li.classList.remove('active');
+                });
+                this.classList.toggle('active');
+            });
+        });
+
+        window.updateResourcePersonalUser = function (selectedLi) {
+            const parentType = selectedLi.parentElement.parentElement.firstChild.textContent.trim();
+            const user = selectedLi.textContent.trim();
+            resourceSelectBtn.firstElementChild.innerText = `Personal ${parentType} (${user})`;
+            resourceWrapper.classList.remove("active");
+            document.querySelectorAll('.option .has-sub').forEach(el => el.classList.remove('active'));
+        };
     }
-    const newFiles = Array.from(fileInput.files)
-    const maxToAdd = 5 - currentCount
-    const filesToAdd = newFiles.slice(0, maxToAdd)
-    if (filesToAdd.length < newFiles.length) {
-        alert(`Hanya ${maxToAdd} berkas lagi yang dapat ditambahkan. ${maxToAdd} berkas pertama akan ditambahkan.`)
+
+    // =======================
+    // Custom Dropdown Project Type
+    // =======================
+    const projectTypeWrapper = document.querySelector('.wrapp.project-type-dropdown');
+    if (projectTypeWrapper) {
+        const projectTypeSelectBtn = projectTypeWrapper.querySelector('.select-btn');
+        const projectTypeOptions = projectTypeWrapper.querySelectorAll('.option li');
+        if (projectTypeSelectBtn) {
+            projectTypeSelectBtn.addEventListener("click", function (e) {
+                e.stopPropagation();
+                const isActive = projectTypeWrapper.classList.contains("active");
+                closeAllDropdowns();
+                if (!isActive) projectTypeWrapper.classList.add("active");
+            });
+        }
+        projectTypeOptions.forEach(option => {
+            option.addEventListener('click', function (e) {
+                e.stopPropagation();
+                projectTypeSelectBtn.firstElementChild.innerText = this.innerText;
+                projectTypeWrapper.classList.remove("active");
+            });
+        });
     }
-    filesToAdd.forEach((file) => {
-        uploadedFiles.push(file)
-        const fileInfo = createFileInfo(file)
-        attachedFilesContainer.appendChild(fileInfo)
-    })
-    updateCount()
-    fileInput.value = ''
-})
 
-// Title = Menambahkan row input pada tabel
-const addRowBtnItem = document.getElementById('addRowBtnItem')
-const itemlistTableBody = document.getElementById('itemListTableBody')
-
-// Fungsi untuk menambah baris baru
-addRowBtnItem.addEventListener('click', () => {
-    const rowCount2 = itemListTableBody.children.length + 1 // Hitung nomor urut
-
-    // Buat elemen tr dan td
-    const newRow = document.createElement('tr')
-
-    newRow.innerHTML = `
-                        <td>${rowCount2}</td> 
-                        <td class="name"><input type='text' class='size form-control1'></td>
-                        <td class="desc"><input type='text' class='size form-control1'></td>
-                        <td class="qty"><input type='number' class='size form-control1' value="0"></td>
-                        <td class="uom"><input type='text' class='size tengah form-control1'></td>
-						<td class="price"><input type='number' class='size form-control1'></td>
-						<td class="notes"><input type='text' class='size form-control1'></td>
-						<td class="details"><input type='text' class='size form-control1'></td>
-						<td class="warranty"><input type='text' class='size form-control1'></td>
-						<td class="amount"><input type='number' class='size form-control1'></td>
-                        <td class="delete"><button onclick="removeRowItemList(this)" class="btn"><i class='bx bx-trash'></i></button>`
-
-    // Tambahkan baris baru ke tbody
-    itemListTableBody.appendChild(newRow)
-})
-
-function removeRowItemList(button) {
-    const row = button.parentNode.parentNode // Dapatkan elemen tr dari tombol hapus
-    itemListTableBody.removeChild(row) // Hapus baris dari tbody
-
-    // Perbarui nomor urut setelah menghapus baris
-    const rows = itemListTableBody.getElementsByTagName('tr')
-    for (let i = 0; i < rows.length; i++) {
-        rows[i].getElementsByTagName('td')[0].innerText = i + 1
+    // =======================
+    // Custom Dropdown Opportunity
+    // =======================
+    const opportunityWrapper = document.getElementById('opportunity-dropdown');
+    if (opportunityWrapper) {
+        const opportunitySelectBtn = opportunityWrapper.querySelector('.select-btn');
+        const opportunityOptions = opportunityWrapper.querySelectorAll('.option li');
+        if (opportunitySelectBtn) {
+            opportunitySelectBtn.addEventListener("click", function (e) {
+                e.stopPropagation();
+                const isActive = opportunityWrapper.classList.contains("active");
+                closeAllDropdowns();
+                if (!isActive) opportunityWrapper.classList.add("active");
+            });
+        }
+        opportunityOptions.forEach(option => {
+            option.addEventListener('click', function (e) {
+                e.stopPropagation();
+                opportunitySelectBtn.firstElementChild.innerText = this.innerText;
+                opportunityWrapper.classList.remove("active");
+            });
+        });
     }
-}
 
-// Title = Menambahkan row input pada tabel Request
-const addRowBtnReq = document.getElementById('addRowBtnReq')
-const reqTableBody = document.getElementById('reqTableBody')
+    // Klik di luar dropdown untuk menutup semua
+    document.addEventListener('click', function () {
+        closeAllDropdowns();
+    });
 
-// Fungsi untuk menambah baris baru
-addRowBtnReq.addEventListener('click', () => {
-    const rowCount2 = reqTableBody.children.length + 1 // Hitung nomor urut
-
-    // Buat elemen tr dan td
-    const newRow = document.createElement('tr')
-
-    newRow.innerHTML = `
-                            <td class="action"><button onclick="" class="btn"><i class='bx bx-plus-circle'></i></button></td>
-                            <td class="nomor" style="padding: 14px 9px;">${rowCount2}</td>
-                            <td class="reqCode"><input type='text' class='tengah size form-control1'></td>
-                            <td class="name"><input type='text' class='size form-control1'></td>
-                            <td class="desc"><input type='text' class='size form-control1'></td>
-                            <td class="qty"><input type='number' class='size form-control1' value="0"></td>
-                            <td class="uom"><input type='text' class='size tengah form-control1'></td>
-							<td class="reason"><input type='text' class='size form-control1'></td>
-							<td class="notes"><input type='text' class='size form-control1'></td>
-							<td class="pic"><input type='text' class='size form-control1'></td>
-							<td class="status"><input type='text' class='size form-control1'></td>
-
-                            <td class="delete"><button onclick="removeRowReq(this)" class="btn"><i class='bx bx-trash'></i></button></td>`
-
-    // Tambahkan baris baru ke tbody
-    reqTableBody.appendChild(newRow)
-})
-
-function removeRowReq(button) {
-    const row = button.parentNode.parentNode // Dapatkan elemen tr dari tombol hapus
-    reqTableBody.removeChild(row) // Hapus baris dari tbody
-
-    // Perbarui nomor urut setelah menghapus baris
-    const rows = reqTableBody.getElementsByTagName('tr')
-    for (let i = 0; i < rows.length; i++) {
-        rows[i].getElementsByTagName('td')[1].innerText = i + 1
+    // =======================
+    // Tabs Customer Contact
+    // =======================
+    const tabButtons = document.querySelectorAll(".customer-contact-tab");
+    const tabPanels = document.querySelectorAll(".customer-contact-panel");
+    if (tabButtons.length && tabPanels.length) {
+        tabButtons.forEach(btn => {
+            btn.addEventListener("click", function () {
+                tabButtons.forEach(b => {
+                    b.classList.remove("active");
+                    b.setAttribute("aria-selected", "false");
+                    b.setAttribute("tabindex", "-1");
+                });
+                this.classList.add("active");
+                this.setAttribute("aria-selected", "true");
+                this.setAttribute("tabindex", "0");
+                tabPanels.forEach(panel => {
+                    if (panel.id === this.getAttribute("aria-controls")) {
+                        panel.removeAttribute("hidden");
+                    } else {
+                        panel.setAttribute("hidden", "");
+                    }
+                });
+            });
+        });
+        // Set default tab active
+        tabButtons[0].click();
     }
-}
 
-document.querySelector("#request-item-to-purchasing-option").addEventListener("click", function () {
-    const modal = document.querySelector(".request-item-to-purchasing-form-pop-up")
-    modal.classList.add("active")
-    document.body.classList.add("pop-up-active")
-    
-    modal.scrollTop = 0
-})
+    // =======================
+    // Due Date Otomatis
+    // =======================
+    const requestDateInput = document.getElementById('request-date');
+    const dueDateInput = document.getElementById('due-date');
+    if (requestDateInput && dueDateInput) {
+        requestDateInput.addEventListener('change', function () {
+            const requestDateValue = this.value;
+            if (requestDateValue) {
+                const requestDate = new Date(requestDateValue);
+                requestDate.setDate(requestDate.getDate() + 2);
+                const year = requestDate.getFullYear();
+                const month = String(requestDate.getMonth() + 1).padStart(2, '0');
+                const day = String(requestDate.getDate()).padStart(2, '0');
+                const dueDateValue = `${year}-${month}-${day}`;
+                dueDateInput.value = dueDateValue;
+            } else {
+                dueDateInput.value = '';
+            }
+        });
+    }
 
-document.querySelector(".request-item-to-purchasing-form-close-btn").addEventListener("click", function () {
-    document.querySelector(".request-item-to-purchasing-form-pop-up").classList.remove("active")
-    document.body.classList.remove("pop-up-active")
-})
+    // =======================
+    // Table Row Functions
+    // =======================
+    // Item Table
+    const addRowBtn = document.getElementById('addRowBtn');
+    const itemTableBody = document.getElementById('itemTableBody');
+    if (addRowBtn && itemTableBody) {
+        addRowBtn.addEventListener('click', () => {
+            const rowCount = itemTableBody.children.length + 1;
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${rowCount}</td>
+                <td class="name"><input type='text' class='size form-control1'></td>
+                <td class="desc"><input type='text' class='size form-control1'></td>
+                <td class="qty"><input type='number' class='size form-control1' value="0"></td>
+                <td class="uom"><input type='text' class='size tengah form-control1'></td>
+                <td class="budget"><input type='number' class='size form-control1'></td>
+                <td class="leadtime"><input type='text' class='size tengah form-control1'></td>
+                <td class="delete"><button type="button" class="btn btn-danger btn-sm btn-remove-row"><i class='bx bx-trash'></i></button></td>
+            `;
+            itemTableBody.appendChild(newRow);
+        });
+        itemTableBody.addEventListener('click', function (e) {
+            if (e.target.closest('.btn-remove-row')) {
+                const row = e.target.closest('tr');
+                if (row) itemTableBody.removeChild(row);
+                // Update nomor urut
+                Array.from(itemTableBody.children).forEach((tr, i) => {
+                    tr.querySelector('td').innerText = i + 1;
+                });
+            }
+        });
+    }
 
-document.querySelector(".request-item-to-purchasing-form-cancel-btn").addEventListener("click", function () {
-    document.querySelector(".request-item-to-purchasing-form-pop-up").classList.remove("active")
-    document.body.classList.remove("pop-up-active")
-})
+    // Item List Table
+    const addRowBtnItem = document.getElementById('addRowBtnItem');
+    const itemListTableBody = document.getElementById('itemListTableBody');
+    if (addRowBtnItem && itemListTableBody) {
+        addRowBtnItem.addEventListener('click', () => {
+            const rowCount = itemListTableBody.children.length + 1;
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${rowCount}</td>
+                <td class="name"><input type='text' class='size form-control1'></td>
+                <td class="desc"><input type='text' class='size form-control1'></td>
+                <td class="qty"><input type='number' class='size form-control1' value="0"></td>
+                <td class="uom"><input type='text' class='size tengah form-control1'></td>
+                <td class="price"><input type='number' class='size form-control1'></td>
+                <td class="notes"><input type='text' class='size form-control1'></td>
+                <td class="details"><input type='text' class='size form-control1'></td>
+                <td class="warranty"><input type='text' class='size form-control1'></td>
+                <td class="amount"><input type='number' class='size form-control1'></td>
+                <td class="delete"><button type="button" class="btn btn-danger btn-sm btn-remove-row-itemlist"><i class='bx bx-trash'></i></button></td>
+            `;
+            itemListTableBody.appendChild(newRow);
+        });
+        itemListTableBody.addEventListener('click', function (e) {
+            if (e.target.closest('.btn-remove-row-itemlist')) {
+                const row = e.target.closest('tr');
+                if (row) itemListTableBody.removeChild(row);
+                // Update nomor urut
+                Array.from(itemListTableBody.children).forEach((tr, i) => {
+                    tr.querySelector('td').innerText = i + 1;
+                });
+            }
+        });
+    }
+
+    // Request Item Table
+    const addRowBtnReq = document.getElementById('addRowBtnReq');
+    const reqTableBody = document.getElementById('reqTableBody');
+    if (addRowBtnReq && reqTableBody) {
+        addRowBtnReq.addEventListener('click', () => {
+            const rowCount = reqTableBody.children.length + 1;
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td class="action"><button type="button" class="btn"><i class='bx bx-plus-circle'></i></button></td>
+                <td class="nomor" style="padding: 14px 9px;">${rowCount}</td>
+                <td class="reqCode"><input type='text' class='tengah size form-control1'></td>
+                <td class="name"><input type='text' class='size form-control1'></td>
+                <td class="desc"><input type='text' class='size form-control1'></td>
+                <td class="qty"><input type='number' class='size form-control1' value="0"></td>
+                <td class="uom"><input type='text' class='size tengah form-control1'></td>
+                <td class="reason"><input type='text' class='size form-control1'></td>
+                <td class="notes"><input type='text' class='size form-control1'></td>
+                <td class="pic"><input type='text' class='size form-control1'></td>
+                <td class="status"><input type='text' class='size form-control1'></td>
+                <td class="delete"><button type="button" class="btn btn-danger btn-sm btn-remove-row-req"><i class='bx bx-trash'></i></button></td>
+            `;
+            reqTableBody.appendChild(newRow);
+        });
+        reqTableBody.addEventListener('click', function (e) {
+            if (e.target.closest('.btn-remove-row-req')) {
+                const row = e.target.closest('tr');
+                if (row) reqTableBody.removeChild(row);
+                // Update nomor urut (kolom ke-2)
+                Array.from(reqTableBody.children).forEach((tr, i) => {
+                    tr.querySelectorAll('td')[1].innerText = i + 1;
+                });
+            }
+        });
+    }
+
+    // =======================
+    // File Upload Area
+    // =======================
+    let uploadedFiles = [];
+    const formUpload = document.querySelector('.form-upload');
+    const fileInput = document.querySelector(".file-input");
+    const attachedFilesContainer = document.getElementById('attached-files');
+    const attachmentCount = document.querySelector('.attachment-count');
+
+    function updateCount() {
+        if (attachmentCount) attachmentCount.textContent = uploadedFiles.length;
+        if (attachedFilesContainer) attachedFilesContainer.style.display = uploadedFiles.length > 0 ? 'block' : 'none';
+    }
+
+    function createFileInfo(file, nameOfFile) {
+        let iconClass = 'fas fa-file';
+        if (file.type.startsWith('image/')) iconClass = 'fas fa-file-image';
+        else if (file.type.startsWith('application/pdf')) iconClass = 'fas fa-file-pdf';
+        else if (file.type.startsWith('application/msword') || file.type.startsWith('application/vnd.openxmlformats-officedocument.wordprocessingml.document')) iconClass = 'fas fa-file-word';
+
+        let fileTotal = Math.floor(file.size / 1024);
+        let fileSize = (fileTotal < 1000) ? fileTotal + " KB" : (file.size / (1024 * 1024)).toFixed(2) + " MB";
+        const fileInfo = document.createElement('div');
+        fileInfo.classList.add('row');
+        fileInfo.innerHTML = `
+            <div class="content upload">
+                <i class="${iconClass}"></i>
+                <div class="details">
+                    <span class="name">${nameOfFile}</span>
+                    <span class="size">${fileSize}</span>
+                </div>
+                <div class="button-function">
+                    <button class="delete-button float-end me-1"><i class="fas fa-times"></i></button>
+                    <button class="download-button float-end me-1"><i class="fas fa-download"></i></button> 
+                </div>
+            </div>
+        `;
+
+        const downloadBtn = fileInfo.querySelector('.download-button');
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', () => {
+                const url = URL.createObjectURL(file);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = file.name;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+        }
+
+        const deleteBtn = fileInfo.querySelector('.delete-button');
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', () => {
+                const fileIndex = uploadedFiles.indexOf(file);
+                if (fileIndex > -1) uploadedFiles.splice(fileIndex, 1);
+                if (attachedFilesContainer) attachedFilesContainer.removeChild(fileInfo);
+                updateCount();
+            });
+        }
+
+        return fileInfo;
+    }
+
+    if (formUpload && fileInput && attachedFilesContainer && attachmentCount) {
+        formUpload.addEventListener("click", () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', () => {
+            const currentCount = uploadedFiles.length;
+            if (currentCount >= 5) {
+                alert('Maksimum 5 berkas diperbolehkan.');
+                return;
+            }
+            const newFiles = Array.from(fileInput.files);
+            const maxToAdd = 5 - currentCount;
+            const filesToAdd = newFiles.slice(0, maxToAdd);
+            if (filesToAdd.length < newFiles.length) {
+                alert(`Hanya ${maxToAdd} berkas lagi yang dapat ditambahkan. ${maxToAdd} berkas pertama akan ditambahkan.`);
+            }
+            filesToAdd.forEach((file) => {
+                uploadedFiles.push(file);
+                let fileName = file.name;
+                if (fileName.length >= 20) {
+                    let splitName = fileName.split('.');
+                    fileName = splitName[0].substring(0, 21) + "... ." + splitName[1];
+                }
+                const fileInfo = createFileInfo(file, fileName);
+                attachedFilesContainer.appendChild(fileInfo);
+            });
+            updateCount();
+            fileInput.value = '';
+        });
+    }
+
+    // =======================
+    // Request Item to Purchasing Popup (jika ada)
+    // =======================
+    const requestItemBtn = document.querySelector("#request-item-to-purchasing-option");
+    const requestItemModal = document.querySelector(".request-item-to-purchasing-form-pop-up");
+    const requestItemCloseBtn = document.querySelector(".request-item-to-purchasing-form-close-btn");
+    const requestItemCancelBtn = document.querySelector(".request-item-to-purchasing-form-cancel-btn");
+
+    if (requestItemBtn && requestItemModal) {
+        requestItemBtn.addEventListener("click", function () {
+            requestItemModal.classList.add("active");
+            document.body.classList.add("pop-up-active");
+            requestItemModal.scrollTop = 0;
+        });
+    }
+    if (requestItemCloseBtn && requestItemModal) {
+        requestItemCloseBtn.addEventListener("click", function () {
+            requestItemModal.classList.remove("active");
+            document.body.classList.remove("pop-up-active");
+        });
+    }
+    if (requestItemCancelBtn && requestItemModal) {
+        requestItemCancelBtn.addEventListener("click", function () {
+            requestItemModal.classList.remove("active");
+            document.body.classList.remove("pop-up-active");
+        });
+    }
+
+    // =======================
+    // Table Sortable (jika ada)
+    // =======================
+    function sortTableByColumn(table, column, asc = true) {
+        const dirModifier = asc ? 1 : -1;
+        const tBody = table.tBodies[0];
+        const rows = Array.from(tBody.querySelectorAll("tr"));
+
+        const sortedRows = rows.sort((a, b) => {
+            const aText = a.querySelector(`td:nth-child(${column + 1})`).textContent.trim();
+            const bText = b.querySelector(`td:nth-child(${column + 1})`).textContent.trim();
+            const aVal = isNaN(aText) ? aText.toLowerCase() : parseFloat(aText);
+            const bVal = isNaN(bText) ? bText.toLowerCase() : parseFloat(bText);
+            if (aVal < bVal) return -1 * dirModifier;
+            if (aVal > bVal) return 1 * dirModifier;
+            return 0;
+        });
+
+        while (tBody.firstChild) {
+            tBody.removeChild(tBody.firstChild);
+        }
+        tBody.append(...sortedRows);
+
+        table.querySelectorAll("th").forEach(th =>
+            th.classList.remove("th-sort-asc", "th-sort-desc")
+        );
+        const th = table.querySelector(`th:nth-child(${column + 1})`);
+        th.classList.toggle("th-sort-asc", asc);
+        th.classList.toggle("th-sort-desc", !asc);
+    }
+
+    document.querySelectorAll(".table-sortable th").forEach(headerCell => {
+        headerCell.addEventListener("click", () => {
+            const table = headerCell.closest("table");
+            const headerIndex = Array.from(headerCell.parentElement.children).indexOf(headerCell);
+            const currentIsAscending = headerCell.classList.contains("th-sort-asc");
+            sortTableByColumn(table, headerIndex, !currentIsAscending);
+        });
+    });
+
+});

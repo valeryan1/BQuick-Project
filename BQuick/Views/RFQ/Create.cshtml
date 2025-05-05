@@ -259,7 +259,7 @@
                             </div>
                         </div>
 
-                        <div class="mb-5 d-flex flex-column">
+                        @* <div class="mb-5 d-flex flex-column">
                             <div class="mb-3 d-flex">
                                 <div>
                                     <button type="button" class="customer-contact-role-btn bg-white" id="customer-end-user-contact-btn" value="End User">
@@ -384,6 +384,233 @@
                                     <button type="button" class="btn btn-danger add-customer-contact-form-close-btn">
                                         Cancel
                                     </button>
+                                </div>
+                            </div>
+                        </div> *@
+
+                        <div class="mb-5 d-flex flex-column">
+                            <div class="customer-contact-tabs mb-3 d-flex" role="tablist" aria-label="Customer Contact Tabs">
+                                <button type="button" class="customer-contact-tab active" role="tab" aria-selected="true" aria-controls="customer-end-user-panel" id="tab-end-user" tabindex="0">
+                                    End User
+                                </button>
+                                <button type="button" class="customer-contact-tab" role="tab" aria-selected="false" aria-controls="customer-purchasing-panel" id="tab-purchasing" tabindex="-1">
+                                    Purchasing
+                                </button>
+                                <button type="button" class="customer-contact-tab" role="tab" aria-selected="false" aria-controls="customer-it-engineer-panel" id="tab-it-engineer" tabindex="-1">
+                                    IT Engineer
+                                </button>
+                            </div>
+
+                            <div class="add-customer-contact-btn-container">
+                                <button type="button" class="bg-white border-1" id="add-customer-contact-btn">
+                                    Add
+                                </button>
+                            </div>
+                            
+                            <div class="mx-4 add-customer-contact-form-pop-up">
+                                <div class="d-flex align-items-center gap-1" style="font-size: 20px;">
+                                    <i class='bx bx-info-circle fw-bold'></i>
+                                    <span class="fw-bold">
+                                        User Information
+                                    </span>
+
+                                    <i class='bx bx-chevron-down ms-auto' id="customer-contact-form-open-chevron"></i>
+                                </div>
+
+                                <hr />
+
+                                <div class="show-customer-contact-form-pop-up">
+                                    <div id="customer-end-user-panel" class="customer-contact-panel" role="tabpanel" aria-labelledby="tab-end-user">
+                                        <div class="mb-5 d-flex align-items-center gap-1" style="font-size: 20px;">
+                                            <span class="fw-bold">
+                                                End User Information
+                                            </span>
+
+                                            <i class='bx bx-chevron-right ms-auto' id="customer-contact-information-form-close-chevron"></i>
+                                            <i class='bx bx-minus ms-auto' id="customer-contact-information-form-open-minus"></i>
+                                        </div>
+
+                                        <div class="show-customer-contact-information-form-pop-up">
+                                            <div class="mb-3">
+                                                <label class="form-label form-label-bold">Customer Name</label>
+                                                <input class="form-control" placeholder="Customer Name" required />
+                                            </div>
+
+                                            <div class="mb-5">
+                                                <label class="form-label form-label-bold">Profile Picture</label>
+                                                <input class="form-control" type="file" name="enduser-profile-picture">
+                                            </div>
+
+                                            <div class="mb-5 row">
+                                                <div class="mb-1 d-flex align-items-center gap-1" style="font-size: 20px;">
+                                                    <i class='bx bx-info-circle fw-bold'></i>
+                                                    <span class="fw-bold">
+                                                        Basic Information
+                                                    </span>
+                                                </div>
+
+                                                <div class="col-12 col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Email</label>
+                                                        <input type="email" class="form-control" placeholder="Email">
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Phone</label>
+                                                        <input type="tel" class="form-control" placeholder="Phone">
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Mobile</label>
+                                                        <input type="tel" class="form-control" placeholder="Mobile">
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-12 col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Title</label>
+                                                        <input type="text" class="form-control" placeholder="Title">
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Job Position</label>
+                                                        <input type="text" class="form-control" placeholder="Job Position">
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Notes</label>
+                                                        <input type="text" class="form-control" placeholder="Notes">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="d-flex justify-content-start">
+                                                <button type="button" class="btn btn-success">Add User</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="customer-purchasing-panel" class="customer-contact-panel" role="tabpanel" aria-labelledby="tab-purchasing" hidden>
+                                        <div class="mb-5 fw-bold">Purchasing Information</div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label form-label-bold">Customer Name</label>
+                                            <input class="form-control" placeholder="Customer Name" required />
+                                        </div>
+
+                                        <div class="mb-5">
+                                            <label class="form-label form-label-bold">Profile Picture</label>
+                                            <input class="form-control" type="file" name="purchasing-profile-picture">
+                                        </div>
+
+                                        <div class="mb-5 row">
+                                            <div class="mb-1 d-flex align-items-center gap-1" style="font-size: 20px;">
+                                                <i class='bx bx-info-circle fw-bold'></i>
+                                                <span class="fw-bold">
+                                                    Basic Information
+                                                </span>
+                                            </div>
+
+                                            <div class="col-12 col-sm-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label form-label-bold">Email</label>
+                                                    <input type="email" class="form-control" placeholder="Email">
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label form-label-bold">Phone</label>
+                                                    <input type="tel" class="form-control" placeholder="Phone">
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label form-label-bold">Mobile</label>
+                                                    <input type="tel" class="form-control" placeholder="Mobile">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-12 col-sm-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label form-label-bold">Title</label>
+                                                    <input type="text" class="form-control" placeholder="Title">
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label form-label-bold">Job Position</label>
+                                                    <input type="text" class="form-control" placeholder="Job Position">
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label form-label-bold">Notes</label>
+                                                    <input type="text" class="form-control" placeholder="Notes">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex justify-content-start">
+                                            <button type="button" class="btn btn-success">Add User</button>
+                                        </div>
+                                    </div>
+
+                                    <div id="customer-it-engineer-panel" class="customer-contact-panel" role="tabpanel" aria-labelledby="tab-it-engineer" hidden>
+                                        <div class="mb-5 fw-bold">IT Engineer Information</div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label form-label-bold">Customer Name</label>
+                                            <input class="form-control" placeholder="Customer Name" required />
+                                        </div>
+
+                                        <div class="mb-5">
+                                            <label class="form-label form-label-bold">Profile Picture</label>
+                                            <input class="form-control" type="file" name="itengineer-profile-picture">
+                                        </div>
+
+                                        <div class="mb-5 row">
+                                            <div class="mb-1 d-flex align-items-center gap-1" style="font-size: 20px;">
+                                                <i class='bx bx-info-circle fw-bold'></i>
+                                                <span class="fw-bold">
+                                                    Basic Information
+                                                </span>
+                                            </div>
+
+                                            <div class="col-12 col-sm-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label form-label-bold">Email</label>
+                                                    <input type="email" class="form-control" placeholder="Email">
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label form-label-bold">Phone</label>
+                                                    <input type="tel" class="form-control" placeholder="Phone">
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label form-label-bold">Mobile</label>
+                                                    <input type="tel" class="form-control" placeholder="Mobile">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-12 col-sm-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label form-label-bold">Title</label>
+                                                    <input type="text" class="form-control" placeholder="Title">
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label form-label-bold">Job Position</label>
+                                                    <input type="text" class="form-control" placeholder="Job Position">
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label form-label-bold">Notes</label>
+                                                    <input type="text" class="form-control" placeholder="Notes">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex justify-content-start">
+                                            <button type="button" class="btn btn-success">Add User</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

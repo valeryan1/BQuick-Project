@@ -423,6 +423,12 @@ th.th-sort-desc::after {
     transform: translate(-50%, -50%);
 }
 
+#add-customer-contact-btn {
+    width: 43px;
+    border-radius: 3px;
+    font-weight: 500;
+}
+
 .add-customer-form-pop-up, .request-item-to-purchasing-form-pop-up {
     justify-content: center;
     position: fixed;
@@ -444,6 +450,15 @@ th.th-sort-desc::after {
     transition: top 0ms ease-in-out 0ms, opacity 200ms ease-in-out 0ms, transform 20ms ease-in-out 0ms;
 }
 
+.show-customer-contact-information-form-pop-up {
+    display: none;
+}
+
+    .show-customer-contact-information-form-pop-up.active {
+        display: block;
+    }
+
+
 .customer-address-details {
     display: none;
 }
@@ -453,60 +468,39 @@ th.th-sort-desc::after {
     transition: top 0ms ease-in-out 0ms, opacity 200ms ease-in-out 0ms, transform 20ms ease-in-out 0ms;
 }
 
-.customer-contact-role-btn {
-    width: 110px;
-    border-radius: 3px;
+.customer-contact-tabs {
+    border-bottom: 1px solid #ccc;
 }
 
-#add-customer-contact-btn {
-    width: 43px;
-    border-radius: 3px;
+.customer-contact-tab {
+    background: #fff;
+    border: none;
+    width: 125px;
+    padding: 8px 0 8px 0;
     font-weight: 500;
-}
-
-.add-customer-contact-btn-container {
-    display: block;
-    transition: top 0ms ease-in-out 0ms, opacity 200ms ease-in-out 0ms, transform 20ms ease-in-out 0ms;
-}
-
-.add-customer-contact-btn-container.hide {
-    display: none;
-    transition: top 0ms ease-in-out 200ms, opacity 200ms ease-in-out 0ms, transform 20ms ease-in-out 0ms;
-}
-
-.add-customer-contact-form-pop-up {
-    justify-content: center;
-    display: none;
-    transition: top 0ms ease-in-out 200ms, opacity 200ms ease-in-out 0ms, transform 20ms ease-in-out 0ms;
-}
-
-.add-customer-contact-form-pop-up.active {
-    display: block;
-    transition: top 0ms ease-in-out 0ms, opacity 200ms ease-in-out 0ms, transform 20ms ease-in-out 0ms;
-}
-
-#customer-contact-form-open-chevron, #customer-contact-form-close-chevron {
-    position: absolute;
-    right: 60px;
+    color: #b0b0b0;
     cursor: pointer;
-    display: block;
-    transition: top 0ms ease-in-out 0ms, opacity 200ms ease-in-out 0ms, transform 20ms ease-in-out 0ms;
+    transition: border-bottom 0.2s, color 0.2s, background 0.2s;
+    border-radius: 7px 7px 0 0;
 }
 
-#customer-contact-form-open-chevron.hide, #customer-contact-form-close-chevron.hide {
-    display: none;
-    transition: top 0ms ease-in-out 200ms, opacity 200ms ease-in-out 0ms, transform 20ms ease-in-out 0ms;
+.customer-contact-tab.active,
+.customer-contact-tab[aria-selected="true"] {
+    border-bottom: 3px solid #000;
+    color: #000;
+    font-weight: bold;
+    background: #eaeaea;
 }
 
-.show-customer-contact-form-pop-up {
-    display: block;
-    transition: top 0ms ease-in-out 0ms, opacity 200ms ease-in-out 0ms, transform 20ms ease-in-out 0ms;
-}
+@media (max-width: 600px) {
+    .customer-contact-tabs {
+        flex-direction: column;
+    }
 
-.show-customer-contact-form-pop-up.active {
-    justify-content: center;
-    display: none;
-    transition: top 0ms ease-in-out 200ms, opacity 200ms ease-in-out 0ms, transform 20ms ease-in-out 0ms;
+    .customer-contact-tab {
+        border-radius: 7px 7px 7px 7px;
+        width: 100%;
+    }
 }
 
 .request-item-to-purchasing-form-close-btn {
