@@ -1,8 +1,21 @@
-﻿// =======================
-// Helper Functions
-// =======================
+﻿function searchRFQ() {
+    const input = document.getElementById("searchInput");
+    const filter = input.value.toLowerCase();
+    const table = document.querySelector(".table-sortable");
+    const trs = table.getElementsByTagName("tr");
+    for (let i = 1; i < trs.length; i++) {
+        const tds = trs[i].getElementsByTagName("td");
+        let match = false;
+        for (let j = 0; j < tds.length; j++) {
+            if (tds[j].textContent.toLowerCase().indexOf(filter) > -1) {
+                match = true;
+                break;
+            }
+        }
+        trs[i].style.display = match ? "" : "none";
+    }
+}
 
-// Tutup semua dropdown custom
 function closeAllDropdowns() {
     document.querySelectorAll('.wrapp').forEach(wrapper => {
         wrapper.classList.remove('active');
@@ -10,7 +23,6 @@ function closeAllDropdowns() {
     document.querySelectorAll('.option .has-sub').forEach(el => el.classList.remove('active'));
 }
 
-// Untuk generate kode perusahaan dari nama
 function getCompanyCode(name) {
     return name
         .split(/\s+/)
@@ -20,14 +32,37 @@ function getCompanyCode(name) {
         .toUpperCase();
 }
 
-// =======================
-// DOMContentLoaded Wrapper
-// =======================
-document.addEventListener("DOMContentLoaded", function () {
+function removeRow(button) {
+    const row = button.parentNode.parentNode;
+    itemTableBody.removeChild(row);
 
-    // =======================
-    // Sidebar Toggle
-    // =======================
+    const rows = itemTableBody.getElementsByTagName('tr');
+    for (let i = 0; i < rows.length; i++) {
+        rows[i].getElementsByTagName('td')[0].innerText = i + 1;
+    }
+}
+
+function removeRowItemList(button) {
+    const row = button.parentNode.parentNode;
+    itemListTableBody.removeChild(row);
+
+    const rows = itemListTableBody.getElementsByTagName('tr');
+    for (let i = 0; i < rows.length; i++) {
+        rows[i].getElementsByTagName('td')[0].innerText = i + 1;
+    }
+}
+
+function removeRowReq(button) {
+    const row = button.parentNode.parentNode;
+    reqTableBody.removeChild(row);
+
+    const rows = reqTableBody.getElementsByTagName('tr');
+    for (let i = 0; i < rows.length; i++) {
+        rows[i].getElementsByTagName('td')[1].innerText = i + 1;
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
     const hamburger = document.querySelector(".toggle-btn");
     const toggler = document.querySelector("#icon");
     if (hamburger && toggler) {
@@ -38,26 +73,91 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // =======================
-    // Add Customer Form Popup
-    // =======================
+    const table = document.querySelector('.table-sortable');
+    if (table) {
+        const ths = table.querySelectorAll('thead th');
+        let sortState = {};
+
+        ths.forEach((th, idx) => {
+            th.style.cursor = 'pointer';
+            th.addEventListener('click', function () {
+                let state = sortState[idx];
+                if (!state) state = 'asc';
+                else if (state === 'asc') state = 'desc';
+                else state = null;
+
+                ths.forEach((oth, i) => {
+                    sortState[i] = null;
+                    const icons = oth.querySelector('.sort-icons');
+                    if (icons) icons.innerHTML = "<i class='bx bxs-up-arrow'></i><i class='bx bxs-down-arrow'></i>";
+                    icons?.querySelectorAll('.bx').forEach(icon => icon.style.opacity = 0.3);
+                });
+
+                sortState[idx] = state;
+                const icons = th.querySelector('.sort-icons');
+                if (icons) {
+                    if (state === 'asc') {
+                        icons.innerHTML = "<i class='bx bxs-up-arrow'></i>";
+                    } else if (state === 'desc') {
+                        icons.innerHTML = "<i class='bx bxs-down-arrow'></i>";
+                    } else {
+                        icons.innerHTML = "<i class='bx bxs-up-arrow'></i><i class='bx bxs-down-arrow'></i>";
+                        icons.querySelectorAll('.bx').forEach(icon => icon.style.opacity = 0.3);
+                    }
+                }
+
+                if (state) sortTable(table, idx, state === 'desc');
+            });
+
+            const icons = th.querySelector('.sort-icons');
+            if (icons) {
+                icons.innerHTML = "<i class='bx bxs-up-arrow'></i><i class='bx bxs-down-arrow'></i>";
+                icons.querySelectorAll('.bx').forEach(icon => icon.style.opacity = 0.3);
+            }
+        });
+
+        function sortTable(table, col, desc) {
+            const tbody = table.tBodies[0];
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            rows.sort((a, b) => {
+                const A = a.children[col].textContent.trim();
+                const B = b.children[col].textContent.trim();
+                return desc ? B.localeCompare(A, undefined, { numeric: true }) : A.localeCompare(B, undefined, { numeric: true });
+            });
+            rows.forEach(row => tbody.appendChild(row));
+        }
+    }
+
     const addBtn = document.getElementById('add-customer-contact-btn');
     const formPopUp = document.querySelector('.add-customer-contact-form-pop-up');
     const closeChevron = document.getElementById('customer-contact-form-open-chevron');
 
-    // Awal: form pop-up disembunyikan, tombol Add tampil
     if (formPopUp) formPopUp.style.display = 'none';
     if (addBtn) addBtn.style.display = 'block';
 
-    // Saat tombol Add diklik: tampilkan form pop-up, tombol Add hilang
     if (addBtn && formPopUp) {
         addBtn.addEventListener('click', function () {
+            formPopUp.querySelectorAll('input, select, textarea').forEach(el => {
+                if (el.type === 'checkbox' || el.type === 'radio') {
+                    el.checked = false;
+                } else if (el.type === 'file') {
+                    el.value = null;
+                } else {
+                    el.value = '';
+                }
+            });
             formPopUp.style.display = 'block';
             addBtn.style.display = 'none';
+
+            const infoPopUp = document.querySelector('.show-customer-contact-information-form-pop-up');
+            const openChevron = document.getElementById('customer-contact-information-form-close-chevron');
+            const closeBtn = document.getElementById('customer-contact-information-form-open-minus');
+            if (infoPopUp) infoPopUp.classList.add('active');
+            if (openChevron) openChevron.style.display = 'none';
+            if (closeBtn) closeBtn.style.display = 'inline-block';
         });
     }
 
-    // Saat Chevron diklik: sembunyikan form pop-up, tombol Add tampil lagi
     if (closeChevron && formPopUp && addBtn) {
         closeChevron.addEventListener('click', function () {
             formPopUp.style.display = 'none';
@@ -69,23 +169,23 @@ document.addEventListener("DOMContentLoaded", function () {
     const closeBtn = document.getElementById('customer-contact-information-form-open-minus');
     const openChevron = document.getElementById('customer-contact-information-form-close-chevron');
 
-    // By default, tampilkan pop-up dan sembunyikan chevron open
     if (infoPopUp) infoPopUp.classList.add('active');
     if (openChevron) openChevron.style.display = 'none';
+    if (closeBtn) closeBtn.style.display = 'inline-block';
 
-    // Saat klik minus, sembunyikan pop-up dan tampilkan chevron open
     if (closeBtn && infoPopUp && openChevron) {
         closeBtn.addEventListener('click', function () {
             infoPopUp.classList.remove('active');
             openChevron.style.display = 'inline-block';
+            closeBtn.style.display = 'none';
         });
     }
 
-    // Saat klik chevron open, tampilkan pop-up dan sembunyikan chevron open
-    if (openChevron && infoPopUp) {
+    if (openChevron && infoPopUp && closeBtn) {
         openChevron.addEventListener('click', function () {
             infoPopUp.classList.add('active');
             openChevron.style.display = 'none';
+            closeBtn.style.display = 'inline-block';
         });
     }
 
@@ -111,7 +211,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             modal.classList.remove("active");
             document.body.classList.remove("pop-up-active");
-            // Update dropdown company
+
             if (window.companies && window.addCompany && window.companyWrapper) {
                 if (!companies.includes(companyName)) {
                     companies.unshift(companyName);
@@ -121,13 +221,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 companyWrapper.querySelector("input").value = "";
                 addCompany(companyName);
                 companyWrapper.classList.remove("active");
+
+                const mainCompanyDropdown = document.querySelector('.wrapp.company-dropdown .select-btn span');
+                if (mainCompanyDropdown) mainCompanyDropdown.innerText = code ? `${companyName} (${code})` : companyName;
             }
         });
     });
 
-    // =======================
-    // Address Checkbox Logic
-    // =======================
     const customerAddressDetailsCheckbox = document.querySelector("#customer-address-details-checkbox");
     if (customerAddressDetailsCheckbox) {
         customerAddressDetailsCheckbox.addEventListener("change", function () {
@@ -142,7 +242,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Checkbox "Same With Billing Address"
     const matchCustomerBillingAddressCheckbox = document.getElementById("match-customer-billing-address-checkbox");
     const customerAddressFields = [
         "address", "street", "city", "province", "country", "zip-code"
@@ -178,9 +277,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // =======================
-    // Custom Dropdown Company
-    // =======================
     window.companyWrapper = document.querySelector(".wrapp.company-dropdown");
     if (companyWrapper) {
         const companySelectBtn = companyWrapper.querySelector(".select-btn");
@@ -223,11 +319,15 @@ document.addEventListener("DOMContentLoaded", function () {
             if (modal) {
                 modal.classList.add("active");
                 document.body.classList.add("pop-up-active");
+                modal.scrollTop = 0;
                 const companyNameInput = modal.querySelector('input[placeholder="Company Name"]');
                 if (companyNameInput) companyNameInput.value = name;
+                const contactFormPopUp = document.querySelector('.add-customer-contact-form-pop-up');
+                const addContactBtn = document.getElementById('add-customer-contact-btn');
+                if (contactFormPopUp) contactFormPopUp.style.display = 'none';
+                if (addContactBtn) addContactBtn.style.display = 'block';
             }
         }
-
         addCompany();
 
         companySearchInp.addEventListener("keyup", () => {
@@ -253,11 +353,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             if (arr.length > 0) {
                 arr.forEach(li => companyOptions.appendChild(li));
-            } else {
-                let p = document.createElement("p");
-                p.style.marginTop = "10px";
-                p.textContent = "Oops! Company not found";
-                companyOptions.appendChild(p);
             }
         });
 
@@ -273,9 +368,19 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // =======================
-    // Custom Dropdown Resource
-    // =======================
+    document.querySelectorAll('.add-customer-contact-form-pop-up .btn-success').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const nameInput = document.getElementById('customer-contact-name');
+            const titleSelect = document.getElementById('customer-contact-title');
+            const endUserInput = document.getElementById('end-user');
+            if (nameInput && titleSelect && endUserInput) {
+                const name = nameInput.value.trim();
+                const title = titleSelect.value;
+                endUserInput.value = title && name ? `${title} ${name}` : name;
+            }
+        });
+    });
+
     const resourceWrapper = document.querySelector('.wrapp.resource-dropdown');
     if (resourceWrapper) {
         const resourceSelectBtn = resourceWrapper.querySelector('.select-btn');
@@ -330,9 +435,6 @@ document.addEventListener("DOMContentLoaded", function () {
         };
     }
 
-    // =======================
-    // Custom Dropdown Project Type
-    // =======================
     const projectTypeWrapper = document.querySelector('.wrapp.project-type-dropdown');
     if (projectTypeWrapper) {
         const projectTypeSelectBtn = projectTypeWrapper.querySelector('.select-btn');
@@ -354,9 +456,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // =======================
-    // Custom Dropdown Opportunity
-    // =======================
     const opportunityWrapper = document.getElementById('opportunity-dropdown');
     if (opportunityWrapper) {
         const opportunitySelectBtn = opportunityWrapper.querySelector('.select-btn');
@@ -378,14 +477,10 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Klik di luar dropdown untuk menutup semua
     document.addEventListener('click', function () {
         closeAllDropdowns();
     });
 
-    // =======================
-    // Tabs Customer Contact
-    // =======================
     const tabButtons = document.querySelectorAll(".customer-contact-tab");
     const tabPanels = document.querySelectorAll(".customer-contact-panel");
     if (tabButtons.length && tabPanels.length) {
@@ -408,13 +503,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
             });
         });
-        // Set default tab active
         tabButtons[0].click();
     }
 
-    // =======================
-    // Due Date Otomatis
-    // =======================
     const requestDateInput = document.getElementById('request-date');
     const dueDateInput = document.getElementById('due-date');
     if (requestDateInput && dueDateInput) {
@@ -434,10 +525,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // =======================
-    // Table Row Functions
-    // =======================
-    // Item Table
     const addRowBtn = document.getElementById('addRowBtn');
     const itemTableBody = document.getElementById('itemTableBody');
     if (addRowBtn && itemTableBody) {
@@ -448,11 +535,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 <td>${rowCount}</td>
                 <td class="name"><input type='text' class='size form-control1'></td>
                 <td class="desc"><input type='text' class='size form-control1'></td>
-                <td class="qty"><input type='number' class='size form-control1' value="0"></td>
+                <td class="qty"><input type='number' class='size form-control1'></td>
                 <td class="uom"><input type='text' class='size tengah form-control1'></td>
                 <td class="budget"><input type='number' class='size form-control1'></td>
                 <td class="leadtime"><input type='text' class='size tengah form-control1'></td>
-                <td class="delete"><button type="button" class="btn btn-danger btn-sm btn-remove-row"><i class='bx bx-trash'></i></button></td>
+                <td class="delete"><button type="button" onclick="removeRow(this)" class="btn"><i class='bx bx-trash'></i></button>
             `;
             itemTableBody.appendChild(newRow);
         });
@@ -460,7 +547,6 @@ document.addEventListener("DOMContentLoaded", function () {
             if (e.target.closest('.btn-remove-row')) {
                 const row = e.target.closest('tr');
                 if (row) itemTableBody.removeChild(row);
-                // Update nomor urut
                 Array.from(itemTableBody.children).forEach((tr, i) => {
                     tr.querySelector('td').innerText = i + 1;
                 });
@@ -468,78 +554,153 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Item List Table
     const addRowBtnItem = document.getElementById('addRowBtnItem');
     const itemListTableBody = document.getElementById('itemListTableBody');
+
     if (addRowBtnItem && itemListTableBody) {
         addRowBtnItem.addEventListener('click', () => {
+            const lastRow = itemListTableBody.lastElementChild;
+            if (lastRow) {
+                const fields = [
+                    lastRow.querySelector('td.name input'),
+                    lastRow.querySelector('td.desc input'),
+                    lastRow.querySelector('td.qty input'),
+                    lastRow.querySelector('td.uom input'),
+                    lastRow.querySelector('td.price input'),
+                    lastRow.querySelector('td.notes input'),
+                    lastRow.querySelector('td.details input'),
+                    lastRow.querySelector('td.warranty input'),
+                    lastRow.querySelector('td.amount input')
+                ];
+                const isAnyFilled = fields.some(input => input && input.value.trim() !== '');
+                if (!isAnyFilled) {
+                    return;
+                }
+            }
             const rowCount = itemListTableBody.children.length + 1;
             const newRow = document.createElement('tr');
             newRow.innerHTML = `
+            <td>${rowCount}</td>
+            <td class="name"><input type='text' class='size form-control1'></td>
+            <td class="desc"><input type='text' class='size form-control1'></td>
+            <td class="qty"><input type='number' class='size form-control1'></td>
+            <td class="uom"><input type='text' class='size tengah form-control1'></td>
+            <td class="price"><input type='number' class='size form-control1'></td>
+            <td class="notes"><input type='text' class='size form-control1'></td>
+            <td class="details"><input type='text' class='size form-control1'></td>
+            <td class="warranty"><input type='text' class='size form-control1'></td>
+            <td class="amount"><input type='number' class='size form-control1'></td>
+            <td class="delete"><button type="button" onclick="removeRowItemList(this)" class="btn"><i class='bx bx-trash'></i></button></td>
+        `;
+            itemListTableBody.appendChild(newRow);
+        });
+    }
+
+    const addRowBtnReq = document.getElementById('addRowBtnReq');
+    const reqTableBody = document.getElementById('reqTableBody');
+
+    if (addRowBtnReq && reqTableBody) {
+        addRowBtnReq.addEventListener('click', () => {
+            const lastRow = reqTableBody.lastElementChild;
+            if (lastRow) {
+                const fields = [
+                    lastRow.querySelector('td.reqCode input'),
+                    lastRow.querySelector('td.name input'),
+                    lastRow.querySelector('td.desc input'),
+                    lastRow.querySelector('td.qty input'),
+                    lastRow.querySelector('td.uom input'),
+                    lastRow.querySelector('td.reason input'),
+                    lastRow.querySelector('td.notes input'),
+                    lastRow.querySelector('td.pic input'),
+                    lastRow.querySelector('td.status input')
+                ];
+                const isAnyFilled = fields.some(input => input && input.value.trim() !== '');
+                if (!isAnyFilled) {
+                    return;
+                }
+            }
+            const rowCount = reqTableBody.children.length + 1;
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+            <td class="action"><button type="button" class="btn"><i class='bx bx-plus-circle'></i></button></td>
+            <td class="nomor" style="padding: 14px 9px;">${rowCount}</td>
+            <td class="reqCode"><input type='text' class='tengah size form-control1'></td>
+            <td class="name"><input type='text' class='size form-control1'></td>
+            <td class="desc"><input type='text' class='size form-control1'></td>
+            <td class="qty"><input type='number' class='size form-control1'></td>
+            <td class="uom"><input type='text' class='size tengah form-control1'></td>
+            <td class="reason"><input type='text' class='size form-control1'></td>
+            <td class="notes"><input type='text' class='size form-control1'></td>
+            <td class="pic"><input type='text' class='size form-control1'></td>
+            <td class="status"><input type='text' class='size form-control1'></td>
+            <td class="delete"><button type="button" onclick="removeRowReq(this)" class="btn btn-remo"><i class='bx bx-trash'></i></button></td>
+        `;
+            reqTableBody.appendChild(newRow);
+        });
+    }
+
+    document.getElementById('reqTableBody').addEventListener('click', function (e) {
+        if (e.target.closest('.bx-plus-circle')) {
+            const row = e.target.closest('tr');
+            if (!row) return;
+
+            const name = row.querySelector('td.name input').value.trim();
+            const desc = row.querySelector('td.desc input').value.trim();
+            const qty = row.querySelector('td.qty input').value.trim();
+            const uom = row.querySelector('td.uom input').value.trim();
+
+            if (!(name || desc || qty || uom)) return;
+
+            const itemListTbody = document.getElementById('itemListTableBody');
+            let foundEmptyRow = null;
+            for (const tr of itemListTbody.children) {
+                const inputs = tr.querySelectorAll('input');
+                const allEmpty = Array.from(inputs).every(input => input.value.trim() === '');
+                if (allEmpty) {
+                    foundEmptyRow = tr;
+                    break;
+                }
+            }
+
+            let targetRow;
+            if (foundEmptyRow) {
+                targetRow = foundEmptyRow;
+            } else {
+                const rowCount = itemListTbody.children.length + 1;
+                targetRow = document.createElement('tr');
+                targetRow.innerHTML = `
                 <td>${rowCount}</td>
                 <td class="name"><input type='text' class='size form-control1'></td>
                 <td class="desc"><input type='text' class='size form-control1'></td>
-                <td class="qty"><input type='number' class='size form-control1' value="0"></td>
+                <td class="qty"><input type='number' class='size form-control1'></td>
                 <td class="uom"><input type='text' class='size tengah form-control1'></td>
                 <td class="price"><input type='number' class='size form-control1'></td>
                 <td class="notes"><input type='text' class='size form-control1'></td>
                 <td class="details"><input type='text' class='size form-control1'></td>
                 <td class="warranty"><input type='text' class='size form-control1'></td>
                 <td class="amount"><input type='number' class='size form-control1'></td>
-                <td class="delete"><button type="button" class="btn btn-danger btn-sm btn-remove-row-itemlist"><i class='bx bx-trash'></i></button></td>
+                <td class="delete"><button type="button" class="btn btn-remove-row-itemlist"><i class='bx bx-trash'></i></button></td>
             `;
-            itemListTableBody.appendChild(newRow);
-        });
-        itemListTableBody.addEventListener('click', function (e) {
-            if (e.target.closest('.btn-remove-row-itemlist')) {
-                const row = e.target.closest('tr');
-                if (row) itemListTableBody.removeChild(row);
-                // Update nomor urut
-                Array.from(itemListTableBody.children).forEach((tr, i) => {
-                    tr.querySelector('td').innerText = i + 1;
-                });
+                itemListTbody.appendChild(targetRow);
             }
-        });
-    }
 
-    // Request Item Table
-    const addRowBtnReq = document.getElementById('addRowBtnReq');
-    const reqTableBody = document.getElementById('reqTableBody');
-    if (addRowBtnReq && reqTableBody) {
-        addRowBtnReq.addEventListener('click', () => {
-            const rowCount = reqTableBody.children.length + 1;
-            const newRow = document.createElement('tr');
-            newRow.innerHTML = `
-                <td class="action"><button type="button" class="btn"><i class='bx bx-plus-circle'></i></button></td>
-                <td class="nomor" style="padding: 14px 9px;">${rowCount}</td>
-                <td class="reqCode"><input type='text' class='tengah size form-control1'></td>
-                <td class="name"><input type='text' class='size form-control1'></td>
-                <td class="desc"><input type='text' class='size form-control1'></td>
-                <td class="qty"><input type='number' class='size form-control1' value="0"></td>
-                <td class="uom"><input type='text' class='size tengah form-control1'></td>
-                <td class="reason"><input type='text' class='size form-control1'></td>
-                <td class="notes"><input type='text' class='size form-control1'></td>
-                <td class="pic"><input type='text' class='size form-control1'></td>
-                <td class="status"><input type='text' class='size form-control1'></td>
-                <td class="delete"><button type="button" class="btn btn-danger btn-sm btn-remove-row-req"><i class='bx bx-trash'></i></button></td>
-            `;
-            reqTableBody.appendChild(newRow);
-        });
-        reqTableBody.addEventListener('click', function (e) {
-            if (e.target.closest('.btn-remove-row-req')) {
-                const row = e.target.closest('tr');
-                if (row) reqTableBody.removeChild(row);
-                // Update nomor urut (kolom ke-2)
-                Array.from(reqTableBody.children).forEach((tr, i) => {
-                    tr.querySelectorAll('td')[1].innerText = i + 1;
-                });
-            }
-        });
-    }
+            targetRow.querySelector('td.name input').value = name;
+            targetRow.querySelector('td.desc input').value = desc;
+            targetRow.querySelector('td.qty input').value = qty;
+            targetRow.querySelector('td.uom input').value = uom;
 
-    // =======================
-    // File Upload Area
-    // =======================
+            row.parentNode.removeChild(row);
+
+            Array.from(itemListTbody.children).forEach((tr, i) => {
+                tr.querySelector('td').innerText = i + 1;
+            });
+            const reqTableBody = document.getElementById('reqTableBody');
+            Array.from(reqTableBody.children).forEach((tr, i) => {
+                tr.querySelectorAll('td')[1].innerText = i + 1;
+            });
+        }
+    });
+
     let uploadedFiles = [];
     const formUpload = document.querySelector('.form-upload');
     const fileInput = document.querySelector(".file-input");
@@ -570,7 +731,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 </div>
                 <div class="button-function">
                     <button class="delete-button float-end me-1"><i class="fas fa-times"></i></button>
-                    <button class="download-button float-end me-1"><i class="fas fa-download"></i></button> 
+                    <button class="download-button float-end me-2"><i class="fas fa-download"></i></button> 
                 </div>
             </div>
         `;
@@ -610,7 +771,7 @@ document.addEventListener("DOMContentLoaded", function () {
         fileInput.addEventListener('change', () => {
             const currentCount = uploadedFiles.length;
             if (currentCount >= 5) {
-                alert('Maksimum 5 berkas diperbolehkan.');
+                alert('You can only upload a maximum of 5 files.');
                 return;
             }
             const newFiles = Array.from(fileInput.files);
@@ -635,71 +796,29 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // =======================
-    // Request Item to Purchasing Popup (jika ada)
+    // Request Item to Purchasing Pop-up (temporary)
     // =======================
-    const requestItemBtn = document.querySelector("#request-item-to-purchasing-option");
-    const requestItemModal = document.querySelector(".request-item-to-purchasing-form-pop-up");
-    const requestItemCloseBtn = document.querySelector(".request-item-to-purchasing-form-close-btn");
-    const requestItemCancelBtn = document.querySelector(".request-item-to-purchasing-form-cancel-btn");
+    //const requestItemBtn = document.querySelector("#request-item-to-purchasing-option");
+    //const requestItemModal = document.querySelector(".request-item-to-purchasing-form-pop-up");
+    //const requestItemCloseBtn = document.querySelector(".request-item-to-purchasing-form-close-btn");
+    //const requestItemCancelBtn = document.querySelector(".request-item-to-purchasing-form-cancel-btn");
 
-    if (requestItemBtn && requestItemModal) {
-        requestItemBtn.addEventListener("click", function () {
-            requestItemModal.classList.add("active");
-            document.body.classList.add("pop-up-active");
-            requestItemModal.scrollTop = 0;
-        });
-    }
-    if (requestItemCloseBtn && requestItemModal) {
-        requestItemCloseBtn.addEventListener("click", function () {
-            requestItemModal.classList.remove("active");
-            document.body.classList.remove("pop-up-active");
-        });
-    }
-    if (requestItemCancelBtn && requestItemModal) {
-        requestItemCancelBtn.addEventListener("click", function () {
-            requestItemModal.classList.remove("active");
-            document.body.classList.remove("pop-up-active");
-        });
-    }
-
-    // =======================
-    // Table Sortable (jika ada)
-    // =======================
-    function sortTableByColumn(table, column, asc = true) {
-        const dirModifier = asc ? 1 : -1;
-        const tBody = table.tBodies[0];
-        const rows = Array.from(tBody.querySelectorAll("tr"));
-
-        const sortedRows = rows.sort((a, b) => {
-            const aText = a.querySelector(`td:nth-child(${column + 1})`).textContent.trim();
-            const bText = b.querySelector(`td:nth-child(${column + 1})`).textContent.trim();
-            const aVal = isNaN(aText) ? aText.toLowerCase() : parseFloat(aText);
-            const bVal = isNaN(bText) ? bText.toLowerCase() : parseFloat(bText);
-            if (aVal < bVal) return -1 * dirModifier;
-            if (aVal > bVal) return 1 * dirModifier;
-            return 0;
-        });
-
-        while (tBody.firstChild) {
-            tBody.removeChild(tBody.firstChild);
-        }
-        tBody.append(...sortedRows);
-
-        table.querySelectorAll("th").forEach(th =>
-            th.classList.remove("th-sort-asc", "th-sort-desc")
-        );
-        const th = table.querySelector(`th:nth-child(${column + 1})`);
-        th.classList.toggle("th-sort-asc", asc);
-        th.classList.toggle("th-sort-desc", !asc);
-    }
-
-    document.querySelectorAll(".table-sortable th").forEach(headerCell => {
-        headerCell.addEventListener("click", () => {
-            const table = headerCell.closest("table");
-            const headerIndex = Array.from(headerCell.parentElement.children).indexOf(headerCell);
-            const currentIsAscending = headerCell.classList.contains("th-sort-asc");
-            sortTableByColumn(table, headerIndex, !currentIsAscending);
-        });
-    });
-
+    //if (requestItemBtn && requestItemModal) {
+    //    requestItemBtn.addEventListener("click", function () {
+    //        requestItemModal.classList.add("active");
+    //        document.body.classList.add("pop-up-active");
+    //    });
+    //}
+    //if (requestItemCloseBtn && requestItemModal) {
+    //    requestItemCloseBtn.addEventListener("click", function () {
+    //        requestItemModal.classList.remove("active");
+    //        document.body.classList.remove("pop-up-active");
+    //    });
+    //}
+    //if (requestItemCancelBtn && requestItemModal) {
+    //    requestItemCancelBtn.addEventListener("click", function () {
+    //        requestItemModal.classList.remove("active");
+    //        document.body.classList.remove("pop-up-active");
+    //    });
+    //}
 });

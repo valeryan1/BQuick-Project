@@ -259,135 +259,6 @@
                             </div>
                         </div>
 
-                        @* <div class="mb-5 d-flex flex-column">
-                            <div class="mb-3 d-flex">
-                                <div>
-                                    <button type="button" class="customer-contact-role-btn bg-white" id="customer-end-user-contact-btn" value="End User">
-                                        End User
-                                    </button>
-                                </div>
-
-                                <div>
-                                    <button type="button" class="customer-contact-role-btn bg-white" id="customer-purchasing-contact-btn" value="Purchasing">
-                                        Purchasing
-                                    </button>
-                                </div>
-
-                                <div>
-                                    <button type="button" class="customer-contact-role-btn bg-white" id="customer-it-engineer-contact-btn" value="IT Engineer">
-                                        IT Engineer
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div class="add-customer-contact-btn-container">
-                                <button type="button" class="bg-white border-1" id="add-customer-contact-btn">
-                                    Add
-                                </button>
-                            </div>
-
-                            <div class="add-customer-contact-form-pop-up">
-                                <div class="d-flex align-items-center gap-1" style="font-size: 20px;">
-                                    <i class='bx bx-info-circle fw-bold'></i>
-                                    <span class="fw-bold">
-                                        User Information
-                                    </span>
-
-                                    <i class='bx bx-chevron-right' id="customer-contact-form-close-chevron"></i>
-                                    <i class='bx bx-chevron-down' id="customer-contact-form-open-chevron"></i>
-                                </div>
-
-                                <hr />
-
-                                <div class="show-customer-contact-form-pop-up">
-                                    <div class="mb-5 fw-bold">
-                                        <span id="customer-contact-role-information-title"></span>&nbsp;Information
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label class="form-label form-label-bold">
-                                            Customer Name
-                                        </label>
-                                        <input class="form-control" placeholder="Customer Name" required />
-                                    </div>
-
-                                    <div class="mb-5">
-                                        <label class="form-label form-label-bold">
-                                            Profile Picture
-                                        </label>
-                                        <input class="form-control" type="file" id="customer-contact-profile-picture" name="attachment">
-                                    </div>
-
-                                    <div class="mb-5 row">
-                                        <div class="mb-1 d-flex align-items-center gap-1" style="font-size: 20px;">
-                                            <i class='bx bx-info-circle fw-bold'></i>
-                                            <span class="fw-bold">
-                                                Basic Information
-                                            </span>
-                                        </div>
-
-                                        <div class="col-12 col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label form-label-bold">
-                                                    Email
-                                                </label>
-                                                <input type="email" class="form-control" id="customer-contact-email" placeholder="Email">
-                                            </div>
-
-                                            <div class="mb-3">
-                                                <label class="form-label form-label-bold">
-                                                    Phone
-                                                </label>
-                                                <input type="tel" class="form-control" id="customer-contact-phone" placeholder="Phone">
-                                            </div>
-
-                                            <div class="mb-3">
-                                                <label class="form-label form-label-bold">
-                                                    Mobile
-                                                </label>
-                                                <input type="tel" class="form-control" id="customer-contact-mobile" placeholder="Mobile">
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12 col-sm-6">
-                                            <div class="mb-3">
-                                                <label class="form-label form-label-bold">
-                                                    Title
-                                                </label>
-                                                <input type="text" class="form-control" id="customer-contact-title" placeholder="Title">
-                                            </div>
-
-                                            <div class="mb-3">
-                                                <label class="form-label form-label-bold">
-                                                    Job Position
-                                                </label>
-                                                <input type="text" class="form-control" id="customer-contact-job-position" placeholder="Job Position">
-                                            </div>
-
-                                            <div class="mb-3">
-                                                <label class="form-label form-label-bold">
-                                                    Notes
-                                                </label>
-                                                <input type="text" class="form-control" id="customer-contact-notes" placeholder="Notes">
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    
-                                </div>
-
-                                <div class="d-flex justify-content-center gap-2">
-                                    <button type="button" class="btn btn-success">
-                                        Add User
-                                    </button>
-
-                                    <button type="button" class="btn btn-danger add-customer-contact-form-close-btn">
-                                        Cancel
-                                    </button>
-                                </div>
-                            </div>
-                        </div> *@
-
                         <div class="mb-5 d-flex flex-column">
                             <div class="customer-contact-tabs mb-3 d-flex" role="tablist" aria-label="Customer Contact Tabs">
                                 <button type="button" class="customer-contact-tab active" role="tab" aria-selected="true" aria-controls="customer-end-user-panel" id="tab-end-user" tabindex="0">
@@ -406,7 +277,7 @@
                                     Add
                                 </button>
                             </div>
-                            
+
                             <div class="mx-4 add-customer-contact-form-pop-up">
                                 <div class="d-flex align-items-center gap-1" style="font-size: 20px;">
                                     <i class='bx bx-info-circle fw-bold'></i>
@@ -433,7 +304,7 @@
                                         <div class="show-customer-contact-information-form-pop-up">
                                             <div class="mb-3">
                                                 <label class="form-label form-label-bold">Customer Name</label>
-                                                <input class="form-control" placeholder="Customer Name" required />
+                                                <input class="form-control" placeholder="Customer Name" id="customer-contact-name" required />
                                             </div>
 
                                             <div class="mb-5">
@@ -469,7 +340,12 @@
                                                 <div class="col-12 col-sm-6">
                                                     <div class="mb-3">
                                                         <label class="form-label form-label-bold">Title</label>
-                                                        <input type="text" class="form-control" placeholder="Title">
+                                                        <select class="form-select" id="customer-contact-title">
+                                                            <option value="" hidden>Title</option>
+                                                            <option value="Mr">Mr</option>
+                                                            <option value="Mrs">Mrs</option>
+                                                            <option value="Ms">Ms</option>
+                                                        </select>
                                                     </div>
 
                                                     <div class="mb-3">
@@ -531,7 +407,12 @@
                                             <div class="col-12 col-sm-6">
                                                 <div class="mb-3">
                                                     <label class="form-label form-label-bold">Title</label>
-                                                    <input type="text" class="form-control" placeholder="Title">
+                                                    <select class="form-select">
+                                                        <option value="" hidden>Title</option>
+                                                        <option value="Mr">Mr</option>
+                                                        <option value="Mrs">Mrs</option>
+                                                        <option value="Ms">Ms</option>
+                                                    </select>
                                                 </div>
 
                                                 <div class="mb-3">
@@ -592,7 +473,12 @@
                                             <div class="col-12 col-sm-6">
                                                 <div class="mb-3">
                                                     <label class="form-label form-label-bold">Title</label>
-                                                    <input type="text" class="form-control" placeholder="Title">
+                                                    <select class="form-select">
+                                                        <option value="" hidden>Title</option>
+                                                        <option value="Mr">Mr</option>
+                                                        <option value="Mrs">Mrs</option>
+                                                        <option value="Ms">Ms</option>
+                                                    </select>
                                                 </div>
 
                                                 <div class="mb-3">
@@ -616,11 +502,11 @@
                         </div>
 
                         <div class="d-flex justify-content-center gap-2">
-                            <button type="submit" class="btn btn-success add-customer-form-save-btn">
+                            <button type="submit" class="btn btn-success add-customer-form-save-btn btn-uniform">
                                 Save
                             </button>
 
-                            <button class="btn btn-danger add-customer-form-close-btn">
+                            <button class="btn btn-danger add-customer-form-close-btn btn-uniform">
                                 Cancel
                             </button>
                         </div>
@@ -870,14 +756,13 @@
                         </div>
                     </div>
 
-
                     <h5 class="note-title underline mb-4">Notes</h5>
                     <div class="row mx-md-4">
                         <div class="col-12 col-sm-6">
                             <div class="mb-3">
                                 <div class="d-flex align-items-center">
                                     <div class="sejajar" style="width: 190px">
-                                        <label for="budget" class="form-label form-label-bold pe-4">Budget (IDR)</label>
+                                        <label for="budget" class="form-label form-label-bold pe-4">Budget</label>
                                     </div>
                                     <input type="number" class="form-control1" style="width:50%" id="budget">
                                 </div>
@@ -910,32 +795,30 @@
                             </thead>
                             <tbody id="itemTableBody">
                                 <tr>
-                                    <td>1.</td>
+                                    <td>1</td>
                                     <td class="name"><input type='text' class='size form-control1'></td>
                                     <td class="desc"><input type='text' class='size form-control1'></td>
-                                    <td class="qty"><input type='number' class='size form-control1' value="0"></td>
+                                    <td class="qty"><input type='number' class='size form-control1'></td>
                                     <td class="uom"><input type='text' class='size tengah form-control1'></td>
                                     <td class="budget"><input type='number' class='size form-control1'></td>
                                     <td class="leadtime"><input type='text' class='size tengah form-control1'></td>
-                                    <td class="delete"><button onclick="removeRow(this)" class="btn"><i class='bx bx-trash'></i></button>
+                                    <td class="delete"><button type="button" onclick="removeRow(this)" class="btn"><i class='bx bx-trash'></i></button>
                                 </tr>
                                 <!-- Baris akan ditambahkan di sini -->
                             </tbody>
 
                         </table>
                     </div>
-                    <button type="button" id="addRowBtn" class="btn btn-dark mb-5 mt-1">Add Row</button>
+                    <button type="button" id="addRowBtn" class="btn btn-dark mt-1 btn-uniform">Add Row</button>
 
-                    <hr>
-
-                    <div class="wrapper-2 my-4">
-                        <div class= "form-upload">
+                    <div class="wrapper-2 mt-3 mb-4">
+                        <div class="form-upload">
                             <input class="file-input" type="file" name="file" hidden>
                             <div class="rounding"><i class="fa-solid fa-paperclip"></i></div>
                             <div class="desc">
-                                <p class="mt-3">Attachment <span class="attachment-count">0</span></p>
+                                <p class="mt-3">Attachment: <span class="attachment-count">0</span></p>
 
-                                <p class="description">Drop files here. You can upload maximum 5 files, 5MB Each</p>
+                                <p class="description">Drag/Drop files here. You can upload a maximum of 5 files, 5MB each</p>
                             </div>
                         </div>
 
@@ -947,7 +830,7 @@
                     </div>
                 </div>
 
-                <div class="col-12 mb-5">
+                <div class="col-12 mb-4">
                     <h4 class="delegation-title underline">Delegation</h4>
                 </div>
 
@@ -971,23 +854,23 @@
                         </thead>
                         <tbody id="itemListTableBody">
                             <tr>
-                                <td>1.</td>
+                                <td>1</td>
                                 <td class="name"><input type='text' class='size form-control1'></td>
                                 <td class="desc"><input type='text' class='size form-control1'></td>
-                                <td class="qty"><input type='number' class='size form-control1' value="0"></td>
+                                <td class="qty"><input type='number' class='size form-control1'></td>
                                 <td class="uom"><input type='text' class='size tengah form-control1'></td>
                                 <td class="price"><input type='number' class='size form-control1'></td>
                                 <td class="notes"><input type='text' class='size form-control1'></td>
                                 <td class="details"><input type='text' class='size form-control1'></td>
                                 <td class="warranty"><input type='text' class='size form-control1'></td>
                                 <td class="amount"><input type='number' class='size form-control1'></td>
-                                <td class="delete"><button onclick="removeRowItemList(this)" class="btn"><i class='bx bx-trash'></i></button></td>
+                                <td class="delete"><button type="button" onclick="removeRowItemList(this)" class="btn"><i class='bx bx-trash'></i></button></td>
                             </tr>
                             <!-- Baris akan ditambahkan di sini -->
                         </tbody>
                     </table>
 
-                    <button type="button" id="addRowBtnItem" class="btn btn-dark mb-5 mt-1">Add Item</button>
+                    <button type="button" id="addRowBtnItem" class="btn btn-dark mb-5 mt-1 btn-uniform">Add Item</button>
                 </div>
 
                 <div class="tabel req-item col-12">
@@ -1011,32 +894,31 @@
                         </thead>
                         <tbody id="reqTableBody">
                             <tr>
-                                <td class="action"><button onclick="" class="btn"><i class='bx bx-plus-circle'></i></button></td>
+                                <td class="action"><button type="button" class="btn"><i class='bx bx-plus-circle'></i></button></td>
                                 <td class="nomor" style="padding: 14px 9px;">1</td>
                                 <td class="reqCode"><input type='text' class='tengah size form-control1'></td>
                                 <td class="name"><input type='text' class='size form-control1'></td>
                                 <td class="desc"><input type='text' class='size form-control1'></td>
-                                <td class="qty"><input type='number' class='size form-control1' value="0"></td>
+                                <td class="qty"><input type='number' class='size form-control1'></td>
                                 <td class="uom"><input type='text' class='size tengah form-control1'></td>
                                 <td class="reason"><input type='text' class='size form-control1'></td>
                                 <td class="notes"><input type='text' class='size form-control1'></td>
                                 <td class="pic"><input type='text' class='size form-control1'></td>
                                 <td class="status"><input type='text' class='size form-control1'></td>
-
-                                <td class="delete"><button onclick="removeRowReq(this)" class="btn"><i class='bx bx-trash'></i></button></td>
+                                <td class="delete"><button type="button" onclick="removeRowReq(this)" class="btn btn-remo"><i class='bx bx-trash'></i></button></td>
                             </tr>
                             <!-- Baris akan ditambahkan di sini -->
                         </tbody>
                     </table>
 
-                    <button type="button" id="addRowBtnReq" class="btn btn-dark mb-5 mt-1">Add Item</button>
+                    <button type="button" id="addRowBtnReq" class="btn btn-dark mb-5 mt-1 btn-uniform">Add Item</button>
                 </div>
 
-                <div class="col-12 ">
-                    <div class="card mt-2">
+                <div class="col-12 mb-5">
+                    <div class="mt-2">
                         <div class="card-body text-center">
-                            <button type="button" class="btn btn-dark">Save</button>
-                            <button type="button" class="btn btn-danger">Discard</button>
+                            <button type="button" class="btn btn-dark btn-uniform">Save</button>
+                            <button type="button" class="btn btn-danger btn-uniform">Discard</button>
                         </div>
                     </div>
                 </div>
