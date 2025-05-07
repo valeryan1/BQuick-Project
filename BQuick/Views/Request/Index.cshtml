@@ -1,0 +1,191 @@
+﻿@{
+    ViewData["Title"] = "Request";
+}
+
+<main class="content-div mx-3">
+    <div class="container-fluid mt-4">
+        <div class="d-flex flex-column align-items-center">
+            <div class="header mb-4 w-100" style="font-size: 29px;">
+                <span class="tes text-decoration page-header">Request</span>
+            </div>
+        </div>
+
+        <table class="table table-bordered table-sortable mb-5">
+            <thead class="table-dark">
+                <tr>
+                    <th><div class="d-flex align-items-center justify-content-between w-100 text-white">REQ Code <span class="sort-icons"></span></div></th>
+                    <th><div class="d-flex align-items-center justify-content-between w-100 text-white">RFQ Code <span class="sort-icons"></span></div></th>
+                    <th><div class="d-flex align-items-center justify-content-between w-100 text-white">RFQ Name <span class="sort-icons"></span></div></th>
+                    <th><div class="d-flex align-items-center justify-content-between w-100 text-white">Purpose <span class="sort-icons"></span></div></th>
+                    <th><div class="d-flex align-items-center justify-content-between w-100 text-white">Request Date <span class="sort-icons"></span></div></th>
+                    <th><div class="d-flex align-items-center justify-content-between w-100 text-white">Detail Location <span class="sort-icons"></span></div></th>
+                    <th><div class="d-flex align-items-center justify-content-between w-100 text-white">Request By <span class="sort-icons"></span></div></th>
+                    <th><div class="d-flex align-items-center justify-content-between w-100 text-white">Action <span class="sort-icons"></span></div></th>
+                    <th><div class="d-flex align-items-center justify-content-between w-100 text-white">Status <span class="sort-icons"></span></div></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>REQ######</td>
+                    <td>RFQ240021</td>
+                    <td>IT.Procurement in PT.Epson Batam</td>
+                    <td>Assign PIC</td>
+                    <td>08-07-24</td>
+                    <td>Epson Lot 151</td>
+                    <td>Rias</td>
+                    <td>
+                        <div style="text-align: center;">
+                            <button id="req-act-option">
+                                Open
+                            </button>
+                        </div>
+                    </td>
+                    <td class="d-flex justify-content-center"><span id="waiting" class="rounded-pill status">Waiting</span></td>
+                </tr>
+                <tr>
+                    <td>REQ Code</td>
+                    <td>RFQ Code</td>
+                    <td>RFQ Name</td>
+                    <td>Purpose</td>
+                    <td>Request Date</td>
+                    <td>Location</td>
+                    <td>Requester Name</td>
+                    <td style="text-align: center;"><i class="bx bxs-x-circle" style="color: #ff0000;"></i><i class="bx bxs-check-circle" style="color: #36c556;"></i></td>
+                    <td class="d-flex justify-content-center"><span id="waiting" class="rounded-pill status">Waiting</span></td>
+                </tr>
+                <tr>
+                    <td>REQ Code</td>
+                    <td>RFQ Code</td>
+                    <td>RFQ Name</td>
+                    <td>Purpose</td>
+                    <td>Request Date</td>
+                    <td>Location</td>
+                    <td>Requester Name</td>
+                    <td style="text-align: center;"><i class="bx bxs-x-circle" style="color: #ff0000;"></i></td>
+                    <td class="d-flex justify-content-center"><span id="review" class="rounded-pill status">Reason Review</span></td>
+                </tr>
+                <tr>
+                    <td>REQ Code</td>
+                    <td>RFQ Code</td>
+                    <td>RFQ Name</td>
+                    <td>Purpose</td>
+                    <td>Request Date</td>
+                    <td>Location</td>
+                    <td>Requester Name</td>
+                    <td style="text-align: center;"><i class="bx bxs-x-circle" style="color: #ff0000;"></i></td>
+                    <td class="d-flex justify-content-center"><span id="review" class="rounded-pill status">Reason Review</span></td>
+                </tr>
+                <tr>
+                    <td>REQ Code</td>
+                    <td>RFQ Code</td>
+                    <td>RFQ Name</td>
+                    <td>Purpose</td>
+                    <td>Request Date</td>
+                    <td>Location</td>
+                    <td>Requester Name</td>
+                    <td style="text-align: center;"><i class="bx bxs-x-circle" style="color: #ff0000;"></i></td>
+                    <td class="d-flex justify-content-center"><span id="reason-accepted" class="rounded-pill status">Reason Accepted</span></td>
+                </tr>
+                <tr>
+                    <td>REQ Code</td>
+                    <td>RFQ Code</td>
+                    <td>RFQ Name</td>
+                    <td>Purpose</td>
+                    <td>Request Date</td>
+                    <td>Location</td>
+                    <td>Requester Name</td>
+                    <td style="text-align: center;"><i class="bx bxs-x-circle" style="color: #ff0000;"></i></td>
+                    <td class="d-flex justify-content-center"><span id="reason-accepted" class="rounded-pill status">Reason Accepted</span></td>
+                </tr>
+                <tr>
+                    <td>REQ Code</td>
+                    <td>RFQ Code</td>
+                    <td>RFQ Name</td>
+                    <td>Purpose</td>
+                    <td>Request Date</td>
+                    <td>Location</td>
+                    <td>Requester Name</td>
+                    <td style="text-align: center;"><i class="bx bxs-x-circle" style="color: #ff0000;"></i></td>
+                    <td class="d-flex justify-content-center"><span id="reason-rejected" class="rounded-pill status">Reason Rejected</span></td>
+                </tr>
+                <tr>
+                    <td>REQ Code</td>
+                    <td>RFQ Code</td>
+                    <td>RFQ Name</td>
+                    <td>Purpose</td>
+                    <td>Request Date</td>
+                    <td>Location</td>
+                    <td>Requester Name</td>
+                    <td style="text-align: center;"><i class="bx bxs-check-circle" style="color: #ff0000;"></i></td>
+                    <td class="d-flex justify-content-center"><span id="reason-rejected" class="rounded-pill status">Reason Rejected</span></td>
+                </tr>
+                <tr>
+                    <td>REQ Code</td>
+                    <td>RFQ Code</td>
+                    <td>RFQ Name</td>
+                    <td>Purpose</td>
+                    <td>Request Date</td>
+                    <td>Location</td>
+                    <td>Requester Name</td>
+                    <td style="text-align: center;"><i class="bx bxs-check-circle" style="color: #36c556;"></i></td>
+                    <td class="d-flex justify-content-center"><span id="accepted" class="rounded-pill status">Accepted</span></td>
+                </tr>
+                <tr>
+                    <td>REQ Code</td>
+                    <td>RFQ Code</td>
+                    <td>RFQ Name</td>
+                    <td>Purpose</td>
+                    <td>Request Date</td>
+                    <td>Location</td>
+                    <td>Requester Name</td>
+                    <td style="text-align: center;"><i class="bx bxs-check-circle" style="color: #36c556;"></i></td>
+                    <td class="d-flex justify-content-center"><span id="accepted" class="rounded-pill status">Accepted</span></td>
+                </tr>
+                <tr>
+                    <td>REQ Code</td>
+                    <td>RFQ Code</td>
+                    <td>RFQ Name</td>
+                    <td>Purpose</td>
+                    <td>Request Date</td>
+                    <td>Location</td>
+                    <td>Requester Name</td>
+                    <td style="text-align: center;"><i class="bx bxs-check-circle" style="color: #36c556;"></i></td>
+                    <td class="d-flex justify-content-center"><span id="accepted" class="rounded-pill status">Accepted</span></td>
+                </tr>
+                <tr>
+                    <td>REQ Code</td>
+                    <td>RFQ Code</td>
+                    <td>RFQ Name</td>
+                    <td>Purpose</td>
+                    <td>Request Date</td>
+                    <td>Location</td>
+                    <td>Requester Name</td>
+                    <td style="text-align: center;"><i class="bx bxs-check-circle" style="color: #36c556;"></i></td>
+                    <td class="d-flex justify-content-center"><span id="accepted" class="rounded-pill status">Accepted</span></td>
+                </tr>
+                <tr>
+                    <td>REQ Code</td>
+                    <td>RFQ Code</td>
+                    <td>RFQ Name</td>
+                    <td>Purpose</td>
+                    <td>Request Date</td>
+                    <td>Location</td>
+                    <td>Requester Name</td>
+                    <td style="text-align: center;"><i class="bx bxs-check-circle" style="color: #36c556;"></i></td>
+                    <td class="d-flex justify-content-center"><span id="accepted" class="rounded-pill status">Accepted</span></td>
+                </tr>
+                <tr>
+                    <td>REQ Code</td>
+                    <td>RFQ Code</td>
+                    <td>RFQ Name</td>
+                    <td>Purpose</td>
+                    <td>Request Date</td>
+                    <td>Location</td>
+                    <td>Requester Name</td>
+                    <td style="text-align: center;"><i class="bx bxs-check-circle" style="color: #36c556;"></i></td>
+                    <td class="d-flex justify-content-center"><span id="accepted" class="rounded-pill status">Accepted</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</main>

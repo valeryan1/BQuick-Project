@@ -20,8 +20,17 @@ body {
     overscroll-behavior: none;
 }
 
+.page-header, .rfq-id {
+    font-weight: 600;
+}
+
 .btn-uniform {
     min-width: 85px;
+}
+
+th {
+    vertical-align: middle !important;
+    text-align: center;
 }
 
 body.pop-up-active::before {
@@ -995,4 +1004,29 @@ div#attached-files .details span {
 
 .item-list-title {
     font-weight: 600;
+}
+
+#reason-accepted {
+    background-color: #00840d;
+    color: #fff;
+}
+
+#reason-rejected {
+    background-color: #e34515;
+    color: #fff;
+}
+
+#accepted {
+    background-color: #02b013;
+    color: #fff;
+}
+
+#waiting {
+    background-color: #ff8601;
+    color: #fff;
+}
+
+#review {
+    background-color: #0228af;
+    color: #fff;
 }

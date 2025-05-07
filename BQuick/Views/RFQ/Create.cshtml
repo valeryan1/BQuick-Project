@@ -4,12 +4,12 @@
     ViewData["Title"] = "Create RFQ";
 }
 
-<main class="content-div px-1 py-4 mx-3">
-    <div class="container">
-        <div class="header mt-4 mb-4 w-100" style="font-size: 29px;">
-            <a class="text-decoration-none" asp-controller="RFQ" asp-action="Index"><span class="text-danger fw-bold rfq-link">RFQ</span></a>&nbsp;<span class="fw-bold">&gt;</span>&nbsp;<span class="tes fw-bold text-decoration">Create RFQ</span>
-            <span class="float-sm-end fw-bold">RFQYY0000</span>
-            @* <span class="float-sm-end fw-bold">@ViewBag.RFQCode</span> *@
+<main class="content-div mx-3">
+    <div class="container-fluid mt-4">
+        <div class="header mt-4 mb-4 w-100 page-header" style="font-size: 29px;">
+            <a class="text-decoration-none" asp-controller="RFQ" asp-action="Index"><span class="text-danger rfq-link">RFQ</span></a>&nbsp;<span>&gt;</span>&nbsp;<span class="tes text-decoration">Create RFQ</span>
+            <span class="float-sm-end rfq-id">RFQYY0000</span>
+            @* <span class="float-sm-end rfq-id">@ViewBag.RFQCode</span> *@
         </div>
 
         <div class="add-customer-form-pop-up px-5 py-3">
