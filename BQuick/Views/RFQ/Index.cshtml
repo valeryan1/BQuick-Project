@@ -15,8 +15,8 @@
                 <i class='bx bx-plus'></i> Create RFQ
             </a>
 
-            <div class="input-group w-25">
-                <input type="text" id="searchInput" class="form-control border-end-0 shadow-none" placeholder="Search..." onkeyup="searchRFQ()" />
+            <div class="input-group" style="width: 400px;">
+                <input type="text" id="searchInput" class="form-control border-end-0 shadow-none" placeholder="Search..." onkeyup="search()" />
                 <i class='bx bx-search input-group-text bg-white border-start-0' style="font-size: 1rem;"></i>
             </div>
         </div>
@@ -41,7 +41,11 @@
                     <td>PEB</td>
                     <td>Instalasi Lan</td>
                     <td>IDR100000000</td>
-                    <td class="d-flex justify-content-center align-items-center flex-column gap-1"><span id="open" class="rounded-pill status">Open</span></td>
+                    <td>
+                        <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                            <span id="open" class="rounded-pill status">Open</span>
+                        </div>
+                    </td>
                 </tr>
                 <tr>
                     <td>RFQ240007</td>
@@ -50,7 +54,11 @@
                     <td>BPB</td>
                     <td>Service Data Center</td>
                     <td>IDR100000000</td>
-                    <td class="d-flex justify-content-center align-items-center flex-column gap-1"><span id="waiting-purc" class="rounded-pill status">Waiting Purc</span></td>
+                    <td>
+                        <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                            <span id="waiting-purc" class="rounded-pill status">Waiting Purc</span>
+                        </div>
+                    </td>
                 </tr>
                 <tr>
                     <td>RFQ240009</td>
@@ -59,7 +67,11 @@
                     <td>BPB</td>
                     <td>Laptop & Peripheral</td>
                     <td>IDR100000000</td>
-                    <td class="d-flex justify-content-center align-items-center flex-column gap-1"><span id="waiting-discuss" class="rounded-pill status">Waiting Discuss</span></td>
+                    <td>
+                        <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                            <span id="waiting-discuss" class="rounded-pill status">Waiting Discuss</span>
+                        </div>
+                    </td>
                 </tr>
                 <tr>
                     <td>RFQ240010</td>
@@ -68,7 +80,11 @@
                     <td>BPB</td>
                     <td>Instalasi Lain</td>
                     <td>IDR100000000</td>
-                    <td class="d-flex justify-content-center align-items-center flex-column gap-1"><span id="waiting-pic" class="rounded-pill status">Waiting PIC</span></td>
+                    <td>
+                        <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                            <span id="waiting-pic" class="rounded-pill status">Waiting PIC</span>
+                        </div>
+                    </td>
                 </tr>
                 <tr>
                     <td>RFQ240011</td>
@@ -77,7 +93,11 @@
                     <td>PEB</td>
                     <td>Instalasi Lain</td>
                     <td>IDR100000000</td>
-                    <td class="d-flex justify-content-center align-items-center flex-column gap-1"><span id="waiting-report" class="rounded-pill status">Waiting Report</span></td>
+                    <td>
+                        <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                            <span id="waiting-report" class="rounded-pill status">Waiting Report</span>
+                        </div>
+                    </td>
                 </tr>
                 <tr>
                     <td>RFQ240012</td>
@@ -86,7 +106,12 @@
                     <td>ABH</td>
                     <td>Instalasi Lain</td>
                     <td>IDR100000000</td>
-                    <td class="d-flex justify-content-center align-items-center flex-column gap-1"><span id="waiting-purc" class="rounded-pill status">Waiting Purc</span><span id="waiting-discuss" class="rounded-pill status">Waiting Discuss</span></td>
+                    <td>
+                        <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                            <span id="waiting-purc" class="rounded-pill status">Waiting Purc</span>
+                            <span id="waiting-discuss" class="rounded-pill status">Waiting Discuss</span>
+                        </div>
+                    </td>
                 </tr>
                 <tr>
                     <td>RFQ240013</td>
@@ -95,7 +120,11 @@
                     <td>PEB</td>
                     <td>Instalasi Lain</td>
                     <td>IDR100000000</td>
-                    <td class="d-flex justify-content-center align-items-center flex-column gap-1"><span id="ready-to-submit" class="rounded-pill status">Ready to Submit</span></td>
+                    <td>
+                        <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                            <span id="ready-to-submit" class="rounded-pill status">Ready to Submit</span>
+                        </div>
+                    </td>
                 </tr>
                 @* @if (Model != null && Model.Any())
                 {
@@ -108,16 +137,18 @@
                             <td>@item.Company?.CompanyCode</td>
                             <td>@item.RFQName</td>
                             <td>@string.Format("IDR{0:N0}", item.ActualValue)</td>
-                            <td class="d-flex justify-content-center align-items-center flex-column gap-1">
-                                @{
-                                    var statuses = item.Status.Split(';', StringSplitOptions.RemoveEmptyEntries);
-                                    foreach (var status in statuses)
-                                    {
-                                        var statusTrimmed = status.Trim();
-                                        var statusId = statusTrimmed.Replace(" ", "-").ToLowerInvariant();
-                                        <span id="@statusId" class="rounded-pill status">@statusTrimmed</span>
+                            <td>
+                                <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                                    @{
+                                        var statuses = item.Status.Split(';', StringSplitOptions.RemoveEmptyEntries);
+                                        foreach (var status in statuses)
+                                        {
+                                            var statusTrimmed = status.Trim();
+                                            var statusId = statusTrimmed.Replace(" ", "-").ToLowerInvariant();
+                                            <span id="@statusId" class="rounded-pill status">@statusTrimmed</span>
+                                        }
                                     }
-                                }
+                                </div>
                             </td>
                         </tr>
                     }

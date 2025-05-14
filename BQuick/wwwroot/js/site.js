@@ -1,4 +1,4 @@
-﻿function searchRFQ() {
+﻿function search() {
     const input = document.getElementById("searchInput");
     const filter = input.value.toLowerCase();
     const table = document.querySelector(".table-sortable");
@@ -63,6 +63,21 @@ function removeRowReq(button) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                if (
+                    e.target.tagName !== 'TEXTAREA' &&
+                    e.target.type !== 'submit' &&
+                    e.target.type !== 'button'
+                ) {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+        });
+    });
+
     const hamburger = document.querySelector(".toggle-btn");
     const toggler = document.querySelector("#icon");
     if (hamburger && toggler) {
@@ -777,10 +792,21 @@ document.addEventListener("DOMContentLoaded", function () {
             const newFiles = Array.from(fileInput.files);
             const maxToAdd = 5 - currentCount;
             const filesToAdd = newFiles.slice(0, maxToAdd);
-            if (filesToAdd.length < newFiles.length) {
-                alert(`Hanya ${maxToAdd} berkas lagi yang dapat ditambahkan. ${maxToAdd} berkas pertama akan ditambahkan.`);
+
+            const validFiles = [];
+            filesToAdd.forEach(file => {
+                if (file.size > 5 * 1024 * 1024) {
+                    alert(`File "${file.name}" is more than 5MB and cannot be uploaded.`);
+                } else {
+                    validFiles.push(file);
+                }
+            });
+
+            if (validFiles.length < filesToAdd.length) {
+                alert('Some files cannot be uploaded because exceed 5MB.');
             }
-            filesToAdd.forEach((file) => {
+
+            validFiles.forEach((file) => {
                 uploadedFiles.push(file);
                 let fileName = file.name;
                 if (fileName.length >= 20) {

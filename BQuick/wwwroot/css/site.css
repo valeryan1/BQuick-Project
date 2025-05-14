@@ -394,6 +394,31 @@ tr.highlight th {
     background-color: #ffc000;
 }
 
+#waiting {
+    background-color: #ff8601;
+    color: #fff;
+}
+
+#reason-review {
+    background-color: #0228af;
+    color: #fff;
+}
+
+#reason-accepted {
+    background-color: #00840d;
+    color: #fff;
+}
+
+#reason-rejected {
+    background-color: #e34515;
+    color: #fff;
+}
+
+#accepted {
+    background-color: #02b013;
+    color: #fff;
+}
+
 #searchInput:focus {
     border-color: #dee2e6;
 }
@@ -1004,29 +1029,4 @@ div#attached-files .details span {
 
 .item-list-title {
     font-weight: 600;
-}
-
-#reason-accepted {
-    background-color: #00840d;
-    color: #fff;
-}
-
-#reason-rejected {
-    background-color: #e34515;
-    color: #fff;
-}
-
-#accepted {
-    background-color: #02b013;
-    color: #fff;
-}
-
-#waiting {
-    background-color: #ff8601;
-    color: #fff;
-}
-
-#review {
-    background-color: #0228af;
-    color: #fff;
 }
