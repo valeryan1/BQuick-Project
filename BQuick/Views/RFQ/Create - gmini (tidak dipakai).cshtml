@@ -1,0 +1,375 @@
+﻿@model BQuick.Models.RfqCreateFullViewModel
+
+@{
+    ViewData["Title"] = "Create RFQ";
+    // Layout = "~/Views/Shared/_Layout.cshtml"; // Pastikan layout Anda benar
+}
+
+<main class="content-div mx-3">
+    <div class="container-fluid mt-4">
+        <div class="header mt-4 mb-4 w-100 page-header" style="font-size: 29px;">
+            <a class="text-decoration-none" asp-controller="RFQ" asp-action="Index"><span class="text-danger rfq-link">RFQ</span></a>&nbsp;<span>&gt;</span>&nbsp;<span class="tes text-decoration">Create RFQ</span>
+            <span asp-validation-for="RFQCode" class="text-danger float-sm-end"></span>
+            <input type="text" asp-for="RFQCode" class="form-control form-control-sm float-sm-end rfq-id" style="width: auto; display: inline-block; text-align: right;" placeholder="Kode RFQ" />
+        </div>
+
+        @* Pop-up Add Customer (dari HTML Anda - fungsionalitas save-nya tidak ke DB di contoh ini) *@
+        <div class="add-customer-form-pop-up px-5 py-3" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:white; border:1px solid #ccc; z-index:1050; width:80%; max-width:700px; box-shadow: 0 5px 15px rgba(0,0,0,.5); border-radius: .3rem; max-height: 90vh; overflow-y: auto;">
+            <form method="post" class="add-customer-form-internal">
+                @* Beri class berbeda agar tidak konflik submit utama *@
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Add New Customer</h5>
+                    <button type="button" class="btn-close add-customer-form-close-btn-direct"></button>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-12">
+                        <div class="mb-3">
+                            <label class="form-label form-label-bold">Company Name</label>
+                            <input id="popupCustomerName" class="form-control" placeholder="Company Name" required />
+                        </div>
+                        @* ... Sisa field untuk pop-up Add Customer dari HTML Anda ... *@
+                        @* Contoh:
+                        <div class="mb-3">
+                            <label class="form-label form-label-bold">Email</label>
+                            <input id="popupCustomerEmail" type="email" class="form-control" placeholder="Email">
+                        </div>
+                        *@
+                        <div class="d-flex justify-content-center gap-2 mt-4">
+                            <button type="button" class="btn btn-success add-customer-form-save-btn btn-uniform">Save Customer</button>
+                            <button type="button" class="btn btn-danger add-customer-form-close-btn-direct btn-uniform">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+
+        <form asp-action="Create" method="post" id="createRfqFullForm" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="All" class="alert alert-danger" role="alert" style="@(ViewData.ModelState.IsValid ? "display: none;" : "")">
+                Harap perbaiki kesalahan berikut dan coba lagi.
+            </div>
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+            }
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Formulir RFQ</h5>
+                </div>
+                <div class="card-body">
+                    <fieldset class="border p-3 mb-4 rounded">
+                        <legend class="w-auto px-2 h6 legend-custom">Informasi RFQ Utama</legend>
+                        <div class="input-field my-4">
+                            @* RFQ Name dari HTML Anda *@
+                            <input asp-for="RFQName" class="input-float" style="width: 100%" id="rfq-name-input" required spellcheck="false">
+                            <label asp-for="RFQName">RFQ Name</label>
+                            <span asp-validation-for="RFQName" class="text-danger"></span>
+                        </div>
+
+                        <div class="row mt-3 mb-2 mx-1">
+                            @* Menggunakan struktur row dari HTML Anda *@
+                            <div class="col-12 col-sm-6">
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="sejajar" style="width: 146px">
+                                            <label asp-for="CustomerID" class="form-label form-label-bold mb-0">Company Name</label>
+                                        </div>
+                                        @* Menggunakan SELECT standar untuk binding, styling bisa disesuaikan *@
+                                        <select asp-for="CustomerID" class="form-select form-select-sm" asp-items="Model.CustomerList" id="customerIdDropdown" style="width: 70%;">
+                                            <option value="">-- Pilih Customer --</option>
+                                        </select>
+                                        @* Tombol untuk membuka pop-up Add Customer (jika masih ingin pakai) *@
+                                        @* <button type="button" id="openAddCustomerPopupBtn" class="btn btn-sm btn-outline-secondary ms-2"><i class="fas fa-plus"></i></button> *@
+                                    </div>
+                                    <span asp-validation-for="CustomerID" class="text-danger offset-md-3"></span>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="sejajar" style="width: 146px">
+                                            <label asp-for="ContactPersonID" class="form-label form-label-bold mb-0">End User</label>
+                                        </div>
+                                        <select asp-for="ContactPersonID" class="form-select form-select-sm" asp-items="Model.ContactPersonList" id="contactPersonIdDropdown" style="width:70%">
+                                            <option value="">-- Pilih End User --</option>
+                                        </select>
+                                    </div>
+                                    <span asp-validation-for="ContactPersonID" class="text-danger offset-md-3"></span>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="sejajar" style="width: 146px">
+                                            <label asp-for="RequestDate" class="form-label form-label-bold mb-0"></label>
+                                        </div>
+                                        <input asp-for="RequestDate" type="date" class="form-control form-control-sm" style="width:70%" />
+                                    </div>
+                                    <span asp-validation-for="RequestDate" class="text-danger offset-md-3"></span>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="sejajar" style="width: 146px">
+                                            <label asp-for="DueDate" class="form-label form-label-bold mb-0"></label>
+                                        </div>
+                                        <input asp-for="DueDate" type="date" class="form-control form-control-sm" style="width:70%" />
+                                    </div>
+                                    <span asp-validation-for="DueDate" class="text-danger offset-md-3"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="sejajar" style="width: 146px">
+                                            <label asp-for="Resource" class="form-label form-label-bold mb-0"></label>
+                                        </div>
+                                        <select asp-for="Resource" class="form-select form-select-sm" style="width: 70%;" id="resourceDropdown">
+                                            <option value="">-- Pilih Resource --</option>
+                                            <option value="Email">Email</option>
+                                            <option value="Whatsapp">Whatsapp</option>
+                                            <option value="Telephone">Telephone</option>
+                                            <option value="Personal">Personal</option>
+                                        </select>
+                                    </div>
+                                    <span asp-validation-for="Resource" class="text-danger offset-md-3"></span>
+                                </div>
+                                <div class="mb-3" id="picPersonalSection" style="display:none;">
+                                    @* Awalnya disembunyikan *@
+                                    <div class="d-flex align-items-center">
+                                        <div class="sejajar" style="width: 146px">
+                                            <label asp-for="PersonalResourceEmployeeID" class="form-label form-label-bold mb-0">PIC Personal</label>
+                                        </div>
+                                        <select asp-for="PersonalResourceEmployeeID" class="form-select form-select-sm" asp-items="Model.UserList" style="width: 70%;">
+                                            <option value="">-- Pilih PIC --</option>
+                                        </select>
+                                    </div>
+                                    <span asp-validation-for="PersonalResourceEmployeeID" class="text-danger offset-md-3"></span>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="sejajar" style="width: 146px">
+                                            <label asp-for="RFQCategoryID" class="form-label form-label-bold mb-0">Category</label>
+                                        </div>
+                                        <select asp-for="RFQCategoryID" class="form-select form-select-sm" asp-items="Model.RFQCategoryList" style="width: 70%;">
+                                            <option value="">-- Pilih Kategori --</option>
+                                        </select>
+                                    </div>
+                                    <span asp-validation-for="RFQCategoryID" class="text-danger offset-md-3"></span>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="sejajar" style="width: 146px">
+                                            <label asp-for="RFQOpportunityID" class="form-label form-label-bold mb-0">Opportunity</label>
+                                        </div>
+                                        <select asp-for="RFQOpportunityID" class="form-select form-select-sm" asp-items="Model.RFQOpportunityList" style="width: 70%;">
+                                            <option value="">-- Pilih Peluang --</option>
+                                        </select>
+                                    </div>
+                                    <span asp-validation-for="RFQOpportunityID" class="text-danger offset-md-3"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="note-title underline mb-2 mt-3">Notes (Overall)</h5> @* Menggunakan style dari HTML Anda *@
+                        <div class="row mx-md-0">
+                            @* Disesuaikan agar tidak terlalu jauh *@
+                            <div class="col-12 col-sm-6 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="sejajar" style="width: 146px">
+                                        <label asp-for="OverallBudget" class="form-label form-label-bold mb-0">Budget</label>
+                                    </div>
+                                    <input asp-for="OverallBudget" type="number" step="any" class="form-control form-control-sm" style="width:70%" />
+                                </div>
+                                <span asp-validation-for="OverallBudget" class="text-danger offset-md-3"></span>
+                            </div>
+                            <div class="col-12 col-sm-6 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="sejajar" style="width: 146px">
+                                        <label asp-for="OverallLeadTime" class="form-label form-label-bold mb-0">Leadtime</label>
+                                    </div>
+                                    <input asp-for="OverallLeadTime" class="form-control form-control-sm" style="width:70%" />
+                                </div>
+                                <span asp-validation-for="OverallLeadTime" class="text-danger offset-md-3"></span>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="border p-3 mb-4 rounded">
+                        <legend class="w-auto px-2 h6 legend-custom">Notes (Permintaan Awal / Item Bebas)</legend>
+                        <div class="tabel-item col-12">
+                            @* Menggunakan class dari HTML Anda *@
+                            <table class="table table-sm table-bordered item" id="notesTable">
+                                @* ID disesuaikan untuk JS *@
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width:2%;">No</th>
+                                        <th style="width:23%;">Item Name (Free Text)</th>
+                                        <th style="width:25%;">Item Description</th>
+                                        <th style="width:8%;" class="text-end">Qty</th>
+                                        <th style="width:8%;">UoM</th>
+                                        <th style="width:12%;" class="text-end">Budget</th>
+                                        <th style="width:12%;">Leadtime</th>
+                                        <th style="width:5%;" class="text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (int i = 0; i < Model.NotesSectionItems.Count; i++)
+                                    {
+                                        <tr>
+                                            <td class="row-number">@(i + 1)</td>
+                                            <td><input asp-for="NotesSectionItems[i].ItemName" class="form-control form-control-sm size" /></td>
+                                            <td><textarea asp-for="NotesSectionItems[i].ItemDescription" class="form-control form-control-sm size" rows="1"></textarea></td>
+                                            <td><input asp-for="NotesSectionItems[i].Quantity" type="number" value="1" class="form-control form-control-sm text-end size" /></td>
+                                            <td><input asp-for="NotesSectionItems[i].UoM" class="form-control form-control-sm size tengah" /></td>
+                                            <td><input asp-for="NotesSectionItems[i].BudgetTarget" type="number" step="any" class="form-control form-control-sm text-end size" /></td>
+                                            <td><input asp-for="NotesSectionItems[i].LeadTimeTarget" class="form-control form-control-sm size tengah" /></td>
+                                            <td class="text-center align-middle delete">
+                                                <button type="button" class="btn btn-danger btn-sm remove-row" title="Hapus Note"><i class="fas fa-trash-alt"></i></button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <button type="button" id="addNoteRowButton" class="btn btn-dark mt-1 btn-uniform"><i class="fas fa-plus"></i> Add Row</button>
+                    </fieldset>
+
+                    <fieldset class="border p-3 mb-4 rounded">
+                        <legend class="w-auto px-2 h6 legend-custom">Attachment RFQ</legend>
+                        <div class="wrapper-2 mt-3 mb-4">
+                            @* Dari HTML Anda *@
+                            <div class="form-upload">
+                                <input class="file-input" type="file" name="rfqHeaderAttachments" id="rfqHeaderAttachments" hidden multiple>
+                                <div class="rounding" onclick="document.getElementById('rfqHeaderAttachments').click();" style="cursor:pointer;">
+                                    <i class="fa-solid fa-paperclip"></i>
+                                </div>
+                                <div class="desc">
+                                    <p class="mt-3">Attachment: <span class="attachment-count">0</span> file(s)</p>
+                                    <p class="description">Drag/Drop files here or click. Max 5 files, 5MB each.</p>
+                                </div>
+                            </div>
+                            <div id="attached-files-display" class="mt-2" style="display: none;"></div>
+                            <section class="progress-area"></section>
+                            <section class="uploaded-area"></section>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="border p-3 mb-4 rounded">
+                        <legend class="w-auto px-2 h6 legend-custom item-list-title underline">Item List (Detail RFQ)</legend> @* Menggunakan style dari HTML Anda *@
+                        <span asp-validation-for="ItemListSectionItems" class="text-danger d-block mb-2"></span>
+                        <div class="tabel item-list col-12">
+                            @* Menggunakan class dari HTML Anda *@
+                            <table class="table table-sm table-bordered item-list" id="rfqItemTable">
+                                @* ID disesuaikan untuk JS *@
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width:2%;">No</th>
+                                        <th style="width:20%;">Item (dari Master)</th>
+                                        <th style="width:15%;">Item Description (auto)</th>
+                                        <th style="width:7%;" class="text-end">Qty</th>
+                                        <th style="width:7%;">UoM</th>
+                                        <th style="width:10%;" class="text-end">U/Price</th>
+                                        <th style="width:12%;">Notes</th>
+                                        <th style="width:12%;">Details</th>
+                                        <th style="width:10%;">Our Warranty</th>
+                                        @* Amount akan dihitung jika perlu, atau hapus jika tidak diinput *@
+                                        <th style="width:5%;" class="text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (int i = 0; i < Model.ItemListSectionItems.Count; i++)
+                                    {
+                                        <tr>
+                                            <td class="row-number">@(i + 1)</td>
+                                            <td class="name">
+                                                <select asp-for="ItemListSectionItems[i].ItemID" class="form-select form-select-sm item-master-dropdown" asp-items="Model.ItemMasterList">
+                                                    <option value="">-- Pilih Item --</option>
+                                                </select>
+                                                <span asp-validation-for="ItemListSectionItems[i].ItemID" class="text-danger"></span>
+                                            </td>
+                                            <td class="desc"><input asp-for="ItemListSectionItems[i].Details" class="form-control form-control-sm size" placeholder="Deskripsi Item (auto)" readonly /></td> @* Placeholder, bisa diisi JS *@
+                                            <td class="qty"><input asp-for="ItemListSectionItems[i].Quantity" type="number" value="1" class="form-control form-control-sm text-end size" /></td>
+                                            <td class="uom"><input asp-for="ItemListSectionItems[i].UoM" class="form-control form-control-sm size tengah" /></td>
+                                            <td class="price"><input asp-for="ItemListSectionItems[i].TargetUnitPrice" type="number" step="any" class="form-control form-control-sm text-end size" /></td>
+                                            <td class="notes"><input asp-for="ItemListSectionItems[i].Notes" class="form-control form-control-sm size" /></td>
+                                            <td class="details"><input asp-for="ItemListSectionItems[i].Details" class="form-control form-control-sm size" /></td>
+                                            <td class="warranty"><input asp-for="ItemListSectionItems[i].SalesWarranty" class="form-control form-control-sm size" /></td>
+                                            <td class="delete text-center align-middle">
+                                                <button type="button" class="btn btn-danger btn-sm remove-row" title="Hapus Item"><i class="fas fa-trash-alt"></i></button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <button type="button" id="addRfqItemRowButton" class="btn btn-dark mb-3 mt-1 btn-uniform"><i class="fas fa-plus"></i> Add Item</button>
+                    </fieldset>
+
+                    <fieldset class="border p-3 mb-4 rounded">
+                        <legend class="w-auto px-2 h6 legend-custom item-list-title underline">Request Item to Purchasing</legend>
+                        <div class="tabel req-item col-12">
+                            @* Menggunakan class dari HTML Anda *@
+                            <table class="table table-sm table-bordered item-list" id="purchasingRequestTable">
+                                @* ID disesuaikan untuk JS *@
+                                <thead class="table-light">
+                                    <tr>
+                                        @* Kolom "Action" dari HTML Anda untuk tombol plus tidak diperlukan jika baris ditambah dari tombol di bawah tabel *@
+                                        <th style="width:2%;">No</th>
+                                        @* <th style="width:10%;">Req Code</th> *@
+                                        <th style="width:18%;">Item (Master)</th>
+                                        <th style="width:18%;">Nama Item Baru</th>
+                                        <th style="width:15%;">Deskripsi Item Baru</th>
+                                        <th style="width:7%;" class="text-end">Qty</th>
+                                        <th style="width:7%;">UoM</th>
+                                        <th style="width:10%;">Alasan</th>
+                                        <th style="width:10%;">Notes (Internal)</th>
+                                        <th style="width:10%;">PIC</th>
+                                        @* <th>Status</th> *@
+                                        <th style="width:5%;" class="text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @* Baris akan ditambahkan oleh JavaScript *@
+                                </tbody>
+                            </table>
+                        </div>
+                        <button type="button" id="addPurchasingRequestRowButton" class="btn btn-dark mb-3 mt-1 btn-uniform"><i class="fas fa-plus"></i> Add Item</button>
+                    </fieldset>
+
+                    <fieldset class="border p-3 mb-4 rounded">
+                        <legend class="w-auto px-2 h6 legend-custom">Request Survey</legend>
+                        <div class="tabel-item col-12">
+                            @* Menggunakan class dari HTML Anda *@
+                            <table class="table table-sm table-bordered" id="surveyRequestTable">
+                                @* ID disesuaikan untuk JS *@
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width:2%;">No</th>
+                                        <th style="width:15%;">Kategori Survey</th>
+                                        <th style="width:15%;">Nama Survey</th>
+                                        <th style="width:10%;">PIC Customer</th>
+                                        <th style="width:15%;">PIC Teknis (Multi)</th>
+                                        <th style="width:13%;">Tgl & Waktu</th>
+                                        <th style="width:15%;">Lokasi</th>
+                                        <th style="width:15%;">Notes (Sales)</th>
+                                        <th style="width:5%;" class="text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @* Baris akan ditambahkan oleh JavaScript *@
+                                </tbody>
+                            </table>
+                        </div>
+                        <button type="button" id="addSurveyRequestRowButton" class="btn btn-dark mb-3 mt-1 btn-uniform"><i class="fas fa-plus"></i> Add Item</button>
+                    </fieldset>
+
+                    <div class="mt-4 pt-3 border-top text-center">
+                        <button type="submit" class="btn btn-primary btn-lg btn-uniform"><i class="fas fa-save"></i> Save</button> @* Menggunakan teks dari HTML Anda *@
+                        <a asp-action="Index" class="btn btn-danger btn-lg ms-2 btn-uniform"><i class="fas fa-times"></i> Discard</a> @* Menggunakan teks dari HTML Anda *@
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</main>
+
+
+
+

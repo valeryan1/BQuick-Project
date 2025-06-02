@@ -16,8 +16,10 @@ namespace BQuick.Controllers
 
         public IActionResult Index()
         {
+            //var product = _context.ReqItem2.ToList();
             return View();
         }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

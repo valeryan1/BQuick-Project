@@ -1,974 +1,509 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using BQuick.Models;
+using BQuick.Models; // Pastikan namespace ini sesuai dengan tempat model Anda berada
 
 namespace BQuick.Data
 {
     public class BQuickDbContext : DbContext
     {
-        public BQuickDbContext(DbContextOptions<BQuickDbContext> options)
-            : base(options)
+        public BQuickDbContext(DbContextOptions<BQuickDbContext> options) : base(options)
         {
         }
 
-        // User and Department
-        public DbSet<User> Users { get; set; }
-        public DbSet<Department> Departments { get; set; }
-        public DbSet<UserDepartment> UserDepartments { get; set; }
+        // --- Entitas Inti & Pengguna ---
+        public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<Role> Roles { get; set; }
+        //public virtual DbSet<ReqItem2> ReqItem2 { get; set; } // Sesuai permintaan Anda
 
-        // Company and Contact
-        public DbSet<Company> Companies { get; set; }
-        public DbSet<CompanyAttachment> CompanyAttachments { get; set; }
-        public DbSet<CustomerContact> CustomerContacts { get; set; }
+        // --- Entitas Terkait Pelanggan ---
+        public virtual DbSet<Customer> Customers { get; set; }
+        public virtual DbSet<CustomerContactPerson> CustomerContactPersons { get; set; }
 
-        // Item and Vendor
-        public DbSet<Item> Items { get; set; }
-        public DbSet<ItemImage> ItemImages { get; set; }
-        public DbSet<Vendor> Vendors { get; set; }
-        public DbSet<VendorBankAccount> VendorBankAccounts { get; set; }
-        public DbSet<VendorAttachment> VendorAttachments { get; set; }
-        public DbSet<ItemVendor> ItemVendors { get; set; }
+        // --- Entitas Terkait Item & Vendor ---
+        public virtual DbSet<Item> Items { get; set; }
+        public virtual DbSet<ItemCategory> ItemCategories { get; set; }
+        public virtual DbSet<ItemType> ItemTypes { get; set; }
+        public virtual DbSet<ItemBundle> ItemBundles { get; set; }
+        public virtual DbSet<Vendor> Vendors { get; set; }
+        public virtual DbSet<VendorBank> VendorBanks { get; set; }
+        public virtual DbSet<ItemVendorPricing> ItemVendorPricings { get; set; }
 
-        // RFQ
-        public DbSet<RFQ> RFQs { get; set; }
-        public DbSet<RFQItem> RFQItems { get; set; }
-        public DbSet<RFQItemAddOn> RFQItemAddOns { get; set; }
-        public DbSet<RFQNotesItem> RFQNotesItems { get; set; }
-        public DbSet<RFQAttachment> RFQAttachments { get; set; }
+        // --- Entitas Terkait RFQ ---
+        public virtual DbSet<RFQ> RFQs { get; set; }
+        public virtual DbSet<RFQCategory> RFQCategories { get; set; }
+        public virtual DbSet<RFQOpportunity> RFQOpportunities { get; set; }
+        public virtual DbSet<RFQStatus> RFQStatuses { get; set; }
+        public virtual DbSet<RFQNote> RFQNotes { get; set; }
+        public virtual DbSet<RFQAttachment> RFQAttachments { get; set; }
+        public virtual DbSet<RFQ_Item> RFQ_Items { get; set; }
 
-        // Request Item
-        public DbSet<RequestItem> RequestItems { get; set; }
-        public DbSet<RequestItemAttachment> RequestItemAttachments { get; set; }
-        public DbSet<RequestItemResponse> RequestItemResponses { get; set; }
+        // --- Entitas Terkait Purchasing ---
+        public virtual DbSet<PurchasingRequest> PurchasingRequests { get; set; }
+        public virtual DbSet<PurchasingStatus> PurchasingStatuses { get; set; }
 
-        // Survey
-        public DbSet<Survey> Surveys { get; set; }
-        public DbSet<SurveyPIC> SurveyPICs { get; set; }
-        public DbSet<SurveyForm> SurveyForms { get; set; }
-        public DbSet<SurveyResult> SurveyResults { get; set; }
-        public DbSet<SurveyAttachment> SurveyAttachments { get; set; }
+        // --- Entitas Terkait Survei ---
+        public virtual DbSet<SurveyCategory> SurveyCategories { get; set; }
+        public virtual DbSet<TechnicalCompetency> TechnicalCompetencies { get; set; }
+        public virtual DbSet<SurveyRequest> SurveyRequests { get; set; }
+        public virtual DbSet<SurveyStatus> SurveyStatuses { get; set; }
+        public virtual DbSet<SurveyPIC> SurveyPICs { get; set; }
+        public virtual DbSet<PICApprovalStatus> PICApprovalStatuses { get; set; }
+        public virtual DbSet<SurveyFormMaster> SurveyFormMasters { get; set; }
+        public virtual DbSet<SurveyInstance> SurveyInstances { get; set; }
+        public virtual DbSet<SurveyDocumentation> SurveyDocumentations { get; set; }
+        public virtual DbSet<ReportMaster> ReportMasters { get; set; }
+        public virtual DbSet<SurveyReportInstance> SurveyReportInstances { get; set; }
+        public virtual DbSet<ReportStatus> ReportStatuses { get; set; }
 
-        // Report
-        public DbSet<Report> Reports { get; set; }
-        public DbSet<ReportAttachment> ReportAttachments { get; set; }
+        // --- Entitas Terkait Meeting ---
+        public virtual DbSet<MeetingRequest> MeetingRequests { get; set; }
+        public virtual DbSet<MeetingStatus> MeetingStatuses { get; set; }
+        public virtual DbSet<MeetingPIC> MeetingPICs { get; set; }
+        public virtual DbSet<MeetingReportInstance> MeetingReportInstances { get; set; }
 
-        // Meeting
-        public DbSet<Meeting> Meetings { get; set; }
-        public DbSet<MeetingPIC> MeetingPICs { get; set; }
-        public DbSet<MeetingExternalParticipant> MeetingExternalParticipants { get; set; }
-        public DbSet<MeetingAttachment> MeetingAttachments { get; set; }
-        public DbSet<MeetingMinute> MeetingMinutes { get; set; }
+        // --- Entitas Terkait Quotation ---
+        public virtual DbSet<Quotation> Quotations { get; set; }
+        public virtual DbSet<PaymentTerm> PaymentTerms { get; set; }
+        public virtual DbSet<ShipmentTerm> ShipmentTerms { get; set; }
+        public virtual DbSet<QuotationStatus> QuotationStatuses { get; set; }
+        public virtual DbSet<QuotationItem> QuotationItems { get; set; }
 
-        // Quotation
-        public DbSet<Quotation> Quotations { get; set; }
-        public DbSet<QuotationItem> QuotationItems { get; set; }
-        public DbSet<QuotationAttachment> QuotationAttachments { get; set; }
-        public DbSet<QuotationHistory> QuotationHistories { get; set; }
+        // --- Entitas Generik untuk Persetujuan & Notifikasi ---
+        public virtual DbSet<ApprovalHistory> ApprovalHistories { get; set; }
+        public virtual DbSet<ApprovalDecisionStatus> ApprovalDecisionStatuses { get; set; }
+        public virtual DbSet<Notification> Notifications { get; set; }
+        public virtual DbSet<Setting> Settings { get; set; }
 
-        // PMO Assignment
-        public DbSet<PMOAssignment> PMOAssignments { get; set; }
-
-        // Marketing and Business Development
-        public DbSet<MarketingActivity> MarketingActivities { get; set; }
-        public DbSet<MarketingActivityCompany> MarketingActivityCompanies { get; set; }
-        public DbSet<BusinessDevelopmentActivity> BusinessDevelopmentActivities { get; set; }
-
-        // Inventory
-        public DbSet<InventoryMovement> InventoryMovements { get; set; }
-
-        // Notification and Task
-        public DbSet<Notification> Notifications { get; set; }
-        public DbSet<TaskToDoTemplate> TaskToDoTemplates { get; set; }
-        public DbSet<TaskToDo> TaskToDos { get; set; }
-
-        // Audit
-        public DbSet<AuditLog> AuditLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configure unique constraints
+            // --- Konfigurasi Composite Keys ---
+            modelBuilder.Entity<TechnicalCompetency>()
+                .HasKey(tc => new { tc.UserID, tc.SurveyCategoryID });
+
+            // --- Konfigurasi Indexes ---
+            ConfigureIndexes(modelBuilder);
+
+            // --- Konfigurasi Delete Behaviors ---
+
+            // ItemBundle ke Item (Mencegah siklus cascade)
+            modelBuilder.Entity<ItemBundle>()
+                .HasOne(ib => ib.ParentItem)
+                .WithMany(i => i.ParentBundleItems)
+                .HasForeignKey(ib => ib.ParentItemID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ItemBundle>()
+                .HasOne(ib => ib.ChildItem)
+                .WithMany(i => i.ChildBundleItems)
+                .HasForeignKey(ib => ib.ChildItemID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // User ke Role (Mencegah Role dihapus jika ada User)
             modelBuilder.Entity<User>()
-                .HasIndex(u => u.Username)
-                .IsUnique();
+                .HasOne(u => u.Role)
+                .WithMany(r => r.Users)
+                .HasForeignKey(u => u.RoleID)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<User>()
-                .HasIndex(u => u.Email)
-                .IsUnique();
-
-            modelBuilder.Entity<Company>()
-                .HasIndex(c => c.CompanyCode)
-                .IsUnique();
-
-            modelBuilder.Entity<Item>()
-                .HasIndex(i => i.ItemCode)
-                .IsUnique();
-
+            // Vendor.CreatedByUserID (Jika User pembuat dihapus, set FK ke null)
             modelBuilder.Entity<Vendor>()
-                .HasIndex(v => v.VendorCode)
-                .IsUnique();
+                .HasOne(v => v.CreatedByUser)
+                .WithMany(u => u.CreatedVendors)
+                .HasForeignKey(v => v.CreatedByUserID)
+                .OnDelete(DeleteBehavior.SetNull); // FK CreatedByUserID di Vendor adalah nullable
+
+            // RFQ Relasi ke Customer
+            modelBuilder.Entity<RFQ>()
+                .HasOne(r => r.Customer)
+                .WithMany(c => c.RFQs)
+                .HasForeignKey(r => r.CustomerID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // **PERUBAHAN KUNCI DI SINI: Semua FK dari RFQ ke User menjadi Restrict**
+            modelBuilder.Entity<RFQ>()
+                .HasOne(r => r.CreatedByUser)
+                .WithMany(u => u.CreatedRFQs)
+                .HasForeignKey(r => r.CreatedByUserID)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<RFQ>()
-                .HasIndex(r => r.RFQCode)
-                .IsUnique();
+                .HasOne(r => r.AssignedToAdminSales)
+                .WithMany(u => u.AssignedRFQsAsAdmin)
+                .HasForeignKey(r => r.AssignedToAdminSalesID)
+                .OnDelete(DeleteBehavior.Restrict); // Diubah dari SetNull
 
-            modelBuilder.Entity<Survey>()
-                .HasIndex(s => s.SurveyCode)
-                .IsUnique();
+            modelBuilder.Entity<RFQ>()
+                .HasOne(r => r.SalesManagerAssigner)
+                .WithMany(u => u.AssignedBySalesManagerRFQs)
+                .HasForeignKey(r => r.SalesManagerAssignerID)
+                .OnDelete(DeleteBehavior.Restrict); // Diubah dari SetNull
+
+            modelBuilder.Entity<RFQ>()
+                .HasOne(r => r.PersonalResourceEmployee)
+                .WithMany(u => u.PersonalResourceRFQs)
+                .HasForeignKey(r => r.PersonalResourceEmployeeID)
+                .OnDelete(DeleteBehavior.Restrict); // Diubah dari SetNull
+            // **********************************************************************
+
+            // RFQ Relasi lain
+            modelBuilder.Entity<RFQ>()
+                .HasOne(r => r.ContactPerson)
+                .WithMany()
+                .HasForeignKey(r => r.ContactPersonID)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // RFQ_Item Relasi
+            modelBuilder.Entity<RFQ_Item>()
+               .HasOne(ri => ri.ChosenVendor)
+               .WithMany()
+               .HasForeignKey(ri => ri.ChosenVendorID)
+               .OnDelete(DeleteBehavior.SetNull);
+
+            // PurchasingRequest Relasi ke User
+            modelBuilder.Entity<PurchasingRequest>()
+                .HasOne(pr => pr.RequestedByUser)
+                .WithMany(u => u.CreatedPurchasingRequests)
+                .HasForeignKey(pr => pr.RequestedByUserID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PurchasingRequest>()
+                .HasOne(pr => pr.AssignedToPurchasingUser)
+                .WithMany(u => u.HandledPurchasingRequests)
+                .HasForeignKey(pr => pr.AssignedToPurchasingUserID)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // SurveyRequest Relasi ke User
+            modelBuilder.Entity<SurveyRequest>()
+                .HasOne(sr => sr.CreatedByUser)
+                .WithMany(u => u.CreatedSurveyRequests)
+                .HasForeignKey(sr => sr.CreatedByUserID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // SurveyPIC Relasi ke User 
+            modelBuilder.Entity<SurveyPIC>()
+                .HasOne(sp => sp.TechnicalUser)
+                .WithMany(u => u.SurveyAssignments)
+                .HasForeignKey(sp => sp.TechnicalUserID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // SurveyInstance Relasi ke User 
+            modelBuilder.Entity<SurveyInstance>()
+                .HasOne(si => si.SubmittedByUser)
+                .WithMany(u => u.SubmittedSurveyInstances)
+                .HasForeignKey(si => si.SubmittedByUserID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // SurveyDocumentation Relasi ke User
+            modelBuilder.Entity<SurveyDocumentation>()
+                .HasOne(sd => sd.UploadedByUser)
+                .WithMany(u => u.UploadedSurveyDocumentations)
+                .HasForeignKey(sd => sd.UploadedByUserID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // SurveyReportInstance Relasi ke SurveyInstance
+            modelBuilder.Entity<SurveyReportInstance>()
+                .HasOne(sri => sri.SurveyInstance)
+                .WithMany(si => si.Reports)
+                .HasForeignKey(sri => sri.SurveyInstanceID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // SurveyReportInstance Relasi ke ReportMaster
+            modelBuilder.Entity<SurveyReportInstance>()
+                .HasOne(sri => sri.ReportMaster)
+                .WithMany(rm => rm.SurveyReportInstances)
+                .HasForeignKey(sri => sri.ReportMasterID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // SurveyReportInstance Relasi ke User (Semua diatur ke Restrict untuk FK ke User)
+            modelBuilder.Entity<SurveyReportInstance>()
+                .HasOne(sri => sri.GeneratedByUser)
+                .WithMany(u => u.GeneratedSurveyReports)
+                .HasForeignKey(sri => sri.GeneratedByUserID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<SurveyReportInstance>()
+                .HasOne(sri => sri.TechManagerReviewer)
+                .WithMany(u => u.TechReviewedSurveyReports)
+                .HasForeignKey(sri => sri.TechManagerReviewerID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<SurveyReportInstance>()
+                .HasOne(sri => sri.SalesManagerReviewer)
+                .WithMany(u => u.SalesReviewedSurveyReports)
+                .HasForeignKey(sri => sri.SalesManagerReviewerID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // MeetingRequest Relasi ke User (Mencegah siklus cascade)
+            modelBuilder.Entity<MeetingRequest>()
+                .HasOne(mr => mr.CreatedByUser)
+                .WithMany(u => u.CreatedMeetingRequests)
+                .HasForeignKey(mr => mr.CreatedByUserID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<MeetingRequest>()
+                .HasOne(mr => mr.PrimaryPIC_User)
+                .WithMany(u => u.LedMeetingRequests)
+                .HasForeignKey(mr => mr.PrimaryPIC_UserID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Quotation Relasi ke User
+            modelBuilder.Entity<Quotation>()
+                .HasOne(q => q.PreparedByUser)
+                .WithMany(u => u.PreparedQuotations)
+                .HasForeignKey(q => q.PreparedByUserID)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Quotation>()
-                .HasIndex(q => q.QuotationNumber)
-                .IsUnique();
-
-            // Configure relationships for User
-            modelBuilder.Entity<User>()
-                .HasOne(u => u.Manager)
-                .WithMany(m => m.Subordinates)
-                .HasForeignKey(u => u.ReportsToID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<User>()
-                .HasOne(u => u.ModifiedBy)
-                .WithMany()
-                .HasForeignKey(u => u.ModifiedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for Company
-            modelBuilder.Entity<Company>()
-                .HasOne(c => c.AccountManager)
-                .WithMany()
-                .HasForeignKey(c => c.AccountManagerID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Company>()
-                .HasOne(c => c.CreatedBy)
-                .WithMany(u => u.CreatedCompanies)
-                .HasForeignKey(c => c.CreatedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Company>()
-                .HasOne(c => c.ModifiedBy)
-                .WithMany(u => u.ModifiedCompanies)
-                .HasForeignKey(c => c.ModifiedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for Department
-            modelBuilder.Entity<Department>()
-                .HasOne(d => d.DepartmentHead)
-                .WithMany()
-                .HasForeignKey(d => d.DepartmentHeadID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Department>()
-                .HasOne(d => d.CreatedBy)
-                .WithMany()
-                .HasForeignKey(d => d.CreatedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Department>()
-                .HasOne(d => d.ModifiedBy)
-                .WithMany()
-                .HasForeignKey(d => d.ModifiedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for UserDepartment
-            modelBuilder.Entity<UserDepartment>()
-                .HasOne(ud => ud.User)
-                .WithMany(u => u.UserDepartments)
-                .HasForeignKey(ud => ud.UserID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<UserDepartment>()
-                .HasOne(ud => ud.Department)
-                .WithMany(d => d.UserDepartments)
-                .HasForeignKey(ud => ud.DepartmentID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<UserDepartment>()
-                .HasOne(ud => ud.CreatedBy)
-                .WithMany()
-                .HasForeignKey(ud => ud.CreatedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for CustomerContact
-            modelBuilder.Entity<CustomerContact>()
-                .HasOne(cc => cc.Company)
-                .WithMany(c => c.CustomerContacts)
-                .HasForeignKey(cc => cc.CompanyID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<CustomerContact>()
-                .HasOne(cc => cc.CreatedBy)
-                .WithMany()
-                .HasForeignKey(cc => cc.CreatedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<CustomerContact>()
-                .HasOne(cc => cc.ModifiedBy)
-                .WithMany()
-                .HasForeignKey(cc => cc.ModifiedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for CompanyAttachment
-            modelBuilder.Entity<CompanyAttachment>()
-                .HasOne(ca => ca.Company)
-                .WithMany(c => c.CompanyAttachments)
-                .HasForeignKey(ca => ca.CompanyID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<CompanyAttachment>()
-                .HasOne(ca => ca.UploadedBy)
-                .WithMany()
-                .HasForeignKey(ca => ca.UploadedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for Item
-            modelBuilder.Entity<Item>()
-                .HasOne(i => i.CreatedBy)
-                .WithMany()
-                .HasForeignKey(i => i.CreatedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Item>()
-                .HasOne(i => i.ModifiedBy)
-                .WithMany()
-                .HasForeignKey(i => i.ModifiedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for ItemImage
-            modelBuilder.Entity<ItemImage>()
-                .HasOne(ii => ii.Item)
-                .WithMany(i => i.ItemImages)
-                .HasForeignKey(ii => ii.ItemID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<ItemImage>()
-                .HasOne(ii => ii.UploadedBy)
-                .WithMany()
-                .HasForeignKey(ii => ii.UploadedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for Vendor
-            modelBuilder.Entity<Vendor>()
-                .HasOne(v => v.PurchasingManager)
-                .WithMany()
-                .HasForeignKey(v => v.PurchasingManagerID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Vendor>()
-                .HasOne(v => v.CreatedBy)
-                .WithMany()
-                .HasForeignKey(v => v.CreatedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Vendor>()
-                .HasOne(v => v.ModifiedBy)
-                .WithMany()
-                .HasForeignKey(v => v.ModifiedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for VendorBankAccount
-            modelBuilder.Entity<VendorBankAccount>()
-                .HasOne(vba => vba.Vendor)
-                .WithMany(v => v.VendorBankAccounts)
-                .HasForeignKey(vba => vba.VendorID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<VendorBankAccount>()
-                .HasOne(vba => vba.CreatedBy)
-                .WithMany()
-                .HasForeignKey(vba => vba.CreatedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<VendorBankAccount>()
-                .HasOne(vba => vba.ModifiedBy)
-                .WithMany()
-                .HasForeignKey(vba => vba.ModifiedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for VendorAttachment
-            modelBuilder.Entity<VendorAttachment>()
-                .HasOne(va => va.Vendor)
-                .WithMany(v => v.VendorAttachments)
-                .HasForeignKey(va => va.VendorID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<VendorAttachment>()
-                .HasOne(va => va.UploadedBy)
-                .WithMany()
-                .HasForeignKey(va => va.UploadedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for ItemVendor
-            modelBuilder.Entity<ItemVendor>()
-                .HasOne(iv => iv.Item)
-                .WithMany(i => i.ItemVendors)
-                .HasForeignKey(iv => iv.ItemID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<ItemVendor>()
-                .HasOne(iv => iv.Vendor)
-                .WithMany(v => v.ItemVendors)
-                .HasForeignKey(iv => iv.VendorID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<ItemVendor>()
-                .HasOne(iv => iv.CreatedBy)
-                .WithMany()
-                .HasForeignKey(iv => iv.CreatedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<ItemVendor>()
-                .HasOne(iv => iv.ModifiedBy)
-                .WithMany()
-                .HasForeignKey(iv => iv.ModifiedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for RFQ
-            modelBuilder.Entity<RFQ>()
-                .HasOne(r => r.Company)
-                .WithMany(c => c.RFQs)
-                .HasForeignKey(r => r.CompanyID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<RFQ>()
-                .HasOne(r => r.Contact)
-                .WithMany(c => c.RFQs)
-                .HasForeignKey(r => r.ContactID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<RFQ>()
-                .HasOne(r => r.AdminSales)
-                .WithMany(u => u.AssignedRFQsAsAdminSales)
-                .HasForeignKey(r => r.AdminSalesID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<RFQ>()
-                .HasOne(r => r.Sales)
-                .WithMany(u => u.AssignedRFQsAsSales)
-                .HasForeignKey(r => r.SalesID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<RFQ>()
-                .HasOne(r => r.BusinessDevelopment)
-                .WithMany(u => u.AssignedRFQsAsBusinessDevelopment)
-                .HasForeignKey(r => r.BusinessDevelopmentID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<RFQ>()
-                .HasOne(r => r.PreSalesSupport)
-                .WithMany(u => u.AssignedRFQsAsPreSalesSupport)
-                .HasForeignKey(r => r.PreSalesSupportID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<RFQ>()
-                .HasOne(r => r.PMO)
-                .WithMany(u => u.AssignedRFQsAsPMO)
-                .HasForeignKey(r => r.PMOID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<RFQ>()
-                .HasOne(r => r.CreatedBy)
-                .WithMany()
-                .HasForeignKey(r => r.CreatedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<RFQ>()
-                .HasOne(r => r.ModifiedBy)
-                .WithMany()
-                .HasForeignKey(r => r.ModifiedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for RFQItem
-            modelBuilder.Entity<RFQItem>()
-                .HasOne(ri => ri.RFQ)
-                .WithMany(r => r.RFQItems)
-                .HasForeignKey(ri => ri.RFQID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<RFQItem>()
-                .HasOne(ri => ri.Item)
-                .WithMany(i => i.RFQItems)
-                .HasForeignKey(ri => ri.ItemID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<RFQItem>()
-                .HasOne(ri => ri.CreatedBy)
-                .WithMany()
-                .HasForeignKey(ri => ri.CreatedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<RFQItem>()
-                .HasOne(ri => ri.ModifiedBy)
-                .WithMany()
-                .HasForeignKey(ri => ri.ModifiedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for RFQItemAddOn
-            modelBuilder.Entity<RFQItemAddOn>()
-                .HasOne(ria => ria.RFQItem)
-                .WithMany(ri => ri.RFQItemAddOns)
-                .HasForeignKey(ria => ria.RFQItemID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            // Configure relationships for RFQNotesItem
-            modelBuilder.Entity<RFQNotesItem>()
-                .HasOne(rni => rni.RFQ)
-                .WithMany(r => r.RFQNotesItems)
-                .HasForeignKey(rni => rni.RFQID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<RFQNotesItem>()
-                .HasOne(rni => rni.CreatedBy)
-                .WithMany()
-                .HasForeignKey(rni => rni.CreatedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<RFQNotesItem>()
-                .HasOne(rni => rni.ModifiedBy)
-                .WithMany()
-                .HasForeignKey(rni => rni.ModifiedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for RFQAttachment
-            modelBuilder.Entity<RFQAttachment>()
-                .HasOne(ra => ra.RFQ)
-                .WithMany(r => r.RFQAttachments)
-                .HasForeignKey(ra => ra.RFQID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<RFQAttachment>()
-                .HasOne(ra => ra.UploadedBy)
-                .WithMany()
-                .HasForeignKey(ra => ra.UploadedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for RequestItem
-            modelBuilder.Entity<RequestItem>()
-                .HasOne(ri => ri.RFQ)
-                .WithMany(r => r.RequestItems)
-                .HasForeignKey(ri => ri.RFQID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<RequestItem>()
-                .HasOne(ri => ri.RequestedBy)
-                .WithMany()
-                .HasForeignKey(ri => ri.RequestedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<RequestItem>()
-                .HasOne(ri => ri.AssignedTo)
-                .WithMany()
-                .HasForeignKey(ri => ri.AssignedToID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<RequestItem>()
-                .HasOne(ri => ri.CreatedBy)
-                .WithMany()
-                .HasForeignKey(ri => ri.CreatedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<RequestItem>()
-                .HasOne(ri => ri.ModifiedBy)
-                .WithMany()
-                .HasForeignKey(ri => ri.ModifiedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for RequestItemAttachment
-            modelBuilder.Entity<RequestItemAttachment>()
-                .HasOne(ria => ria.RequestItem)
-                .WithMany(ri => ri.RequestItemAttachments)
-                .HasForeignKey(ria => ria.RequestItemID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<RequestItemAttachment>()
-                .HasOne(ria => ria.UploadedBy)
-                .WithMany()
-                .HasForeignKey(ria => ria.UploadedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for RequestItemResponse
-            modelBuilder.Entity<RequestItemResponse>()
-                .HasOne(rir => rir.RequestItem)
-                .WithMany(ri => ri.RequestItemResponses)
-                .HasForeignKey(rir => rir.RequestItemID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<RequestItemResponse>()
-                .HasOne(rir => rir.RespondedBy)
-                .WithMany()
-                .HasForeignKey(rir => rir.RespondedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for Survey
-            modelBuilder.Entity<Survey>()
-                .HasOne(s => s.RFQ)
-                .WithMany(r => r.Surveys)
-                .HasForeignKey(s => s.RFQID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Survey>()
-                .HasOne(s => s.CreatedBy)
-                .WithMany()
-                .HasForeignKey(s => s.CreatedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Survey>()
-                .HasOne(s => s.ModifiedBy)
-                .WithMany()
-                .HasForeignKey(s => s.ModifiedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for SurveyPIC
-            modelBuilder.Entity<SurveyPIC>()
-                .HasOne(sp => sp.Survey)
-                .WithMany(s => s.SurveyPICs)
-                .HasForeignKey(sp => sp.SurveyID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<SurveyPIC>()
-                .HasOne(sp => sp.User)
-                .WithMany()
-                .HasForeignKey(sp => sp.UserID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<SurveyPIC>()
-                .HasOne(sp => sp.CreatedBy)
-                .WithMany()
-                .HasForeignKey(sp => sp.CreatedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for SurveyForm
-            modelBuilder.Entity<SurveyForm>()
-                .HasOne(sf => sf.Survey)
-                .WithMany(s => s.SurveyForms)
-                .HasForeignKey(sf => sf.SurveyID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<SurveyForm>()
-                .HasOne(sf => sf.CreatedBy)
-                .WithMany()
-                .HasForeignKey(sf => sf.CreatedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<SurveyForm>()
-                .HasOne(sf => sf.ModifiedBy)
-                .WithMany()
-                .HasForeignKey(sf => sf.ModifiedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for SurveyResult
-            modelBuilder.Entity<SurveyResult>()
-                .HasOne(sr => sr.Survey)
-                .WithMany(s => s.SurveyResults)
-                .HasForeignKey(sr => sr.SurveyID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<SurveyResult>()
-                .HasOne(sr => sr.CreatedBy)
-                .WithMany()
-                .HasForeignKey(sr => sr.CreatedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<SurveyResult>()
-                .HasOne(sr => sr.ModifiedBy)
-                .WithMany()
-                .HasForeignKey(sr => sr.ModifiedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for SurveyAttachment
-            modelBuilder.Entity<SurveyAttachment>()
-                .HasOne(sa => sa.Survey)
-                .WithMany(s => s.SurveyAttachments)
-                .HasForeignKey(sa => sa.SurveyID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<SurveyAttachment>()
-                .HasOne(sa => sa.UploadedBy)
-                .WithMany()
-                .HasForeignKey(sa => sa.UploadedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for Report
-            modelBuilder.Entity<Report>()
-                .HasOne(r => r.RFQ)
-                .WithMany()
-                .HasForeignKey(r => r.RFQID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Report>()
-                .HasOne(r => r.Survey)
-                .WithMany()
-                .HasForeignKey(r => r.SurveyID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Report>()
-                .HasOne(r => r.CreatedBy)
-                .WithMany()
-                .HasForeignKey(r => r.CreatedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Report>()
-                .HasOne(r => r.ModifiedBy)
-                .WithMany()
-                .HasForeignKey(r => r.ModifiedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for ReportAttachment
-            modelBuilder.Entity<ReportAttachment>()
-                .HasOne(ra => ra.Report)
-                .WithMany(r => r.ReportAttachments)
-                .HasForeignKey(ra => ra.ReportID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<ReportAttachment>()
-                .HasOne(ra => ra.UploadedBy)
-                .WithMany()
-                .HasForeignKey(ra => ra.UploadedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for Meeting
-            modelBuilder.Entity<Meeting>()
-                .HasOne(m => m.RFQ)
-                .WithMany(r => r.Meetings)
-                .HasForeignKey(m => m.RFQID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Meeting>()
-                .HasOne(m => m.OrganizedBy)
-                .WithMany()
-                .HasForeignKey(m => m.OrganizedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Meeting>()
-                .HasOne(m => m.CreatedBy)
-                .WithMany()
-                .HasForeignKey(m => m.CreatedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Meeting>()
-                .HasOne(m => m.ModifiedBy)
-                .WithMany()
-                .HasForeignKey(m => m.ModifiedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for MeetingPIC
-            modelBuilder.Entity<MeetingPIC>()
-                .HasOne(mp => mp.Meeting)
-                .WithMany(m => m.MeetingPICs)
-                .HasForeignKey(mp => mp.MeetingID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<MeetingPIC>()
-                .HasOne(mp => mp.User)
-                .WithMany()
-                .HasForeignKey(mp => mp.UserID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for MeetingExternalParticipant
-            modelBuilder.Entity<MeetingExternalParticipant>()
-                .HasOne(mep => mep.Meeting)
-                .WithMany(m => m.MeetingExternalParticipants)
-                .HasForeignKey(mep => mep.MeetingID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<MeetingExternalParticipant>()
-                .HasOne(mep => mep.Contact)
-                .WithMany()
-                .HasForeignKey(mep => mep.ContactID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for MeetingAttachment
-            modelBuilder.Entity<MeetingAttachment>()
-                .HasOne(ma => ma.Meeting)
-                .WithMany(m => m.MeetingAttachments)
-                .HasForeignKey(ma => ma.MeetingID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<MeetingAttachment>()
-                .HasOne(ma => ma.UploadedBy)
-                .WithMany()
-                .HasForeignKey(ma => ma.UploadedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for MeetingMinute
-            modelBuilder.Entity<MeetingMinute>()
-                .HasOne(mm => mm.Meeting)
-                .WithMany(m => m.MeetingMinutes)
-                .HasForeignKey(mm => mm.MeetingID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<MeetingMinute>()
-                .HasOne(mm => mm.AssignedTo)
-                .WithMany()
-                .HasForeignKey(mm => mm.AssignedToID)
+                .HasOne(q => q.SalesManagerApprover)
+                .WithMany(u => u.SMApprovedQuotations)
+                .HasForeignKey(q => q.SalesManagerApproverID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<MeetingMinute>()
-                .HasOne(mm => mm.CreatedBy)
-                .WithMany()
-                .HasForeignKey(mm => mm.CreatedByID)
+            modelBuilder.Entity<Quotation>()
+                .HasOne(q => q.TechnicalManagerApprover)
+                .WithMany(u => u.TMApprovedQuotations)
+                .HasForeignKey(q => q.TechnicalManagerApproverID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<MeetingMinute>()
-                .HasOne(mm => mm.ModifiedBy)
-                .WithMany()
-                .HasForeignKey(mm => mm.ModifiedByID)
+            modelBuilder.Entity<Quotation>()
+                .HasOne(q => q.DirectorApprover)
+                .WithMany(u => u.DirectorApprovedQuotations)
+                .HasForeignKey(q => q.DirectorApproverID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Configure relationships for Quotation
+            // Relasi Quotation ke RFQ
             modelBuilder.Entity<Quotation>()
                 .HasOne(q => q.RFQ)
                 .WithMany(r => r.Quotations)
                 .HasForeignKey(q => q.RFQID)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Item Relasi
+            modelBuilder.Entity<Item>()
+                .HasOne(i => i.ItemType)
+                .WithMany(it => it.Items)
+                .HasForeignKey(i => i.ItemTypeID)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // Quotation Split (Mencegah parent dihapus jika ada child)
             modelBuilder.Entity<Quotation>()
-                .HasOne(q => q.PreparedBy)
-                .WithMany()
-                .HasForeignKey(q => q.PreparedByID)
+                .HasOne(q => q.SplitParentQuotation)
+                .WithMany(pq => pq.SplitChildQuotations)
+                .HasForeignKey(q => q.SplitParentQuotationID)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // ApprovalHistory Relasi ke User (Jangan hapus User jika ada histori approval)
+            modelBuilder.Entity<ApprovalHistory>()
+                .HasOne(ah => ah.ApproverUser)
+                .WithMany(u => u.ApprovalsMade)
+                .HasForeignKey(ah => ah.ApproverUserID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Konfigurasi untuk tabel lookup (mencegah penghapusan jika masih digunakan)
+            ConfigureRestrictDeleteForLookupTables(modelBuilder);
+        }
+
+        private void ConfigureIndexes(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Username)
+                .IsUnique();
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
+
+            modelBuilder.Entity<Role>()
+                .HasIndex(r => r.RoleName)
+                .IsUnique();
+
+            modelBuilder.Entity<Customer>()
+                .HasIndex(c => c.CustomerCode)
+                .IsUnique()
+                .HasFilter("[CustomerCode] IS NOT NULL");
+
+            modelBuilder.Entity<Item>()
+                .HasIndex(i => i.ItemCode)
+                .IsUnique();
+
+            modelBuilder.Entity<ItemCategory>()
+                .HasIndex(ic => ic.CategoryName)
+                .IsUnique();
+
+            modelBuilder.Entity<ItemType>()
+                .HasIndex(it => new { it.ItemCategoryID, it.ItemTypeName })
+                .IsUnique();
+
+            modelBuilder.Entity<Vendor>()
+                .HasIndex(v => v.VendorCode)
+                .IsUnique()
+                .HasFilter("[VendorCode] IS NOT NULL");
+
+            modelBuilder.Entity<RFQ>()
+                .HasIndex(r => r.RFQCode)
+                .IsUnique();
+
+            modelBuilder.Entity<RFQCategory>()
+                .HasIndex(rc => rc.Name)
+                .IsUnique();
+            modelBuilder.Entity<RFQOpportunity>()
+                .HasIndex(ro => ro.Name)
+                .IsUnique();
+            modelBuilder.Entity<RFQStatus>()
+                .HasIndex(rs => rs.Name)
+                .IsUnique();
+
+            modelBuilder.Entity<PurchasingStatus>()
+                .HasIndex(ps => ps.Name)
+                .IsUnique();
+
+            modelBuilder.Entity<SurveyCategory>()
+                .HasIndex(sc => sc.CategoryName)
+                .IsUnique();
+            modelBuilder.Entity<SurveyRequest>()
+                .HasIndex(sr => sr.SurveyCode)
+                .IsUnique();
+            modelBuilder.Entity<SurveyStatus>()
+                .HasIndex(ss => ss.Name)
+                .IsUnique();
+            modelBuilder.Entity<PICApprovalStatus>()
+                .HasIndex(pas => pas.Name)
+                .IsUnique();
+            modelBuilder.Entity<SurveyFormMaster>()
+                .HasIndex(sfm => sfm.FormName)
+                .IsUnique();
+            modelBuilder.Entity<ReportMaster>()
+                .HasIndex(rm => rm.ReportName)
+                .IsUnique();
+            modelBuilder.Entity<ReportStatus>()
+                .HasIndex(rs => rs.Name)
+                .IsUnique();
+
+            modelBuilder.Entity<MeetingRequest>()
+                .HasIndex(mr => mr.MeetingCode)
+                .IsUnique();
+            modelBuilder.Entity<MeetingStatus>()
+                .HasIndex(ms => ms.Name)
+                .IsUnique();
 
             modelBuilder.Entity<Quotation>()
-                .HasOne(q => q.ApprovedBy)
-                .WithMany()
-                .HasForeignKey(q => q.ApprovedByID)
+                .HasIndex(q => q.QuotationCode)
+                .IsUnique();
+            modelBuilder.Entity<PaymentTerm>()
+                .HasIndex(pt => pt.Name)
+                .IsUnique();
+            modelBuilder.Entity<ShipmentTerm>()
+                .HasIndex(st => st.Name)
+                .IsUnique();
+            modelBuilder.Entity<QuotationStatus>()
+                .HasIndex(qs => qs.Name)
+                .IsUnique();
+
+            modelBuilder.Entity<ApprovalDecisionStatus>()
+                .HasIndex(ads => ads.Name)
+                .IsUnique();
+
+            modelBuilder.Entity<Setting>()
+                .HasIndex(s => new { s.SettingGroup, s.SettingKey })
+                .IsUnique();
+        }
+
+        private void ConfigureRestrictDeleteForLookupTables(ModelBuilder modelBuilder)
+        {
+            // RFQ Lookups
+            modelBuilder.Entity<RFQ>()
+                .HasOne(r => r.RFQCategory)
+                .WithMany(rc => rc.RFQs)
+                .HasForeignKey(r => r.RFQCategoryID)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<RFQ>()
+                .HasOne(r => r.RFQOpportunity)
+                .WithMany(ro => ro.RFQs)
+                .HasForeignKey(r => r.RFQOpportunityID)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<RFQ>()
+                .HasOne(r => r.RFQStatus)
+                .WithMany(rs => rs.RFQs)
+                .HasForeignKey(r => r.RFQStatusID)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Purchasing Lookup
+            modelBuilder.Entity<PurchasingRequest>()
+                .HasOne(pr => pr.PurchasingStatus)
+                .WithMany(ps => ps.PurchasingRequests)
+                .HasForeignKey(pr => pr.PurchasingStatusID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Survey Lookups
+            modelBuilder.Entity<SurveyRequest>()
+               .HasOne(sr => sr.SurveyCategory)
+               .WithMany(sc => sc.SurveyRequests)
+               .HasForeignKey(sr => sr.SurveyCategoryID)
+               .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<SurveyRequest>()
+                .HasOne(sr => sr.SurveyStatus)
+                .WithMany(ss => ss.SurveyRequests)
+                .HasForeignKey(sr => sr.SurveyStatusID)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<SurveyPIC>()
+                .HasOne(sp => sp.PICApprovalStatus)
+                .WithMany(pas => pas.SurveyPICs)
+                .HasForeignKey(sp => sp.PICApprovalStatusID)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<SurveyReportInstance>()
+                .HasOne(sri => sri.ReportStatus)
+                .WithMany(rs => rs.SurveyReportInstances)
+                .HasForeignKey(sri => sri.ReportStatusID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Meeting Lookups
+            modelBuilder.Entity<MeetingRequest>()
+                .HasOne(mr => mr.MeetingStatus)
+                .WithMany(ms => ms.MeetingRequests)
+                .HasForeignKey(mr => mr.MeetingStatusID)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<MeetingPIC>()
+               .HasOne(mp => mp.PICApprovalStatus)
+               .WithMany(pas => pas.MeetingPICs)
+               .HasForeignKey(mp => mp.PICApprovalStatusID)
+               .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<MeetingReportInstance>()
+                .HasOne(mri => mri.ReportStatus)
+                .WithMany(rs => rs.MeetingReportInstances)
+                .HasForeignKey(mri => mri.ReportStatusID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Quotation Lookups
             modelBuilder.Entity<Quotation>()
-                .HasOne(q => q.CreatedBy)
-                .WithMany()
-                .HasForeignKey(q => q.CreatedByID)
+                .HasOne(q => q.PaymentTerm)
+                .WithMany(pt => pt.Quotations)
+                .HasForeignKey(q => q.PaymentTermID)
                 .OnDelete(DeleteBehavior.Restrict);
-
             modelBuilder.Entity<Quotation>()
-                .HasOne(q => q.ModifiedBy)
-                .WithMany()
-                .HasForeignKey(q => q.ModifiedByID)
+                .HasOne(q => q.ShipmentTerm)
+                .WithMany(st => st.Quotations)
+                .HasForeignKey(q => q.ShipmentTermID)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Quotation>()
+                .HasOne(q => q.QuotationStatus)
+                .WithMany(qs => qs.Quotations)
+                .HasForeignKey(q => q.QuotationStatusID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Configure relationships for QuotationItem
-            modelBuilder.Entity<QuotationItem>()
-                .HasOne(qi => qi.Quotation)
-                .WithMany(q => q.QuotationItems)
-                .HasForeignKey(qi => qi.QuotationID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<QuotationItem>()
-                .HasOne(qi => qi.Item)
-                .WithMany()
-                .HasForeignKey(qi => qi.ItemID)
+            // Approval History Lookup
+            modelBuilder.Entity<ApprovalHistory>()
+                .HasOne(ah => ah.ApprovalDecisionStatus)
+                .WithMany(ads => ads.ApprovalHistories)
+                .HasForeignKey(ah => ah.ApprovalDecisionStatusID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Configure relationships for QuotationAttachment
-            modelBuilder.Entity<QuotationAttachment>()
-                .HasOne(qa => qa.Quotation)
-                .WithMany(q => q.QuotationAttachments)
-                .HasForeignKey(qa => qa.QuotationID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<QuotationAttachment>()
-                .HasOne(qa => qa.UploadedBy)
-                .WithMany()
-                .HasForeignKey(qa => qa.UploadedByID)
+            // Item Category & Type
+            modelBuilder.Entity<Item>()
+                .HasOne(i => i.ItemCategory)
+                .WithMany(ic => ic.Items)
+                .HasForeignKey(i => i.ItemCategoryID)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for QuotationHistory
-            modelBuilder.Entity<QuotationHistory>()
-                .HasOne(qh => qh.Quotation)
-                .WithMany(q => q.QuotationHistories)
-                .HasForeignKey(qh => qh.QuotationID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<QuotationHistory>()
-                .HasOne(qh => qh.ChangedBy)
-                .WithMany()
-                .HasForeignKey(qh => qh.ChangedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for PMOAssignment
-            modelBuilder.Entity<PMOAssignment>()
-                .HasOne(pa => pa.RFQ)
-                .WithMany(r => r.PMOAssignments)
-                .HasForeignKey(pa => pa.RFQID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<PMOAssignment>()
-                .HasOne(pa => pa.PMO)
-                .WithMany()
-                .HasForeignKey(pa => pa.PMOID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<PMOAssignment>()
-                .HasOne(pa => pa.AssignedBy)
-                .WithMany()
-                .HasForeignKey(pa => pa.AssignedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<PMOAssignment>()
-                .HasOne(pa => pa.ModifiedBy)
-                .WithMany()
-                .HasForeignKey(pa => pa.ModifiedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for MarketingActivity
-            modelBuilder.Entity<MarketingActivity>()
-                .HasOne(ma => ma.ResponsibleUser)
-                .WithMany()
-                .HasForeignKey(ma => ma.ResponsibleUserID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<MarketingActivity>()
-                .HasOne(ma => ma.CreatedBy)
-                .WithMany()
-                .HasForeignKey(ma => ma.CreatedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<MarketingActivity>()
-                .HasOne(ma => ma.ModifiedBy)
-                .WithMany()
-                .HasForeignKey(ma => ma.ModifiedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for MarketingActivityCompany
-            modelBuilder.Entity<MarketingActivityCompany>()
-                .HasOne(mac => mac.MarketingActivity)
-                .WithMany(ma => ma.MarketingActivityCompanies)
-                .HasForeignKey(mac => mac.ActivityID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<MarketingActivityCompany>()
-                .HasOne(mac => mac.Company)
-                .WithMany()
-                .HasForeignKey(mac => mac.CompanyID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<MarketingActivityCompany>()
-                .HasOne(mac => mac.Contact)
-                .WithMany()
-                .HasForeignKey(mac => mac.ContactID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<MarketingActivityCompany>()
-                .HasOne(mac => mac.CreatedBy)
-                .WithMany()
-                .HasForeignKey(mac => mac.CreatedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for BusinessDevelopmentActivity
-            modelBuilder.Entity<BusinessDevelopmentActivity>()
-                .HasOne(bda => bda.RFQ)
-                .WithMany()
-                .HasForeignKey(bda => bda.RFQID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<BusinessDevelopmentActivity>()
-                .HasOne(bda => bda.Company)
-                .WithMany()
-                .HasForeignKey(bda => bda.CompanyID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<BusinessDevelopmentActivity>()
-                .HasOne(bda => bda.Contact)
-                .WithMany()
-                .HasForeignKey(bda => bda.ContactID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<BusinessDevelopmentActivity>()
-                .HasOne(bda => bda.PerformedBy)
-                .WithMany()
-                .HasForeignKey(bda => bda.PerformedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<BusinessDevelopmentActivity>()
-                .HasOne(bda => bda.CreatedBy)
-                .WithMany()
-                .HasForeignKey(bda => bda.CreatedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<BusinessDevelopmentActivity>()
-                .HasOne(bda => bda.ModifiedBy)
-                .WithMany()
-                .HasForeignKey(bda => bda.ModifiedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for InventoryMovement
-            modelBuilder.Entity<InventoryMovement>()
-                .HasOne(im => im.Item)
-                .WithMany()
-                .HasForeignKey(im => im.ItemID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<InventoryMovement>()
-                .HasOne(im => im.PerformedBy)
-                .WithMany()
-                .HasForeignKey(im => im.PerformedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for Notification
-            modelBuilder.Entity<Notification>()
-                .HasOne(n => n.User)
-                .WithMany()
-                .HasForeignKey(n => n.UserID)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<Notification>()
-                .HasOne(n => n.CreatedBy)
-                .WithMany()
-                .HasForeignKey(n => n.CreatedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for TaskToDoTemplate
-            modelBuilder.Entity<TaskToDoTemplate>()
-                .HasOne(tdt => tdt.CreatedBy)
-                .WithMany()
-                .HasForeignKey(tdt => tdt.CreatedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<TaskToDoTemplate>()
-                .HasOne(tdt => tdt.ModifiedBy)
-                .WithMany()
-                .HasForeignKey(tdt => tdt.ModifiedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for TaskToDo
-            modelBuilder.Entity<TaskToDo>()
-                .HasOne(ttd => ttd.Template)
-                .WithMany(tdt => tdt.TaskToDos)
-                .HasForeignKey(ttd => ttd.TemplateID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<TaskToDo>()
-                .HasOne(ttd => ttd.AssignedTo)
-                .WithMany()
-                .HasForeignKey(ttd => ttd.AssignedToID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<TaskToDo>()
-                .HasOne(ttd => ttd.AssignedBy)
-                .WithMany()
-                .HasForeignKey(ttd => ttd.AssignedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<TaskToDo>()
-                .HasOne(ttd => ttd.CreatedBy)
-                .WithMany()
-                .HasForeignKey(ttd => ttd.CreatedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<TaskToDo>()
-                .HasOne(ttd => ttd.ModifiedBy)
-                .WithMany()
-                .HasForeignKey(ttd => ttd.ModifiedByID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Configure relationships for AuditLog
-            modelBuilder.Entity<AuditLog>()
-                .HasOne(al => al.User)
-                .WithMany()
-                .HasForeignKey(al => al.UserID)
-                .OnDelete(DeleteBehavior.Restrict);
-
         }
     }
 }

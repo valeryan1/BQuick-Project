@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 let state = sortState[idx];
                 if (!state) state = 'asc';
                 else if (state === 'asc') state = 'desc';
-                else state = null; 
+                else state = null;
 
                 ths.forEach((oth, i) => {
                     sortState[i] = null;
@@ -298,18 +298,13 @@ document.addEventListener("DOMContentLoaded", function () {
         const companySearchInp = companyWrapper.querySelector("input");
         const companyOptions = companyWrapper.querySelector(".option");
 
-        if (typeof serverSideCustomerData !== 'undefined' && serverSideCustomerData.length > 0) {
-            window.companies = serverSideCustomerData.map(c => c.text);
-        } else if (!window.companies) {
-            // Fallback ke hardcoded list jika serverSideCustomerData tidak ada
-            window.companies = [
-                "PT. Accenture", "PT. Adhya Tirta Batam", "PT. Agiva Indonesia", "PT. Pelangi Fortuna Global",
-                "PT. Indoshipsupply", "PT. Bintan Sukses Ancol", "PT. Citra Maritime", "PT. Bintai Kindenko Engineering Indonesia",
-                "PT. Karya Abadi", "PT. Digital Solutions", "PT. Nusantara Shipping", "PT. Mandiri Sejahtera", "PT. Pertiwi",
-                "PT. Megah", "PT. Maju Sejahtera", "PT. Harmoni", "PT. Prima", "PT. Sentosa", "PT. Nusantara",
-                "PT. Satu", "PT. Global Investama", "PT. Intertech", "PT. Jaya Abadi"
-            ];
-        }
+        window.companies = [
+            "PT. Accenture", "PT. Adhya Tirta Batam", "PT. Agiva Indonesia", "PT. Pelangi Fortuna Global",
+            "PT. Indoshipsupply", "PT. Bintan Sukses Ancol", "PT. Citra Maritime", "PT. Bintai Kindenko Engineering Indonesia",
+            "PT. Karya Abadi", "PT. Digital Solutions", "PT. Nusantara Shipping", "PT. Mandiri Sejahtera", "PT. Pertiwi",
+            "PT. Megah", "PT. Maju Sejahtera", "PT. Harmoni", "PT. Prima", "PT. Sentosa", "PT. Nusantara",
+            "PT. Satu", "PT. Global Investama", "PT. Intertech", "PT. Jaya Abadi"
+        ];
 
         window.addCompany = function (selectedCompany) {
             companyOptions.innerHTML = "";
@@ -323,63 +318,12 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         };
 
-        function updateName(selectedLi) { // selectedLi adalah elemen <li> yang diklik
-            console.log("updateName dipanggil dengan elemen:", selectedLi); // DEBUG: Pastikan ini muncul
-
-            if (!companySearchInp || !companyWrapper || !companySelectBtn) {
-                console.error("Variabel dropdown perusahaan (companySearchInp, companyWrapper, companySelectBtn) tidak terdefinisi di scope updateName!");
-                return;
-            }
-
+        function updateName(selectedLi) {
             companySearchInp.value = "";
-            // PENTING: selectedLi.textContent adalah nama perusahaan yang dipilih
-            const selectedCompanyName = selectedLi.textContent;
-            console.log("Nama Perusahaan yang Dipilih:", selectedCompanyName); // DEBUG
-
-            // addCompany(selectedCompanyName); // Ini akan memanggil addCompany lagi, yang akan memanggil updateName lagi -> rekursi tak terbatas. Ini sepertinya salah.
-            // Fungsi addCompany seharusnya hanya untuk mengisi daftar opsi.
-            // Anda mungkin tidak perlu memanggil addCompany lagi di sini,
-            // cukup update tampilan dan nilai yang dipilih.
-            // Atau, jika addCompany hanya untuk refresh tampilan, pastikan tidak ada rekursi.
-            // Untuk sementara, saya akan disable baris ini untuk menghindari rekursi.
-            // Jika Anda membutuhkannya untuk menandai item sebagai 'selected', kita perlu cara lain.
-
+            addCompany(selectedLi.textContent);
             companyWrapper.classList.remove("active");
-            const code = getCompanyCode(selectedCompanyName); // Fungsi getCompanyCode sudah ada
-
-            companySelectBtn.firstElementChild.innerText = code ? `${selectedCompanyName} (${code})` : selectedCompanyName;
-
-            // --- Logika untuk mendapatkan CustomerID dan memanggil populateEndUserDropdown ---
-            var selectedCustomerDataObj = null;
-            if (typeof window.serverSideCustomerData !== 'undefined' && Array.isArray(window.serverSideCustomerData)) {
-                console.log("Mencari di window.serverSideCustomerData:", window.serverSideCustomerData); // DEBUG
-                selectedCustomerDataObj = window.serverSideCustomerData.find(c => c.text.trim() === selectedCompanyName.trim()); // Tambahkan .trim() untuk keamanan
-                console.log("Hasil pencarian:", selectedCustomerDataObj); // DEBUG
-            } else {
-                console.warn("window.serverSideCustomerData tidak terdefinisi atau bukan array di updateName.");
-            }
-
-            var customerIdToUse = "";
-            const hiddenCustomerIdInput = document.getElementById('hiddenCustomerId');
-
-            if (selectedCustomerDataObj && selectedCustomerDataObj.value) {
-                customerIdToUse = selectedCustomerDataObj.value;
-                if (hiddenCustomerIdInput) {
-                    hiddenCustomerIdInput.value = customerIdToUse;
-                }
-                console.log("CustomerID ditemukan dan diset ke hidden input:", customerIdToUse); // DEBUG
-            } else {
-                if (hiddenCustomerIdInput) {
-                    hiddenCustomerIdInput.value = ""; // Kosongkan jika tidak ditemukan
-                }
-                console.warn("CustomerID TIDAK ditemukan untuk perusahaan:", selectedCompanyName);
-            }
-
-            if (typeof populateEndUserDropdown === "function") {
-                populateEndUserDropdown(customerIdToUse);
-            } else {
-                console.error("Fungsi populateEndUserDropdown tidak terdefinisi. Periksa @section Scripts di Create.cshtml.");
-            }
+            const code = getCompanyCode(selectedLi.textContent);
+            companySelectBtn.firstElementChild.innerText = code ? `${selectedLi.textContent} (${code})` : selectedLi.textContent;
         }
 
         function createCompanyOption(name) {
@@ -877,9 +821,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    //=======================
-    //Request Item to Purchasing Pop-up (temporary)
-    //=======================
+     //=======================
+     //Request Item to Purchasing Pop-up (temporary)
+     //=======================
     const requestItemBtn = document.querySelector("#request-item-to-purchasing-option");
     const requestItemModal = document.querySelector(".request-item-to-purchasing-form-pop-up");
     const requestItemCloseBtn = document.querySelector(".request-item-to-purchasing-form-close-btn");
@@ -890,7 +834,7 @@ document.addEventListener("DOMContentLoaded", function () {
             requestItemModal.classList.add("active");
             document.body.classList.add("pop-up-active");
         });
-    } 
+    }
     if (requestItemCloseBtn && requestItemModal) {
         requestItemCloseBtn.addEventListener("click", function () {
             requestItemModal.classList.remove("active");
@@ -904,4 +848,3 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
-

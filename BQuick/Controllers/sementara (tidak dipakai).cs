@@ -1,9 +1,16 @@
-﻿using BQuick.Data;
-using BQuick.Models;
+﻿/*// File: BQuick/Controllers/RFQController.cs
+// Modifikasi atau tambahkan action berikut
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using BQuick.Data;
+using BQuick.Models;
+using BQuick.Models.ViewModels; // Pastikan namespace ViewModel benar
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
+using System.Collections.Generic;
+using System;
 
 namespace BQuick.Controllers
 {
@@ -17,6 +24,7 @@ namespace BQuick.Controllers
             _context = context;
         }
 
+        
         private async Task PopulateDropdownsForCreateFullAsync(RfqCreateFullViewModel viewModel)
         {
             // Dropdown untuk Company Name
@@ -29,21 +37,13 @@ namespace BQuick.Controllers
                 viewModel.ContactPersonList = new SelectList(
                     await _context.CustomerContactPersons.Where(cp => cp.CustomerID == viewModel.CustomerID).OrderBy(cp => cp.FullName).ToListAsync(),
                     "ContactPersonID", "FullName", viewModel.ContactPersonID);
-
-                // Inisialisasi juga untuk EndUserContactPersonList jika CustomerID sudah ada
-                // Ini lebih relevan untuk skenario edit, tapi tidak masalah ada di sini.
-                // Untuk create, ini akan kosong dan diisi oleh JavaScript.
-                viewModel.EndUserContactPersonList = new SelectList(
-                    await _context.CustomerContactPersons.Where(cp => cp.CustomerID == viewModel.CustomerID).OrderBy(cp => cp.FullName).ToListAsync(),
-                    "ContactPersonID", "FullName", viewModel.EndUserContactPersonID);
             }
             else
             {
                 viewModel.ContactPersonList = new SelectList(new List<CustomerContactPerson>(), "ContactPersonID", "FullName");
-                viewModel.EndUserContactPersonList = new SelectList(Enumerable.Empty<CustomerContactPerson>(), "ContactPersonID", "FullName"); // Pastikan inisialisasi
             }
 
-
+            
             var activeUsers = await _context.Users.Where(u => u.IsActive).OrderBy(u => u.FullName).ToListAsync();
             viewModel.UserList = new SelectList(activeUsers, "UserID", "FullName", viewModel.PersonalResourceEmployeeID);
             // UserList ini juga bisa dipakai untuk PIC Purchasing dan Survey
@@ -70,93 +70,10 @@ namespace BQuick.Controllers
 
         // GET: RFQ/CreateFull (atau nama action Anda)
         [HttpGet]
-        public async Task<IActionResult> CreateFull(int? id)  // Ganti nama jika perlu
+        public async Task<IActionResult> CreateFull() // Ganti nama jika perlu
         {
             var viewModel = new RfqCreateFullViewModel();
-
-            if (id.HasValue) // Jika ada ID, berarti mode "lanjutkan/edit"
-            {
-                var rfq = await _context.RFQs
-                    // Anda mungkin perlu .Include() data terkait jika ingin menampilkannya di form
-                    // Misalnya, jika Anda ingin menampilkan detail item RFQ yang sudah ada:
-                    // .Include(r => r.Items) 
-                    // .ThenInclude(item => item.Item) // Contoh jika RFQ_Item punya navigasi ke Item master
-                    // .Include(r => r.Notes)
-                    // .Include(r => r.PurchasingRequests)
-                    // .Include(r => r.SurveyRequests)
-                    //     .ThenInclude(sr => sr.AssignedPICs) // Contoh jika ingin memuat PIC survei yang sudah ada
-                    .FirstOrDefaultAsync(r => r.RFQID == id.Value);
-
-                if (rfq == null)
-                {
-                    return NotFound(); // Atau handle error lain jika RFQ tidak ditemukan
-                }
-
-                // --- Melengkapi pemetaan dari entitas RFQ ke RfqCreateFullViewModel ---
-                // viewModel.RFQID_FromEdit = rfq.RFQID; // Jika Anda menambahkan properti ini di ViewModel untuk menandai mode edit
-
-                viewModel.RFQCode = rfq.RFQCode;
-                viewModel.RFQName = rfq.RFQName;
-                viewModel.CustomerID = rfq.CustomerID;
-
-                // Mengisi EndUserContactPersonID (dan ContactPersonID jika fieldnya sama di ViewModel untuk tujuan berbeda)
-                // Asumsi ContactPersonID di entitas RFQ adalah End User yang dipilih di Tahap 1
-                viewModel.ContactPersonID = rfq.ContactPersonID;
-                viewModel.EndUserContactPersonID = rfq.ContactPersonID;
-
-                // Mengisi field-field yang mungkin sudah diisi di tahap sebelumnya atau akan dilanjutkan
-                viewModel.RequestDate = rfq.RequestDate; // Beri default jika null saat load
-                viewModel.DueDate = rfq.DueDate; // Beri default jika null saat load
-                viewModel.OverallBudget = rfq.OverallBudget;
-                viewModel.OverallLeadTime = rfq.OverallLeadTime;
-                viewModel.Resource = rfq.Resource;
-                viewModel.PersonalResourceEmployeeID = rfq.PersonalResourceEmployeeID;
-
-                // Untuk RFQCategoryID dan RFQOpportunityID, karena di model RFQ.cs tipe datanya int (non-nullable)
-                // Jika nilainya 0 (default untuk int jika tidak diset dan tidak nullable di DB), 
-                // Anda mungkin ingin agar dropdown tidak memilih apa-apa atau memilih opsi default "pilih..."
-                // Jika nilainya valid (misalnya > 0), maka akan otomatis terpilih di dropdown oleh SelectList.
-                viewModel.RFQCategoryID = rfq.RFQCategoryID ?? 0;
-                viewModel.RFQOpportunityID = rfq.RFQOpportunityID ?? 0;
-
-                // Jika Anda juga ingin memuat ulang daftar item, notes, dll., dari RFQ yang ada ke ViewModel:
-                // Contoh untuk Notes (asumsi RfqCreateNoteItemViewModel cocok dengan RFQNote)
-                // viewModel.NotesSectionItems = rfq.Notes?.Select(n => new RfqCreateNoteItemViewModel
-                // {
-                //     ItemName = n.ItemName,
-                //     ItemDescription = n.ItemDescription,
-                //     Quantity = n.Quantity,
-                //     UoM = n.UoM,
-                //     BudgetTarget = n.BudgetTarget,
-                //     LeadTimeTarget = n.LeadTimeTarget
-                // }).ToList() ?? new List<RfqCreateNoteItemViewModel> { new RfqCreateNoteItemViewModel() };
-
-                // Lakukan hal serupa untuk ItemListSectionItems, PurchasingRequestSectionItems, SurveySectionItems
-                // jika data tersebut sudah ada dan perlu ditampilkan/diedit.
-                // Ini memerlukan pemetaan dari model entitas (misalnya RFQ_Item) ke sub-viewmodel yang sesuai.
-                // Contoh untuk ItemListSectionItems (jika RFQ_Item punya data yang relevan):
-                // viewModel.ItemListSectionItems = rfq.Items?.Select(i => new RfqCreateRfqItemViewModel
-                // {
-                //     ItemID = i.ItemID,
-                //     Quantity = i.Quantity,
-                //     UoM = i.UoM, // Anda mungkin perlu mengambil UoM dari Item master atau RFQ_Item
-                //     TargetUnitPrice = i.TargetUnitPrice,
-                //     Notes = i.Notes,
-                //     Details = i.Details,
-                //     SalesWarranty = i.SalesWarranty
-                // }).ToList() ?? new List<RfqCreateRfqItemViewModel> { new RfqCreateRfqItemViewModel() };
-
-                // Pastikan setelah memetakan CustomerID, Anda memanggil PopulateDropdownsForCreateFullAsync
-                // agar ContactPersonList dan EndUserContactPersonList terisi dengan benar berdasarkan CustomerID yang dimuat.
-            }
-            else // Mode Create Baru
-            {
-                viewModel.RFQCode = GenerateUniqueRFQCode(); // Generate calon kode untuk ditampilkan
-                                                             // (kode final akan di-generate ulang saat POST)
-            }
-
-            // Panggil ini setelah viewModel.CustomerID terisi (baik dari RFQ yang ada atau dari create baru jika ada default)
-            // agar dropdown ContactPerson dan EndUser terisi dengan benar.
+            // Inisialisasi list dengan satu item kosong jika diinginkan, sudah dihandle di constructor ViewModel
             await PopulateDropdownsForCreateFullAsync(viewModel);
             return View("Create", viewModel); // Menggunakan view Create.cshtml
         }
@@ -164,7 +81,7 @@ namespace BQuick.Controllers
         // POST: RFQ/CreateFull
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(RfqCreateFullViewModel viewModel)
+        public async Task<IActionResult> CreateFull(RfqCreateFullViewModel viewModel)
         {
             // Hapus baris kosong dari list sebelum validasi
             viewModel.NotesSectionItems?.RemoveAll(n => string.IsNullOrWhiteSpace(n.ItemName) && string.IsNullOrWhiteSpace(n.ItemDescription) && n.Quantity == 1 && n.BudgetTarget == null && string.IsNullOrWhiteSpace(n.LeadTimeTarget));
@@ -183,7 +100,7 @@ namespace BQuick.Controllers
                 // --- 1. Buat Entitas RFQ (Header) ---
                 var rfqEntity = new RFQ
                 {
-                    RFQCode = GenerateUniqueRFQCode(),
+                    RFQCode = viewModel.RFQCode,
                     RFQName = viewModel.RFQName,
                     CustomerID = viewModel.CustomerID,
                     ContactPersonID = viewModel.ContactPersonID,
@@ -358,49 +275,6 @@ namespace BQuick.Controllers
                                                .ToListAsync();
             return Json(contactPersons);
         }
-
-        /*   public async Task<IActionResult> Index()
-           {
-               *//*var rfqs = await _context.RFQs
-                   .Include(r => r.Company)
-                   .ToListAsync();
-               return View(rfqs);*//*
-               return View();
-           }*/
-
-
-        ///=============================================
-
-
-
-        /// ====================================================================================
-
-
-        /*public IActionResult Create()
-        {
-            //ViewBag.RFQCode = GenerateRFQCode();
-            var product = _context.PurchasingRequests.ToList();
-            return View(product);
-        }*/
-        private static Random random = new Random();
-
-        private string GenerateUniqueRFQCode()
-        {
-            var yearTwoDigits = DateTime.Now.ToString("yy"); // Misal "25"
-            var prefix = $"RFQ{yearTwoDigits}"; // Misal "RFQ25"
-
-            // Generate 4 angka acak antara 0000 dan 9999
-            // random.Next(0, 10000) akan menghasilkan angka antara 0 dan 9999.
-            // Format "D4" akan memastikan ada padding nol di depan jika angkanya kurang dari 4 digit.
-            string uniqueNumericPart = random.Next(0, 10000).ToString("D4");
-
-            return $"{prefix}{uniqueNumericPart}"; // Contoh: RFQ251234, RFQ250087
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
     }
 }
+*/

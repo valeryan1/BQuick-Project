@@ -626,7 +626,7 @@ h5.note-title {
     height: 40px;
     font-size: 15px;
     display: flex;
-    padding: 8px 14px;
+    padding: 8px 1px 8px 14px;
     background: #fff;
     align-items: center;
     background-color: #fff;
