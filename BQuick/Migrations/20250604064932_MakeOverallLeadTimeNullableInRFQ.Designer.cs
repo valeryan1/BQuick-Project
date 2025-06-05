@@ -4,6 +4,7 @@ using BQuick.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BQuick.Migrations
 {
     [DbContext(typeof(BQuickDbContext))]
-    partial class BQuickDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250604064932_MakeOverallLeadTimeNullableInRFQ")]
+    partial class MakeOverallLeadTimeNullableInRFQ
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1270,16 +1273,18 @@ namespace BQuick.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("LeadTimeTarget")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<decimal?>("Quantity")
+                    b.Property<decimal>("Quantity")
                         .HasColumnType("decimal(18, 2)");
 
                     b.Property<int>("RFQID")
                         .HasColumnType("int");
 
                     b.Property<string>("UoM")
+                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 

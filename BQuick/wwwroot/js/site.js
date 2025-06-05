@@ -600,17 +600,17 @@ document.addEventListener("DOMContentLoaded", function () {
     const itemTableBody = document.getElementById('itemTableBody');
     if (addRowBtn && itemTableBody) {
         addRowBtn.addEventListener('click', () => {
-            const rowCount = itemTableBody.children.length + 1;
+            const rowCount = itemTableBody.children.length + 1; // Nomor baris berikutnya
             const newRow = document.createElement('tr');
             newRow.innerHTML = `
                 <td>${rowCount}</td>
-                <td class="name"><input type='text' class='size form-control1'></td>
-                <td class="desc"><input type='text' class='size form-control1'></td>
-                <td class="qty"><input type='number' class='size form-control1'></td>
-                <td class="uom"><input type='text' class='size tengah form-control1'></td>
-                <td class="budget"><input type='number' class='size form-control1'></td>
-                <td class="leadtime"><input type='text' class='size tengah form-control1'></td>
-                <td class="delete"><button type="button" onclick="removeRow(this)" class="btn"><i class='bx bx-trash'></i></button>
+                <td class="name"><input type='text' class='size form-control1' name="NotesSectionItems[${rowCount - 1}].ItemName"></td>
+                <td class="desc"><input type='text' class='size form-control1' name="NotesSectionItems[${rowCount - 1}].ItemDescription"></td>
+                <td class="qty"><input type='number' class='size form-control1' name="NotesSectionItems[${rowCount - 1}].Quantity" value="1"></td>
+                <td class="uom"><input type='text' class='size tengah form-control1' name="NotesSectionItems[${rowCount - 1}].UoM" value="Unit"></td>
+                <td class="budget"><input type='number' class='size form-control1' name="NotesSectionItems[${rowCount - 1}].BudgetTarget"></td>
+                <td class="leadtime"><input type='text' class='size tengah form-control1' name="NotesSectionItems[${rowCount - 1}].LeadTimeTarget"></td>
+                <td class="delete"><button type="button" onclick="removeRow(this)" class="btn"><i class='bx bx-trash'></i></button></td>
             `;
             itemTableBody.appendChild(newRow);
         });

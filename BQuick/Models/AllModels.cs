@@ -613,10 +613,10 @@ namespace BQuick.Models
         [Column(TypeName = "decimal(18, 2)")]
         public decimal? OverallBudget { get; set; }
         [StringLength(100)]
-        public string OverallLeadTime { get; set; } // Misalnya "4-6 Weeks"
+        public string? OverallLeadTime { get; set; } // Misalnya "4-6 Weeks"
 
         [StringLength(50)]
-        public string Resource { get; set; } // Email, Whatsapp, Personal
+        public string? Resource { get; set; } // Email, Whatsapp, Personal
         public int? PersonalResourceEmployeeID { get; set; }
         [ForeignKey("PersonalResourceEmployeeID")]
         [InverseProperty("PersonalResourceRFQs")]
@@ -722,13 +722,13 @@ namespace BQuick.Models
         public string ItemName { get; set; }
         public string ItemDescription { get; set; }
         [Column(TypeName = "decimal(18, 2)")]
-        public decimal Quantity { get; set; }
+        public decimal? Quantity { get; set; }
         [StringLength(20)]
-        public string UoM { get; set; }
+        public string? UoM { get; set; }
         [Column(TypeName = "decimal(18, 2)")]
         public decimal? BudgetTarget { get; set; }
         [StringLength(100)]
-        public string LeadTimeTarget { get; set; }
+        public string? LeadTimeTarget { get; set; }
     }
 
     public class RFQAttachment

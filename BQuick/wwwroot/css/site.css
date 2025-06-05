@@ -717,6 +717,17 @@ h5.note-title {
     font-size: 15px;
 }
 
+input:disabled {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+    border-radius: 4px;
+}
+
+.disabled {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+    border-radius: 4px;
+}
 .select-btn:hover, .select-btn:focus {
     padding: 8px 1px 8px 14px;
     background-color: #f2f2f2;
@@ -1030,3 +1041,20 @@ div#attached-files .details span {
 .item-list-title {
     font-weight: 600;
 }
+
+.btn-link-style {
+    background: none; /* Menghapus background */
+    border: none; /* Menghapus border */
+    padding: 0; /* Menghapus padding default tombol jika ada */
+    color: #0d6efd; /* Warna teks default link Bootstrap, bisa Anda ganti */
+    text-decoration: underline; /* Menambahkan garis bawah seperti link */
+    cursor: pointer; /* Mengubah cursor menjadi tangan saat hover */
+    font-size: inherit; /* Menggunakan ukuran font dari parent */
+    font-weight: normal; /* Atau sesuaikan dengan keinginan Anda */
+}
+
+    .btn-link-style:hover,
+    .btn-link-style:focus {
+        color: #0a58ca; /* Warna link saat hover/focus, bisa Anda ganti */
+        text-decoration: underline;
+    }
