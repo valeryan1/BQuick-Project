@@ -718,7 +718,7 @@ h5.note-title {
 }
 
 .select-btn:hover, .select-btn:focus {
-    padding: 8px 15px;
+    padding: 8px 1px 8px 14px;
     background-color: #f2f2f2;
     border: solid 1.6px #808080;
     border-radius: 7px;
