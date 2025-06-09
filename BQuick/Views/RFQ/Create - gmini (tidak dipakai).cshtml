@@ -1,42 +1,588 @@
 ﻿@model BQuick.Models.RfqCreateFullViewModel
+@* @model List<PurchasingRequest> *@
 
 @{
     ViewData["Title"] = "Create RFQ";
-    // Layout = "~/Views/Shared/_Layout.cshtml"; // Pastikan layout Anda benar
+    bool isReadOnlyForAdminSalesTahap1 = true;
 }
 
 <main class="content-div mx-3">
     <div class="container-fluid mt-4">
-        <div class="header mt-4 mb-4 w-100 page-header" style="font-size: 29px;">
-            <a class="text-decoration-none" asp-controller="RFQ" asp-action="Index"><span class="text-danger rfq-link">RFQ</span></a>&nbsp;<span>&gt;</span>&nbsp;<span class="tes text-decoration">Create RFQ</span>
-            <span asp-validation-for="RFQCode" class="text-danger float-sm-end"></span>
-            <input type="text" asp-for="RFQCode" class="form-control form-control-sm float-sm-end rfq-id" style="width: auto; display: inline-block; text-align: right;" placeholder="Kode RFQ" />
-        </div>
+        
 
-        @* Pop-up Add Customer (dari HTML Anda - fungsionalitas save-nya tidak ke DB di contoh ini) *@
-        <div class="add-customer-form-pop-up px-5 py-3" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:white; border:1px solid #ccc; z-index:1050; width:80%; max-width:700px; box-shadow: 0 5px 15px rgba(0,0,0,.5); border-radius: .3rem; max-height: 90vh; overflow-y: auto;">
-            <form method="post" class="add-customer-form-internal">
-                @* Beri class berbeda agar tidak konflik submit utama *@
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="mb-0">Add New Customer</h5>
-                    <button type="button" class="btn-close add-customer-form-close-btn-direct"></button>
-                </div>
+        <div class="add-customer-form-pop-up px-5 py-3">
+            <form method="post" enctype="multipart/form-data" class="add-customer-form">
                 <div class="row justify-content-center">
                     <div class="col-12">
                         <div class="mb-3">
-                            <label class="form-label form-label-bold">Company Name</label>
-                            <input id="popupCustomerName" class="form-control" placeholder="Company Name" required />
+                            <label class="form-label form-label-bold">
+                                Company Name
+                            </label>
+                            <input class="form-control" placeholder="Company Name" required />
                         </div>
-                        @* ... Sisa field untuk pop-up Add Customer dari HTML Anda ... *@
-                        @* Contoh:
+
+                        <div class="mb-5">
+                            <label class="form-label form-label-bold">
+                                Profile Picture
+                            </label>
+                            <input class="form-control" type="file" id="customer-profile-picture" name="attachment">
+                        </div>
+
+                        <div class="mb-5 row">
+                            <div class="mb-1 d-flex align-items-center gap-1" style="font-size: 20px;">
+                                <i class='bx bx-info-circle fw-bold'></i>
+                                <span class="fw-bold">
+                                    Basic Information
+                                </span>
+                            </div>
+
+                            <div class="col-12 col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label form-label-bold">
+                                        Fax
+                                    </label>
+                                    <input type="tel" class="form-control" id="customer-fax" placeholder="Fax">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label form-label-bold">
+                                        Currency default
+                                    </label>
+                                    <select class="form-select">
+                                        <option value="" hidden>Currency default</option>
+                                        <option value="IDR">IDR</option>
+                                        <option value="USD">USD</option>
+                                        <option value="SGD">SGD</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label form-label-bold">
+                                        Phone
+                                    </label>
+                                    <input type="tel" class="form-control" id="customer-phone" placeholder="Phone">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label form-label-bold">
+                                        Mobile
+                                    </label>
+                                    <input type="tel" class="form-control" id="customer-mobile" placeholder="Mobile">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label form-label-bold">
+                                        Account Receivable
+                                    </label>
+                                    <input type="text" class="form-control" id="customer-account-receivable" placeholder="Account Receivable">
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-sm-6">
+                                <div class="mb-3">
+                                    <label class="form-label form-label-bold">
+                                        Email
+                                    </label>
+                                    <input type="email" class="form-control" id="customer-email" placeholder="Email">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label form-label-bold">
+                                        TOP
+                                    </label>
+                                    <select class="form-select">
+                                        <option value="" hidden>TOP</option>
+                                        <option value="30 days">30 days</option>
+                                        <option value="45 days">45 days</option>
+                                        <option value="60 days">60 days</option>
+                                        <option value="65 days">65 days</option>
+                                        <option value="90 days">90 days</option>
+                                        <option value="Cash in Advance">Cash in Advance</option>
+                                        <option value="Cash before Delivery">Cash before Delivery</option>
+                                        <option value="Cash on Delivery">Cash on Delivery</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label form-label-bold">
+                                        NPWP
+                                    </label>
+                                    <input type="text" class="form-control" id="customer-npwp" placeholder="NPWP">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label form-label-bold">
+                                        Account Payable
+                                    </label>
+                                    <input type="text" class="form-control" id="customer-account-payable" placeholder="Account Payable">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="formFile" class="form-label form-label-bold">Attachment</label>
+                                <input class="form-control" type="file" id="formFile" name="attachment">
+                            </div>
+                        </div>
+
+                        <div class="mb-5">
+                            <div class="mb-1 d-flex align-items-center gap-1" style="font-size: 20px;">
+                                <span class="fw-bold">
+                                    Address
+                                </span>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12 col-sm-6">
+                                    <div class="mb-3">
+                                        <label class="form-label form-label-bold">
+                                            Billing Address
+                                        </label>
+                                        <input type="text" class="form-control" id="customer-billing-address" placeholder="Billing Address">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label form-label-bold">
+                                            Street
+                                        </label>
+                                        <input type="text" class="form-control" id="customer-billing-street" placeholder="Street">
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-12 col-sm-6">
+                                            <div class="customer-address-details mb-3">
+                                                <label class="form-label form-label-bold">
+                                                    City
+                                                </label>
+                                                <input type="text" class="form-control" id="customer-billing-city" placeholder="City">
+                                            </div>
+
+                                            <div class="customer-address-details mb-3">
+                                                <label class="form-label form-label-bold">
+                                                    Country
+                                                </label>
+                                                <input type="text" class="form-control" id="customer-billing-country" placeholder="Country">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 col-sm-6">
+                                            <div class="customer-address-details mb-3">
+                                                <label class="form-label form-label-bold">
+                                                    Province
+                                                </label>
+                                                <input type="text" class="form-control" id="customer-billing-province" placeholder="Province">
+                                            </div>
+
+                                            <div class="customer-address-details mb-3">
+                                                <label class="form-label form-label-bold">
+                                                    ZIP Code
+                                                </label>
+                                                <input type="text" class="form-control" id="customer-billing-zip-code" placeholder="ZIP Code">
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex align-items-center gap-2">
+                                            <input type="checkbox" class="customer-address-checkboxes" id="customer-address-details-checkbox" />
+                                            <label>
+                                                Detail
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-sm-6">
+                                    <div class="mb-3">
+                                        <label class="form-label form-label-bold">
+                                            Shipping Address
+                                        </label>
+                                        <input type="text" class="form-control" id="customer-shipping-address" placeholder="Shipping Address">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label form-label-bold">
+                                            Street
+                                        </label>
+                                        <input type="text" class="form-control" id="customer-shipping-street" placeholder="Street">
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-12 col-sm-6">
+                                            <div class="customer-address-details mb-3">
+                                                <label class="form-label form-label-bold">
+                                                    City
+                                                </label>
+                                                <input type="text" class="form-control" id="customer-shipping-city" placeholder="City">
+                                            </div>
+
+                                            <div class="customer-address-details mb-3">
+                                                <label class="form-label form-label-bold">
+                                                    Country
+                                                </label>
+                                                <input type="text" class="form-control" id="customer-shipping-country" placeholder="Country">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 col-sm-6">
+                                            <div class="customer-address-details mb-3">
+                                                <label class="form-label form-label-bold">
+                                                    Province
+                                                </label>
+                                                <input type="text" class="form-control" id="customer-shipping-province" placeholder="Province">
+                                            </div>
+
+                                            <div class="customer-address-details mb-3">
+                                                <label class="form-label form-label-bold">
+                                                    ZIP Code
+                                                </label>
+                                                <input type="text" class="form-control" id="customer-shipping-zip-code" placeholder="ZIP Code">
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex align-items-center gap-2">
+                                            <input type="checkbox" class="customer-address-checkboxes" id="match-customer-billing-address-checkbox" />
+                                            <label>
+                                                Same With Billing Address
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-5">
+                            <div class="d-flex align-items-center gap-1" style="font-size: 20px;">
+                                <i class='bx bx-info-circle fw-bold'></i>
+                                <span class="fw-bold">
+                                    Bank Information
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="mb-5 d-flex flex-column">
+                            <div class="customer-contact-tabs mb-3 d-flex" role="tablist" aria-label="Customer Contact Tabs">
+                                <button type="button" class="customer-contact-tab active" role="tab" aria-selected="true" aria-controls="customer-end-user-panel" id="tab-end-user" tabindex="0">
+                                    End User
+                                </button>
+                                <button type="button" class="customer-contact-tab" role="tab" aria-selected="false" aria-controls="customer-purchasing-panel" id="tab-purchasing" tabindex="-1">
+                                    Purchasing
+                                </button>
+                                <button type="button" class="customer-contact-tab" role="tab" aria-selected="false" aria-controls="customer-it-engineer-panel" id="tab-it-engineer" tabindex="-1">
+                                    IT Engineer
+                                </button>
+                            </div>
+
+                            <div class="add-customer-contact-btn-container">
+                                <button type="button" class="bg-white border-1" id="add-customer-contact-btn">
+                                    Add
+                                </button>
+                            </div>
+
+                            <div class="mx-4 add-customer-contact-form-pop-up">
+                                <div class="d-flex align-items-center gap-1" style="font-size: 20px;">
+                                    <i class='bx bx-info-circle fw-bold'></i>
+                                    <span class="fw-bold">
+                                        User Information
+                                    </span>
+
+                                    <i class='bx bx-chevron-down ms-auto' id="customer-contact-form-open-chevron"></i>
+                                </div>
+
+                                <hr />
+
+                                <div class="show-customer-contact-form-pop-up">
+                                    <div id="customer-end-user-panel" class="customer-contact-panel" role="tabpanel" aria-labelledby="tab-end-user">
+                                        <div class="mb-5 d-flex align-items-center gap-1" style="font-size: 20px;">
+                                            <span class="fw-bold">
+                                                End User Information
+                                            </span>
+
+                                            <i class='bx bx-chevron-right ms-auto' id="customer-contact-information-form-close-chevron"></i>
+                                            <i class='bx bx-minus ms-auto' id="customer-contact-information-form-open-minus"></i>
+                                        </div>
+
+                                        <div class="show-customer-contact-information-form-pop-up">
+                                            <div class="mb-3">
+                                                <label class="form-label form-label-bold">Customer Name</label>
+                                                <input class="form-control" placeholder="Customer Name" id="customer-contact-name" required />
+                                            </div>
+
+                                            <div class="mb-5">
+                                                <label class="form-label form-label-bold">Profile Picture</label>
+                                                <input class="form-control" type="file" name="enduser-profile-picture">
+                                            </div>
+
+                                            <div class="mb-5 row">
+                                                <div class="mb-1 d-flex align-items-center gap-1" style="font-size: 20px;">
+                                                    <i class='bx bx-info-circle fw-bold'></i>
+                                                    <span class="fw-bold">
+                                                        Basic Information
+                                                    </span>
+                                                </div>
+
+                                                <div class="col-12 col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Email</label>
+                                                        <input type="email" class="form-control" placeholder="Email">
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Phone</label>
+                                                        <input type="tel" class="form-control" placeholder="Phone">
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Mobile</label>
+                                                        <input type="tel" class="form-control" placeholder="Mobile">
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-12 col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Title</label>
+                                                        <select class="form-select" id="customer-contact-title">
+                                                            <option value="" hidden>Title</option>
+                                                            <option value="Mr">Mr</option>
+                                                            <option value="Mrs">Mrs</option>
+                                                            <option value="Ms">Ms</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Job Position</label>
+                                                        <input type="text" class="form-control" placeholder="Job Position">
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Notes</label>
+                                                        <input type="text" class="form-control" placeholder="Notes">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="d-flex justify-content-start">
+                                                <button type="button" class="btn btn-success">Add User</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="customer-purchasing-panel" class="customer-contact-panel" role="tabpanel" aria-labelledby="tab-purchasing" hidden>
+                                        <div class="mb-5 fw-bold">Purchasing Information</div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label form-label-bold">Customer Name</label>
+                                            <input class="form-control" placeholder="Customer Name" required />
+                                        </div>
+
+                                        <div class="mb-5">
+                                            <label class="form-label form-label-bold">Profile Picture</label>
+                                            <input class="form-control" type="file" name="purchasing-profile-picture">
+                                        </div>
+
+                                        <div class="mb-5 row">
+                                            <div class="mb-1 d-flex align-items-center gap-1" style="font-size: 20px;">
+                                                <i class='bx bx-info-circle fw-bold'></i>
+                                                <span class="fw-bold">
+                                                    Basic Information
+                                                </span>
+                                            </div>
+
+                                            <div class="col-12 col-sm-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label form-label-bold">Email</label>
+                                                    <input type="email" class="form-control" placeholder="Email">
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label form-label-bold">Phone</label>
+                                                    <input type="tel" class="form-control" placeholder="Phone">
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label form-label-bold">Mobile</label>
+                                                    <input type="tel" class="form-control" placeholder="Mobile">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-12 col-sm-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label form-label-bold">Title</label>
+                                                    <select class="form-select">
+                                                        <option value="" hidden>Title</option>
+                                                        <option value="Mr">Mr</option>
+                                                        <option value="Mrs">Mrs</option>
+                                                        <option value="Ms">Ms</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label form-label-bold">Job Position</label>
+                                                    <input type="text" class="form-control" placeholder="Job Position">
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label form-label-bold">Notes</label>
+                                                    <input type="text" class="form-control" placeholder="Notes">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex justify-content-start">
+                                            <button type="button" class="btn btn-success">Add User</button>
+                                        </div>
+                                    </div>
+
+                                    <div id="customer-it-engineer-panel" class="customer-contact-panel" role="tabpanel" aria-labelledby="tab-it-engineer" hidden>
+                                        <div class="mb-5 fw-bold">IT Engineer Information</div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label form-label-bold">Customer Name</label>
+                                            <input class="form-control" placeholder="Customer Name" required />
+                                        </div>
+
+                                        <div class="mb-5">
+                                            <label class="form-label form-label-bold">Profile Picture</label>
+                                            <input class="form-control" type="file" name="itengineer-profile-picture">
+                                        </div>
+
+                                        <div class="mb-5 row">
+                                            <div class="mb-1 d-flex align-items-center gap-1" style="font-size: 20px;">
+                                                <i class='bx bx-info-circle fw-bold'></i>
+                                                <span class="fw-bold">
+                                                    Basic Information
+                                                </span>
+                                            </div>
+
+                                            <div class="col-12 col-sm-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label form-label-bold">Email</label>
+                                                    <input type="email" class="form-control" placeholder="Email">
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label form-label-bold">Phone</label>
+                                                    <input type="tel" class="form-control" placeholder="Phone">
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label form-label-bold">Mobile</label>
+                                                    <input type="tel" class="form-control" placeholder="Mobile">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-12 col-sm-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label form-label-bold">Title</label>
+                                                    <select class="form-select">
+                                                        <option value="" hidden>Title</option>
+                                                        <option value="Mr">Mr</option>
+                                                        <option value="Mrs">Mrs</option>
+                                                        <option value="Ms">Ms</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label form-label-bold">Job Position</label>
+                                                    <input type="text" class="form-control" placeholder="Job Position">
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label form-label-bold">Notes</label>
+                                                    <input type="text" class="form-control" placeholder="Notes">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex justify-content-start">
+                                            <button type="button" class="btn btn-success">Add User</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-center gap-2">
+                            <button type="submit" class="btn btn-success add-customer-form-save-btn btn-uniform">
+                                Save
+                            </button>
+
+                            <button class="btn btn-danger add-customer-form-close-btn btn-uniform">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        @* <div>
+            <button id="request-item-to-purchasing-option">
+                Request to Purchasing (Temporary Button)
+            </button>
+        </div> *@
+
+        <div class="request-item-to-purchasing-form-pop-up px-5 py-3">
+            <form method="post" enctype="multipart/form-data" class="request-item-to-purchasing-form">
+                <div class="mb-4 d-flex" style="font-size: 25px;">
+                    <span class="fw-bold">
+                        Request to Purchasing
+                    </span>
+
+                    <div class="request-item-to-purchasing-form-close-btn">
+                        <i class='bx bx-x fw-bold' style="border: 1px solid #000; border-radius: 3px;"></i>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center">
+                    <div class="col-12">
                         <div class="mb-3">
-                            <label class="form-label form-label-bold">Email</label>
-                            <input id="popupCustomerEmail" type="email" class="form-control" placeholder="Email">
+                            <label class="form-label form-label-bold">
+                                Item Name
+                            </label>
+                            <input class="form-control" required />
                         </div>
-                        *@
-                        <div class="d-flex justify-content-center gap-2 mt-4">
-                            <button type="button" class="btn btn-success add-customer-form-save-btn btn-uniform">Save Customer</button>
-                            <button type="button" class="btn btn-danger add-customer-form-close-btn-direct btn-uniform">Cancel</button>
+
+                        <div class="mb-3">
+                            <label class="form-label form-label-bold">
+                                Item Description
+                            </label>
+                            <input class="form-control" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label form-label-bold">
+                                Quantity
+                            </label>
+                            <input type="number" min="1" class="form-control" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label form-label-bold">
+                                UoM
+                            </label>
+                            <input class="form-control" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label form-label-bold">
+                                Detail
+                            </label>
+                            <input class="form-control" required />
+                        </div>
+
+                        <div class="mb-5">
+                            <label class="form-label form-label-bold">
+                                Attachment
+                            </label>
+                            <input class="form-control" type="file" id="request-item-to-purchasing-attachment" name="attachment">
+                        </div>
+
+                        <div class="d-flex justify-content-center gap-2">
+                            <button class="btn btn-danger request-item-to-purchasing-form-cancel-btn">
+                                Cancel
+                            </button>
+
+                            <button class="btn btn-success">
+                                Sent
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -44,325 +590,346 @@
         </div>
 
 
-        <form asp-action="Create" method="post" id="createRfqFullForm" enctype="multipart/form-data">
-            @Html.AntiForgeryToken()
-            <div asp-validation-summary="All" class="alert alert-danger" role="alert" style="@(ViewData.ModelState.IsValid ? "display: none;" : "")">
-                Harap perbaiki kesalahan berikut dan coba lagi.
-            </div>
-            @if (TempData["SuccessMessage"] != null)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
+            @if (Model.RFQID_FromEdit.HasValue)
             {
-                <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+                <input type="hidden" asp-for="RFQID_FromEdit" />
             }
+            @* <div class="col-12 mb-5">
+                    <div class="mt-2">
+                        <div class="col-12 d-flex justify-content-end">
+                            <button type="submit" class="btn-link-style me-3">Save</button>
+                            <a asp-controller="RFQ" asp-action="Index" class="btn-link-style text-danger">Discard</a>
+                        </div>
+                    </div>
+            </div> *@
 
-            <div class="card shadow-sm">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0">Formulir RFQ</h5>
+            <div class="header mt-4 mb-4 w-100 page-header" style="font-size: 29px;">
+                <a class="text-decoration-none" asp-controller="RFQ" asp-action="Index"><span class="text-danger rfq-link">RFQ</span></a>&nbsp;<span>&gt;</span>&nbsp;<span class="tes text-decoration">Create RFQ</span>
+                @if (!string.IsNullOrEmpty(Model.RFQCode))
+                {
+                    <label class="float-sm-end rfq-id" asp-for="RFQCode">@Model.RFQCode</label>
+                    <input type="hidden" asp-for="RFQCode" />
+
+                }
+                else if (!Model.RFQID_FromEdit.HasValue) // Hanya tampilkan placeholder jika benar-benar baru & belum di-generate
+                {
+                    <span class="float-sm-end rfq-id">RFQYYXXXX</span>
+                }
+                @* <span class="float-sm-end rfq-id">@ViewBag.RFQCode</span> *@
+            </div>
+
+            
+
+            <div class="row justify-content-center">
+                <div class="col-12">
+                    <div class="input-field my-4">
+                        <input asp-for="RFQName" type="text" class="input-float" style="width: 100%" id="rfq-name" required spellcheck="false">
+                        <label asp-for="RFQName">RFQ Name</label>
+                        <span asp-validation-for="RFQName" class="text-danger"></span>
+                    </div>
+
+                    <div class="row mt-5 mb-4 mx-1">
+                        <div class="col-12 col-sm-6">
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="sejajar" style="width: 146px">
+                                        <label asp-for="CustomerID" class="form-label form-label-bold mb-0">Company Name</label>
+                                    </div>
+                                    <div class="wrapp company-dropdown" style="width: 70%;">
+                                        <div class="select-btn">
+                                            <span></span>
+                                            <i class='bx bx-chevron-down'></i>
+                                        </div>
+                                        <div class="content-search">
+                                            <div class="search">
+                                                <i class="bx bx-search-alt-2"></i>
+                                                <input type="text" placeholder="Search" />
+                                            </div>
+                                            <ul class="option" style="margin-bottom: 10px;"></ul>
+                                        </div>
+                                        <input type="hidden" asp-for="CustomerID" id="hiddenCustomerId" />
+                                    </div>
+                                </div>
+                                <span asp-validation-for="CustomerID" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="sejajar" style="width: 146px">
+                                        <label asp-for="EndUserContactPersonID" class="form-label form-label-bold mb-0">End User</label>
+                                    </div>
+                                    <select asp-for="EndUserContactPersonID" asp-items="Model.EndUserContactPersonList" class="select-btn" style="width:70%" id="endUserDropdown">
+                                        <option value="">-- Select Company First --</option>
+                                    </select>
+                                    <span asp-validation-for="EndUserContactPersonID" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="sejajar" style="width: 146px">
+                                        <label asp-for="RequestDate" class="form-label form-label-bold mb-0">Request Date</label>
+                                    </div>
+                                    <input asp-for="RequestDate" type='date' class="form-control1 mb-0" style="width:70%" id='request-date'>
+                                </div>
+                                <span asp-validation-for="RequestDate" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="sejajar" style="width: 146px">
+                                        <label asp-for="DueDate" class='form-label form-label-bold mb-0'>Due Date</label>
+                                    </div>
+                                    <input asp-for="DueDate" type='date' class="form-control1 mb-0" style="width:70%" id='due-date'>
+                                </div>
+                                <span asp-validation-for="DueDate" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6">
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="sejajar" style="width: 146px">
+                                        <label asp-for="Resource" class="form-label form-label-bold mb-0">Resource</label>
+                                    </div>
+                                    <div class="wrapp resource-dropdown" style="width: 70%;">
+                                        <div class="select-btn">
+                                            <span>@(Model.Resource ?? "Select Resource")</span>
+                                            <i class='bx bx-chevron-down'></i>
+                                        </div>
+                                        <div class="content-search">
+                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
+                                                <li onclick="updateResource(this)">Email</li>
+                                                <li onclick="updateResource(this)">Whatsapp</li>
+                                                <li onclick="updateResource(this)">Telephone</li>
+                                                <li class="has-sub" id="resource-personal-option">
+                                                    Personal
+                                                    <ul class="sub-option" id="resource-personal-sub-dropdown">
+                                                        <li class="has-sub" id="resource-personal-email"> Email <ul class="sub-option second-level"> <li onclick="updateResourcePersonalUser(this)">Seheni</li> <li onclick="updateResourcePersonalUser(this)">Nadya</li> <li onclick="updateResourcePersonalUser(this)">Meli</li> <li onclick="updateResourcePersonalUser(this)">Elpera</li> </ul> </li>
+                                                        <li class="has-sub" id="resource-personal-phone"> Phone <ul class="sub-option second-level"> <li onclick="updateResourcePersonalUser(this)">Seheni</li> <li onclick="updateResourcePersonalUser(this)">Nadya</li> <li onclick="updateResourcePersonalUser(this)">Meli</li> <li onclick="updateResourcePersonalUser(this)">Elpera</li> </ul> </li>
+                                                        <li class="has-sub" id="resource-personal-direct"> Direct <ul class="sub-option second-level"> <li onclick="updateResourcePersonalUser(this)">Seheni</li> <li onclick="updateResourcePersonalUser(this)">Nadya</li> <li onclick="updateResourcePersonalUser(this)">Meli</li> <li onclick="updateResourcePersonalUser(this)">Elpera</li> </ul> </li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" asp-for="Resource" />
+                                    <input type="hidden" asp-for="PersonalResourceEmployeeID" />
+                                </div>
+                                <span asp-validation-for="Resource" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="mb-3" id="personalResourceEmployeeSection" style="display: @(Model.Resource == "Personal" || (Model.Resource != null && Model.Resource.StartsWith("Personal")) ? "block" : "none");">
+                                <div class="d-flex align-items-center">
+                                    <div class="sejajar" style="width: 146px">
+                                        <label asp-for="PersonalResourceEmployeeID" class="form-label form-label-bold mb-0">Personal Resource</label>
+                                    </div>
+                                    <select asp-for="PersonalResourceEmployeeID" asp-items="Model.UserList" class="form-select form-control1 mb-0" style="width:70%">
+                                        <option value="">-- Select Employee --</option>
+                                    </select>
+                                </div>
+                                <span asp-validation-for="PersonalResourceEmployeeID" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="sejajar" style="width: 146px">
+                                        <label asp-for="RFQCategoryID" class="form-label form-label-bold mb-0">Category</label>
+                                    </div>
+                                    <div class="wrapp project-type-dropdown" style="width: 70%;">
+                                        <div class="select-btn">
+                                            <span>@(Model.RFQCategoryList?.FirstOrDefault(x => x.Value == Model.RFQCategoryID.ToString())?.Text ?? "Select Category")</span>
+                                            <i class='bx bx-chevron-down'></i>
+                                        </div>
+                                        <div class="content-search">
+                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
+                                                @foreach (var item in Model.RFQCategoryList ?? Enumerable.Empty<SelectListItem>())
+                                                { <li data-value="@item.Value">@item.Text</li> }
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" asp-for="RFQCategoryID" />
+                                </div>
+                                <span asp-validation-for="RFQCategoryID" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="sejajar" style="width: 146px">
+                                        <label asp-for="RFQOpportunityID" class="form-label form-label-bold mb-0">Opportunity</label>
+                                    </div>
+                                    <div class="wrapp" id="opportunity-dropdown" style="width: 70%;">
+                                        <div class="select-btn">
+                                            <span>@(Model.RFQOpportunityList?.FirstOrDefault(x => x.Value == Model.RFQOpportunityID.ToString())?.Text ?? "Select Opportunity")</span>
+                                            <i class='bx bx-chevron-down'></i>
+                                        </div>
+                                        <div class="content-search">
+                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
+                                                @foreach (var item in Model.RFQOpportunityList ?? Enumerable.Empty<SelectListItem>())
+                                                { <li data-value="@item.Value">@item.Text</li> }
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" asp-for="RFQOpportunityID" />
+                                </div>
+                                <span asp-validation-for="RFQOpportunityID" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h5 class="note-title underline mb-4">Notes</h5>
+                    <div class="row mx-md-4">
+                        <div class="col-12 col-sm-6">
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="sejajar" style="width: 190px">
+                                        <label asp-for="OverallBudget" class="form-label form-label-bold pe-4">Budget</label>
+                                    </div>
+                                    <input asp-for="OverallBudget" type="number" class="form-control1" style="width:50%" id="budget">
+                                    <span asp-validation-for="OverallBudget" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="sejajar" style="width: 146px">
+                                        <label asp-for="OverallLeadTime" class="form-label form-label-bold">Leadtime</label>
+                                    </div>
+                                    <input asp-for="OverallLeadTime" type='text' class='form-control1' style='width:100%' id='leadtime'>
+                                    <span asp-validation-for="OverallLeadTime" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tabel-item col-12">
+                        <table class="table item">
+                             <thead class="table-light">
+                                <tr>
+                                    <th>No</th><th>Item Name</th><th>Item Description</th><th>Qty</th><th>UoM</th><th>Budget</th><th>Leadtime</th><th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="itemTableBody">
+                                @for (int i = 0; i < (Model.NotesSectionItems?.Count ?? 1); i++)
+                                {
+                                    <tr>
+                                        <td>@(i + 1)</td>
+                                        <td class="name"><input asp-for="@Model.NotesSectionItems[i].ItemName" class='size form-control1' /></td>
+                                        <td class="desc"><input asp-for="@Model.NotesSectionItems[i].ItemDescription" class='size form-control1' /></td>
+                                        <td class="qty"><input asp-for="@Model.NotesSectionItems[i].Quantity" type='number' class='size form-control1' /></td>
+                                        <td class="uom"><input asp-for="@Model.NotesSectionItems[i].UoM" class='size tengah form-control1' /></td>
+                                        <td class="budget"><input asp-for="@Model.NotesSectionItems[i].BudgetTarget" type='number' class='size form-control1' /></td>
+                                        <td class="leadtime"><input asp-for="@Model.NotesSectionItems[i].LeadTimeTarget" class='size tengah form-control1' /></td>
+                                        <td class="delete">
+                                            <button type="button" onclick="removeRow(this)" class="btn"><i class='bx bx-trash'></i></button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <button type="button" id="addRowBtn" class="btn btn-dark mt-1 btn-uniform">Add Row</button>
+
+                    <div class="wrapper-2 mt-3 mb-4">
+                        <div class="form-upload">
+                            <input class="file-input" type="file" name="AttachmentFiles" hidden multiple>
+                            <div class="rounding"><i class="fa-solid fa-paperclip"></i></div>
+                            <div class="desc">
+                                <p class="mt-3">Attachment: <span class="attachment-count">0</span></p>
+                                <p class="description">Drag/Drop files here. You can upload a maximum of 5 files, 5MB each</p>
+                            </div>
+                        </div>
+                        <div id="attached-files" style="display: none;"></div>
+                        <section class="progress-area"></section>
+                        <section class="uploaded-area"></section>
+                    </div>
+
+                    <div class="col-12 mb-4">
+                        <h4 class="delegation-title underline">Delegation</h4>
+                    </div>
+
+                    <div class="tabel item-list col-12">
+                        <h5 class="item-list-title underline">Item List</h5>
+                        <table class="table item-list">
+                            <thead class="table-light">
+                                <tr><th>No</th><th>Item Name</th><th>Item Description</th><th>Qty</th><th>UoM</th><th>U/Price</th><th>Notes</th><th>Details</th><th>Our Warranty</th><th>Amount</th><th></th></tr>
+                            </thead>
+                            <tbody id="itemListTableBody">
+                                 @for (int i = 0; i < (Model.ItemListSectionItems?.Count ?? 0); i++) // ?? 0 agar tidak render baris default jika list kosong
+                                {
+                                    <tr>
+                                        <td>@(i+1)</td>
+                                        <td class="name"><select asp-for="@Model.ItemListSectionItems[i].ItemID" asp-items="Model.ItemMasterList" class='size form-control1 form-select'><option value="">--Select Item--</option></select></td>
+                                        <td class="desc"><input asp-for="@Model.ItemListSectionItems[i].Details" class='size form-control1' /></td>
+                                        <td class="qty"><input asp-for="@Model.ItemListSectionItems[i].Quantity" type='number' class='size form-control1' /></td>
+                                        <td class="uom"><input asp-for="@Model.ItemListSectionItems[i].UoM" class='size tengah form-control1' /></td>
+                                        <td class="price"><input asp-for="@Model.ItemListSectionItems[i].TargetUnitPrice" type='number' class='size form-control1' /></td>
+                                        <td class="notes"><input asp-for="@Model.ItemListSectionItems[i].Notes" class='size form-control1' /></td>
+                                        <td class="details"><input asp-for="@Model.ItemListSectionItems[i].Details" class='size form-control1' /></td>
+                                        <td class="warranty"><input asp-for="@Model.ItemListSectionItems[i].SalesWarranty" class='size form-control1' /></td>
+                                        <td class="amount"><input type='number' class='size form-control1' readonly /></td>
+                                        <td class="delete"><button type="button" onclick="removeRowItemList(this)" class="btn"><i class='bx bx-trash'></i></button></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <button type="button" id="addRowBtnItem" class="btn btn-dark mb-5 mt-1 btn-uniform">Add Item</button>
+                    </div>
+
+                    <div class="tabel req-item col-12">
+                        <h5 class="item-list-title underline">Request Item to Purchasing</h5>
+                        <table class="table item-list">
+                             <thead class="table-light">
+                                <tr><th>Action</th><th>No</th><th>Req Code</th><th>Item Name</th><th>Item Description</th><th>Qty</th><th>UoM</th><th>Reason for Request</th><th>Notes (Internal)</th><th>PIC</th><th>Status</th><th></th></tr>
+                            </thead>
+                            <tbody id="reqTableBody">
+                                @for (int i = 0; i < (Model.PurchasingRequestSectionItems?.Count ?? 0); i++) // ?? 0 agar tidak render baris default
+                                {
+                                    <tr>
+                                        <td class="action"><button type="button" class="btn"><i class='bx bx-plus-circle'></i></button></td>
+                                        <td class="nomor" style="padding: 14px 9px;">@(i+1)</td>
+                                        <td class="reqCode"><input type='text' class='tengah size form-control1' /></td>
+                                        <td class="name"><input asp-for="@Model.PurchasingRequestSectionItems[i].RequestedItemName" class='size form-control1' /></td>
+                                        <td class="desc"><input asp-for="@Model.PurchasingRequestSectionItems[i].RequestedItemDescription" class='size form-control1' /></td>
+                                        <td class="qty"><input asp-for="@Model.PurchasingRequestSectionItems[i].Quantity" type='number' class='size form-control1' /></td>
+                                        <td class="uom"><input asp-for="@Model.PurchasingRequestSectionItems[i].UoM" class='size tengah form-control1' /></td>
+                                        <td class="reason"><input asp-for="@Model.PurchasingRequestSectionItems[i].ReasonForRequest" class='size form-control1' /></td>
+                                        <td class="notes"><input asp-for="@Model.PurchasingRequestSectionItems[i].SalesNotes" class='size form-control1' /></td>
+                                        <td class="pic"><select asp-for="@Model.PurchasingRequestSectionItems[i].AssignedToPurchasingUserID" asp-items="Model.UserList" class='size form-control1 form-select'><option value="">--Select PIC--</option></select></td>
+                                        <td class="status"><input type='text' class='size form-control1' /></td>
+                                        <td class="delete"><button type="button" onclick="removeRowReq(this)" class="btn btn-remo"><i class='bx bx-trash'></i></button></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <button type="button" id="addRowBtnReq" class="btn btn-dark mb-5 mt-1 btn-uniform">Add Item</button>
+                    </div>
+                    
+                    @* Tambahkan section Survey di sini jika perlu, dengan logika disable yang sama *@
+
                 </div>
-                <div class="card-body">
-                    <fieldset class="border p-3 mb-4 rounded">
-                        <legend class="w-auto px-2 h6 legend-custom">Informasi RFQ Utama</legend>
-                        <div class="input-field my-4">
-                            @* RFQ Name dari HTML Anda *@
-                            <input asp-for="RFQName" class="input-float" style="width: 100%" id="rfq-name-input" required spellcheck="false">
-                            <label asp-for="RFQName">RFQ Name</label>
-                            <span asp-validation-for="RFQName" class="text-danger"></span>
-                        </div>
 
-                        <div class="row mt-3 mb-2 mx-1">
-                            @* Menggunakan struktur row dari HTML Anda *@
-                            <div class="col-12 col-sm-6">
-                                <div class="mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <div class="sejajar" style="width: 146px">
-                                            <label asp-for="CustomerID" class="form-label form-label-bold mb-0">Company Name</label>
-                                        </div>
-                                        @* Menggunakan SELECT standar untuk binding, styling bisa disesuaikan *@
-                                        <select asp-for="CustomerID" class="form-select form-select-sm" asp-items="Model.CustomerList" id="customerIdDropdown" style="width: 70%;">
-                                            <option value="">-- Pilih Customer --</option>
-                                        </select>
-                                        @* Tombol untuk membuka pop-up Add Customer (jika masih ingin pakai) *@
-                                        @* <button type="button" id="openAddCustomerPopupBtn" class="btn btn-sm btn-outline-secondary ms-2"><i class="fas fa-plus"></i></button> *@
-                                    </div>
-                                    <span asp-validation-for="CustomerID" class="text-danger offset-md-3"></span>
-                                </div>
-                                <div class="mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <div class="sejajar" style="width: 146px">
-                                            <label asp-for="ContactPersonID" class="form-label form-label-bold mb-0">End User</label>
-                                        </div>
-                                        <select asp-for="ContactPersonID" class="form-select form-select-sm" asp-items="Model.ContactPersonList" id="contactPersonIdDropdown" style="width:70%">
-                                            <option value="">-- Pilih End User --</option>
-                                        </select>
-                                    </div>
-                                    <span asp-validation-for="ContactPersonID" class="text-danger offset-md-3"></span>
-                                </div>
-                                <div class="mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <div class="sejajar" style="width: 146px">
-                                            <label asp-for="RequestDate" class="form-label form-label-bold mb-0"></label>
-                                        </div>
-                                        <input asp-for="RequestDate" type="date" class="form-control form-control-sm" style="width:70%" />
-                                    </div>
-                                    <span asp-validation-for="RequestDate" class="text-danger offset-md-3"></span>
-                                </div>
-                                <div class="mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <div class="sejajar" style="width: 146px">
-                                            <label asp-for="DueDate" class="form-label form-label-bold mb-0"></label>
-                                        </div>
-                                        <input asp-for="DueDate" type="date" class="form-control form-control-sm" style="width:70%" />
-                                    </div>
-                                    <span asp-validation-for="DueDate" class="text-danger offset-md-3"></span>
-                                </div>
-                            </div>
-                            <div class="col-12 col-sm-6">
-                                <div class="mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <div class="sejajar" style="width: 146px">
-                                            <label asp-for="Resource" class="form-label form-label-bold mb-0"></label>
-                                        </div>
-                                        <select asp-for="Resource" class="form-select form-select-sm" style="width: 70%;" id="resourceDropdown">
-                                            <option value="">-- Pilih Resource --</option>
-                                            <option value="Email">Email</option>
-                                            <option value="Whatsapp">Whatsapp</option>
-                                            <option value="Telephone">Telephone</option>
-                                            <option value="Personal">Personal</option>
-                                        </select>
-                                    </div>
-                                    <span asp-validation-for="Resource" class="text-danger offset-md-3"></span>
-                                </div>
-                                <div class="mb-3" id="picPersonalSection" style="display:none;">
-                                    @* Awalnya disembunyikan *@
-                                    <div class="d-flex align-items-center">
-                                        <div class="sejajar" style="width: 146px">
-                                            <label asp-for="PersonalResourceEmployeeID" class="form-label form-label-bold mb-0">PIC Personal</label>
-                                        </div>
-                                        <select asp-for="PersonalResourceEmployeeID" class="form-select form-select-sm" asp-items="Model.UserList" style="width: 70%;">
-                                            <option value="">-- Pilih PIC --</option>
-                                        </select>
-                                    </div>
-                                    <span asp-validation-for="PersonalResourceEmployeeID" class="text-danger offset-md-3"></span>
-                                </div>
-                                <div class="mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <div class="sejajar" style="width: 146px">
-                                            <label asp-for="RFQCategoryID" class="form-label form-label-bold mb-0">Category</label>
-                                        </div>
-                                        <select asp-for="RFQCategoryID" class="form-select form-select-sm" asp-items="Model.RFQCategoryList" style="width: 70%;">
-                                            <option value="">-- Pilih Kategori --</option>
-                                        </select>
-                                    </div>
-                                    <span asp-validation-for="RFQCategoryID" class="text-danger offset-md-3"></span>
-                                </div>
-                                <div class="mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <div class="sejajar" style="width: 146px">
-                                            <label asp-for="RFQOpportunityID" class="form-label form-label-bold mb-0">Opportunity</label>
-                                        </div>
-                                        <select asp-for="RFQOpportunityID" class="form-select form-select-sm" asp-items="Model.RFQOpportunityList" style="width: 70%;">
-                                            <option value="">-- Pilih Peluang --</option>
-                                        </select>
-                                    </div>
-                                    <span asp-validation-for="RFQOpportunityID" class="text-danger offset-md-3"></span>
-                                </div>
-                            </div>
+                <div class="col-12 mb-5">
+                    <div class="mt-2">
+                        <div class="card-body text-center">
+                            <button type="submit" class="btn btn-dark btn-uniform">Save</button>
+                            <a asp-controller="RFQ" asp-action="Index" class="btn btn-danger btn-uniform">Discard</a>
                         </div>
-                        <h5 class="note-title underline mb-2 mt-3">Notes (Overall)</h5> @* Menggunakan style dari HTML Anda *@
-                        <div class="row mx-md-0">
-                            @* Disesuaikan agar tidak terlalu jauh *@
-                            <div class="col-12 col-sm-6 mb-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="sejajar" style="width: 146px">
-                                        <label asp-for="OverallBudget" class="form-label form-label-bold mb-0">Budget</label>
-                                    </div>
-                                    <input asp-for="OverallBudget" type="number" step="any" class="form-control form-control-sm" style="width:70%" />
-                                </div>
-                                <span asp-validation-for="OverallBudget" class="text-danger offset-md-3"></span>
-                            </div>
-                            <div class="col-12 col-sm-6 mb-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="sejajar" style="width: 146px">
-                                        <label asp-for="OverallLeadTime" class="form-label form-label-bold mb-0">Leadtime</label>
-                                    </div>
-                                    <input asp-for="OverallLeadTime" class="form-control form-control-sm" style="width:70%" />
-                                </div>
-                                <span asp-validation-for="OverallLeadTime" class="text-danger offset-md-3"></span>
-                            </div>
-                        </div>
-                    </fieldset>
-
-                    <fieldset class="border p-3 mb-4 rounded">
-                        <legend class="w-auto px-2 h6 legend-custom">Notes (Permintaan Awal / Item Bebas)</legend>
-                        <div class="tabel-item col-12">
-                            @* Menggunakan class dari HTML Anda *@
-                            <table class="table table-sm table-bordered item" id="notesTable">
-                                @* ID disesuaikan untuk JS *@
-                                <thead class="table-light">
-                                    <tr>
-                                        <th style="width:2%;">No</th>
-                                        <th style="width:23%;">Item Name (Free Text)</th>
-                                        <th style="width:25%;">Item Description</th>
-                                        <th style="width:8%;" class="text-end">Qty</th>
-                                        <th style="width:8%;">UoM</th>
-                                        <th style="width:12%;" class="text-end">Budget</th>
-                                        <th style="width:12%;">Leadtime</th>
-                                        <th style="width:5%;" class="text-center">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @for (int i = 0; i < Model.NotesSectionItems.Count; i++)
-                                    {
-                                        <tr>
-                                            <td class="row-number">@(i + 1)</td>
-                                            <td><input asp-for="NotesSectionItems[i].ItemName" class="form-control form-control-sm size" /></td>
-                                            <td><textarea asp-for="NotesSectionItems[i].ItemDescription" class="form-control form-control-sm size" rows="1"></textarea></td>
-                                            <td><input asp-for="NotesSectionItems[i].Quantity" type="number" value="1" class="form-control form-control-sm text-end size" /></td>
-                                            <td><input asp-for="NotesSectionItems[i].UoM" class="form-control form-control-sm size tengah" /></td>
-                                            <td><input asp-for="NotesSectionItems[i].BudgetTarget" type="number" step="any" class="form-control form-control-sm text-end size" /></td>
-                                            <td><input asp-for="NotesSectionItems[i].LeadTimeTarget" class="form-control form-control-sm size tengah" /></td>
-                                            <td class="text-center align-middle delete">
-                                                <button type="button" class="btn btn-danger btn-sm remove-row" title="Hapus Note"><i class="fas fa-trash-alt"></i></button>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                        <button type="button" id="addNoteRowButton" class="btn btn-dark mt-1 btn-uniform"><i class="fas fa-plus"></i> Add Row</button>
-                    </fieldset>
-
-                    <fieldset class="border p-3 mb-4 rounded">
-                        <legend class="w-auto px-2 h6 legend-custom">Attachment RFQ</legend>
-                        <div class="wrapper-2 mt-3 mb-4">
-                            @* Dari HTML Anda *@
-                            <div class="form-upload">
-                                <input class="file-input" type="file" name="rfqHeaderAttachments" id="rfqHeaderAttachments" hidden multiple>
-                                <div class="rounding" onclick="document.getElementById('rfqHeaderAttachments').click();" style="cursor:pointer;">
-                                    <i class="fa-solid fa-paperclip"></i>
-                                </div>
-                                <div class="desc">
-                                    <p class="mt-3">Attachment: <span class="attachment-count">0</span> file(s)</p>
-                                    <p class="description">Drag/Drop files here or click. Max 5 files, 5MB each.</p>
-                                </div>
-                            </div>
-                            <div id="attached-files-display" class="mt-2" style="display: none;"></div>
-                            <section class="progress-area"></section>
-                            <section class="uploaded-area"></section>
-                        </div>
-                    </fieldset>
-
-                    <fieldset class="border p-3 mb-4 rounded">
-                        <legend class="w-auto px-2 h6 legend-custom item-list-title underline">Item List (Detail RFQ)</legend> @* Menggunakan style dari HTML Anda *@
-                        <span asp-validation-for="ItemListSectionItems" class="text-danger d-block mb-2"></span>
-                        <div class="tabel item-list col-12">
-                            @* Menggunakan class dari HTML Anda *@
-                            <table class="table table-sm table-bordered item-list" id="rfqItemTable">
-                                @* ID disesuaikan untuk JS *@
-                                <thead class="table-light">
-                                    <tr>
-                                        <th style="width:2%;">No</th>
-                                        <th style="width:20%;">Item (dari Master)</th>
-                                        <th style="width:15%;">Item Description (auto)</th>
-                                        <th style="width:7%;" class="text-end">Qty</th>
-                                        <th style="width:7%;">UoM</th>
-                                        <th style="width:10%;" class="text-end">U/Price</th>
-                                        <th style="width:12%;">Notes</th>
-                                        <th style="width:12%;">Details</th>
-                                        <th style="width:10%;">Our Warranty</th>
-                                        @* Amount akan dihitung jika perlu, atau hapus jika tidak diinput *@
-                                        <th style="width:5%;" class="text-center">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @for (int i = 0; i < Model.ItemListSectionItems.Count; i++)
-                                    {
-                                        <tr>
-                                            <td class="row-number">@(i + 1)</td>
-                                            <td class="name">
-                                                <select asp-for="ItemListSectionItems[i].ItemID" class="form-select form-select-sm item-master-dropdown" asp-items="Model.ItemMasterList">
-                                                    <option value="">-- Pilih Item --</option>
-                                                </select>
-                                                <span asp-validation-for="ItemListSectionItems[i].ItemID" class="text-danger"></span>
-                                            </td>
-                                            <td class="desc"><input asp-for="ItemListSectionItems[i].Details" class="form-control form-control-sm size" placeholder="Deskripsi Item (auto)" readonly /></td> @* Placeholder, bisa diisi JS *@
-                                            <td class="qty"><input asp-for="ItemListSectionItems[i].Quantity" type="number" value="1" class="form-control form-control-sm text-end size" /></td>
-                                            <td class="uom"><input asp-for="ItemListSectionItems[i].UoM" class="form-control form-control-sm size tengah" /></td>
-                                            <td class="price"><input asp-for="ItemListSectionItems[i].TargetUnitPrice" type="number" step="any" class="form-control form-control-sm text-end size" /></td>
-                                            <td class="notes"><input asp-for="ItemListSectionItems[i].Notes" class="form-control form-control-sm size" /></td>
-                                            <td class="details"><input asp-for="ItemListSectionItems[i].Details" class="form-control form-control-sm size" /></td>
-                                            <td class="warranty"><input asp-for="ItemListSectionItems[i].SalesWarranty" class="form-control form-control-sm size" /></td>
-                                            <td class="delete text-center align-middle">
-                                                <button type="button" class="btn btn-danger btn-sm remove-row" title="Hapus Item"><i class="fas fa-trash-alt"></i></button>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                        <button type="button" id="addRfqItemRowButton" class="btn btn-dark mb-3 mt-1 btn-uniform"><i class="fas fa-plus"></i> Add Item</button>
-                    </fieldset>
-
-                    <fieldset class="border p-3 mb-4 rounded">
-                        <legend class="w-auto px-2 h6 legend-custom item-list-title underline">Request Item to Purchasing</legend>
-                        <div class="tabel req-item col-12">
-                            @* Menggunakan class dari HTML Anda *@
-                            <table class="table table-sm table-bordered item-list" id="purchasingRequestTable">
-                                @* ID disesuaikan untuk JS *@
-                                <thead class="table-light">
-                                    <tr>
-                                        @* Kolom "Action" dari HTML Anda untuk tombol plus tidak diperlukan jika baris ditambah dari tombol di bawah tabel *@
-                                        <th style="width:2%;">No</th>
-                                        @* <th style="width:10%;">Req Code</th> *@
-                                        <th style="width:18%;">Item (Master)</th>
-                                        <th style="width:18%;">Nama Item Baru</th>
-                                        <th style="width:15%;">Deskripsi Item Baru</th>
-                                        <th style="width:7%;" class="text-end">Qty</th>
-                                        <th style="width:7%;">UoM</th>
-                                        <th style="width:10%;">Alasan</th>
-                                        <th style="width:10%;">Notes (Internal)</th>
-                                        <th style="width:10%;">PIC</th>
-                                        @* <th>Status</th> *@
-                                        <th style="width:5%;" class="text-center">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @* Baris akan ditambahkan oleh JavaScript *@
-                                </tbody>
-                            </table>
-                        </div>
-                        <button type="button" id="addPurchasingRequestRowButton" class="btn btn-dark mb-3 mt-1 btn-uniform"><i class="fas fa-plus"></i> Add Item</button>
-                    </fieldset>
-
-                    <fieldset class="border p-3 mb-4 rounded">
-                        <legend class="w-auto px-2 h6 legend-custom">Request Survey</legend>
-                        <div class="tabel-item col-12">
-                            @* Menggunakan class dari HTML Anda *@
-                            <table class="table table-sm table-bordered" id="surveyRequestTable">
-                                @* ID disesuaikan untuk JS *@
-                                <thead class="table-light">
-                                    <tr>
-                                        <th style="width:2%;">No</th>
-                                        <th style="width:15%;">Kategori Survey</th>
-                                        <th style="width:15%;">Nama Survey</th>
-                                        <th style="width:10%;">PIC Customer</th>
-                                        <th style="width:15%;">PIC Teknis (Multi)</th>
-                                        <th style="width:13%;">Tgl & Waktu</th>
-                                        <th style="width:15%;">Lokasi</th>
-                                        <th style="width:15%;">Notes (Sales)</th>
-                                        <th style="width:5%;" class="text-center">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @* Baris akan ditambahkan oleh JavaScript *@
-                                </tbody>
-                            </table>
-                        </div>
-                        <button type="button" id="addSurveyRequestRowButton" class="btn btn-dark mb-3 mt-1 btn-uniform"><i class="fas fa-plus"></i> Add Item</button>
-                    </fieldset>
-
-                    <div class="mt-4 pt-3 border-top text-center">
-                        <button type="submit" class="btn btn-primary btn-lg btn-uniform"><i class="fas fa-save"></i> Save</button> @* Menggunakan teks dari HTML Anda *@
-                        <a asp-action="Index" class="btn btn-danger btn-lg ms-2 btn-uniform"><i class="fas fa-times"></i> Discard</a> @* Menggunakan teks dari HTML Anda *@
                     </div>
                 </div>
             </div>
@@ -370,6 +937,62 @@
     </div>
 </main>
 
+@section Scripts {
+    <script>
+        window.serverSideCustomerData = [];
+        @if (Model.CustomerList != null)
+        {
+                foreach (var customer in Model.CustomerList.Cast<SelectListItem>())
+                {
+                        @:serverSideCustomerData.push({ value: "@Html.Raw(customer.Value)", text: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(customer.Text))" });
+                }
+        }
 
+                function populateEndUserDropdown(customerId) {
+            console.log("populateEndUserDropdown called with customerId:", customerId); // Ini sudah muncul dengan benar
+            var endUserSelect = $('#endUserDropdown');
+            endUserSelect.empty();
 
+            if (customerId && customerId !== "" && customerId !== "0") {
+                endUserSelect.append($('<option></option>').val('').text('-- Loading End Users... --'));
+                $.ajax({
+                    url: '@Url.Action("GetContactPersonsByCustomerId", "RFQ")',
+                    type: 'GET',
+                    data: { customerId: customerId },
+                    success: function (data) {
+                        console.log("AJAX success, data diterima:", data); // TAMBAHKAN INI
+                        endUserSelect.empty();
+                        endUserSelect.append($('<option></option>').val('').text('-- Select End User --'));
+                        if (data && data.length > 0) {
+                            $.each(data, function (index, item) {
+                                console.log("Menambahkan opsi:", item.text, "value:", item.value); // TAMBAHKAN INI
+                                endUserSelect.append($('<option></option>').val(item.value).text(item.text));
+                            });
+                        } else {
+                            console.log("Tidak ada data end user atau data kosong."); // TAMBAHKAN INI
+                            endUserSelect.empty().append($('<option></option>').val('').text('-- No End Users Found --'));
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching end users: ", xhr, status, error);
+                        endUserSelect.empty().append($('<option></option>').val('').text('-- Error Loading --'));
+                    }
+                });
+            } else {
+                endUserSelect.append($('<option></option>').val('').text('-- Select Company First --'));
+            }
+        }
 
+        // Panggil populateEndUserDropdown saat dokumen siap JIKA #hiddenCustomerId sudah punya nilai valid.
+        // Ini berguna jika halaman bisa dimuat dengan customer yang sudah terpilih (misalnya halaman edit).
+        $(document).ready(function() {
+            var initialCustomerId = $('#hiddenCustomerId').val();
+            if (initialCustomerId && initialCustomerId !== "0") {
+                // populateEndUserDropdown(initialCustomerId); // Kita panggil dari updateName saja agar konsisten
+            } else {
+                // Pastikan dropdown End User dalam keadaan default jika tidak ada customer awal
+                populateEndUserDropdown(""); // Atau $('#endUserDropdown').empty().append(...opsi default...);
+            }
+        });
+    </script>
+}
