@@ -1,14 +1,14 @@
-﻿@{
+﻿@model BQuick.Models.RfqCreateFullViewModel
+@* @model List<PurchasingRequest> *@
+
+@{
     ViewData["Title"] = "Create RFQ";
+    
 }
 
 <main class="content-div mx-3">
     <div class="container-fluid mt-4">
-        <div class="header mt-4 mb-4 w-100 page-header" style="font-size: 29px;">
-            <a class="text-decoration-none" asp-controller="RFQ" asp-action="Index"><span class="text-danger rfq-link">RFQ</span></a>&nbsp;<span>&gt;</span>&nbsp;<span class="tes text-decoration">Create RFQ</span>
-            <span class="float-sm-end rfq-id">RFQYY0000</span>
-            @* <span class="float-sm-end rfq-id">@ViewBag.RFQCode</span> *@
-        </div>
+        
 
         <div class="add-customer-form-pop-up px-5 py-3">
             <form method="post" enctype="multipart/form-data" class="add-customer-form">
@@ -513,11 +513,11 @@
             </form>
         </div>
 
-        <div>
+        @* <div>
             <button id="request-item-to-purchasing-option">
                 Request to Purchasing (Temporary Button)
             </button>
-        </div>
+        </div> *@
 
         <div class="request-item-to-purchasing-form-pop-up px-5 py-3">
             <form method="post" enctype="multipart/form-data" class="request-item-to-purchasing-form">
@@ -589,21 +589,66 @@
             </form>
         </div>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         <form asp-action="Create" method="post" enctype="multipart/form-data">
+            @if (Model.RFQID_FromEdit.HasValue)
+            {
+                <input type="hidden" asp-for="RFQID_FromEdit" />
+            }
+            @* <div class="col-12 mb-5">
+                    <div class="mt-2">
+                        <div class="col-12 d-flex justify-content-end">
+                            <button type="submit" class="btn-link-style me-3">Save</button>
+                            <a asp-controller="RFQ" asp-action="Index" class="btn-link-style text-danger">Discard</a>
+                        </div>
+                    </div>
+            </div> *@
+
+            <div class="header mt-4 mb-4 w-100 page-header" style="font-size: 29px;">
+                <a class="text-decoration-none" asp-controller="RFQ" asp-action="Index"><span class="text-danger rfq-link">RFQ</span></a>&nbsp;<span>&gt;</span>&nbsp;<span class="tes text-decoration">Create RFQ</span>
+                @if (!string.IsNullOrEmpty(Model.RFQCode))
+                {
+                    <label class="float-sm-end rfq-id" asp-for="RFQCode">@Model.RFQCode</label>
+                    <input type="hidden" asp-for="RFQCode" />
+
+                }
+                else if (!Model.RFQID_FromEdit.HasValue) // Hanya tampilkan placeholder jika benar-benar baru & belum di-generate
+                {
+                    <span class="float-sm-end rfq-id">RFQYYXXXX</span>
+                }
+                @* <span class="float-sm-end rfq-id">@ViewBag.RFQCode</span> *@
+            </div>
+
+            
+
             <div class="row justify-content-center">
                 <div class="col-12">
                     <div class="input-field my-4">
-                        <input type="text" class="input-float" style="width: 100%" id="rfq-name" required spellcheck="false">
-                        <label>RFQ Name</label>
+                        <input asp-for="RFQName" type="text" class="input-float" style="width: 100%" id="rfq-name" required spellcheck="false">
+                        <label asp-for="RFQName">RFQ Name</label>
+                        <span asp-validation-for="RFQName" class="text-danger"></span>
                     </div>
 
                     <div class="row mt-5 mb-4 mx-1">
                         <div class="col-12 col-sm-6">
-                            <!-- Company Name -->
                             <div class="mb-3">
                                 <div class="d-flex align-items-center">
                                     <div class="sejajar" style="width: 146px">
-                                        <label for="company-name" class="form-label form-label-bold mb-0">Company Name</label>
+                                        <label asp-for="CustomerID" class="form-label form-label-bold mb-0">Company Name</label>
                                     </div>
                                     <div class="wrapp company-dropdown" style="width: 70%;">
                                         <div class="select-btn">
@@ -617,51 +662,54 @@
                                             </div>
                                             <ul class="option" style="margin-bottom: 10px;"></ul>
                                         </div>
+                                        <input type="hidden" asp-for="CustomerID" id="hiddenCustomerId" />
                                     </div>
                                 </div>
+                                <span asp-validation-for="CustomerID" class="text-danger"></span>
                             </div>
 
-                            <!-- End User -->
                             <div class="mb-3">
                                 <div class="d-flex align-items-center">
                                     <div class="sejajar" style="width: 146px">
-                                        <label for="end-user" class="form-label form-label-bold mb-0">End User</label>
+                                        <label asp-for="EndUserContactPersonID" class="form-label form-label-bold mb-0">End User</label>
                                     </div>
-                                    <input type="text" class="form-control1 mb-0" style="width:70%" id="end-user">
+                                    <select asp-for="EndUserContactPersonID" asp-items="Model.EndUserContactPersonList" class="select-btn" style="width:70%" id="endUserDropdown">
+                                        <option value="">-- Select Company First --</option>
+                                    </select>
+                                    <span asp-validation-for="EndUserContactPersonID" class="text-danger"></span>
                                 </div>
                             </div>
 
-                            <!-- Request Date -->
                             <div class="mb-3">
                                 <div class="d-flex align-items-center">
                                     <div class="sejajar" style="width: 146px">
-                                        <label for="request-date" class="form-label form-label-bold mb-0">Request Date</label>
+                                        <label asp-for="RequestDate" class="form-label form-label-bold mb-0">Request Date</label>
                                     </div>
-                                    <input type='date' class="form-control1 mb-0" style="width:70%" id='request-date'>
+                                    <input asp-for="RequestDate" type='date' class="form-control1 mb-0" style="width:70%" id='request-date'>
                                 </div>
+                                <span asp-validation-for="RequestDate" class="text-danger"></span>
                             </div>
 
-                            <!-- Due Date -->
                             <div class="mb-3">
                                 <div class="d-flex align-items-center">
                                     <div class="sejajar" style="width: 146px">
-                                        <label for='due-date' class='form-label form-label-bold mb-0'>Due Date</label>
+                                        <label asp-for="DueDate" class='form-label form-label-bold mb-0'>Due Date</label>
                                     </div>
-                                    <input type='date' class="form-control1 mb-0" style="width:70%" id='due-date'>
+                                    <input asp-for="DueDate" type='date' class="form-control1 mb-0" style="width:70%" id='due-date'>
                                 </div>
+                                <span asp-validation-for="DueDate" class="text-danger"></span>
                             </div>
                         </div>
 
                         <div class="col-12 col-sm-6">
-                            <!-- Resource Dropdown -->
                             <div class="mb-3">
                                 <div class="d-flex align-items-center">
                                     <div class="sejajar" style="width: 146px">
-                                        <label for="resource" class="form-label form-label-bold mb-0">Resource</label>
+                                        <label asp-for="Resource" class="form-label form-label-bold mb-0">Resource</label>
                                     </div>
                                     <div class="wrapp resource-dropdown" style="width: 70%;">
                                         <div class="select-btn">
-                                            <span></span>
+                                            <span>@(Model.Resource ?? "Select Resource")</span>
                                             <i class='bx bx-chevron-down'></i>
                                         </div>
                                         <div class="content-search">
@@ -672,97 +720,89 @@
                                                 <li class="has-sub" id="resource-personal-option">
                                                     Personal
                                                     <ul class="sub-option" id="resource-personal-sub-dropdown">
-                                                        <li class="has-sub" id="resource-personal-email">
-                                                            Email
-                                                            <ul class="sub-option second-level">
-                                                                <li onclick="updateResourcePersonalUser(this)">Seheni</li>
-                                                                <li onclick="updateResourcePersonalUser(this)">Nadya</li>
-                                                                <li onclick="updateResourcePersonalUser(this)">Meli</li>
-                                                                <li onclick="updateResourcePersonalUser(this)">Elpera</li>
-                                                            </ul>
-                                                        </li>
-                                                        <li class="has-sub" id="resource-personal-phone">
-                                                            Phone
-                                                            <ul class="sub-option second-level">
-                                                                <li onclick="updateResourcePersonalUser(this)">Seheni</li>
-                                                                <li onclick="updateResourcePersonalUser(this)">Nadya</li>
-                                                                <li onclick="updateResourcePersonalUser(this)">Meli</li>
-                                                                <li onclick="updateResourcePersonalUser(this)">Elpera</li>
-                                                            </ul>
-                                                        </li>
-                                                        <li class="has-sub" id="resource-personal-direct">
-                                                            Direct
-                                                            <ul class="sub-option second-level">
-                                                                <li onclick="updateResourcePersonalUser(this)">Seheni</li>
-                                                                <li onclick="updateResourcePersonalUser(this)">Nadya</li>
-                                                                <li onclick="updateResourcePersonalUser(this)">Meli</li>
-                                                                <li onclick="updateResourcePersonalUser(this)">Elpera</li>
-                                                            </ul>
-                                                        </li>
+                                                        <li class="has-sub" id="resource-personal-email"> Email <ul class="sub-option second-level"> <li onclick="updateResourcePersonalUser(this)">Seheni</li> <li onclick="updateResourcePersonalUser(this)">Nadya</li> <li onclick="updateResourcePersonalUser(this)">Meli</li> <li onclick="updateResourcePersonalUser(this)">Elpera</li> </ul> </li>
+                                                        <li class="has-sub" id="resource-personal-phone"> Phone <ul class="sub-option second-level"> <li onclick="updateResourcePersonalUser(this)">Seheni</li> <li onclick="updateResourcePersonalUser(this)">Nadya</li> <li onclick="updateResourcePersonalUser(this)">Meli</li> <li onclick="updateResourcePersonalUser(this)">Elpera</li> </ul> </li>
+                                                        <li class="has-sub" id="resource-personal-direct"> Direct <ul class="sub-option second-level"> <li onclick="updateResourcePersonalUser(this)">Seheni</li> <li onclick="updateResourcePersonalUser(this)">Nadya</li> <li onclick="updateResourcePersonalUser(this)">Meli</li> <li onclick="updateResourcePersonalUser(this)">Elpera</li> </ul> </li>
                                                     </ul>
                                                 </li>
                                             </ul>
                                         </div>
                                     </div>
+                                    <input type="hidden" asp-for="Resource" />
+                                    <input type="hidden" asp-for="PersonalResourceEmployeeID" />
                                 </div>
+                                <span asp-validation-for="Resource" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="mb-3" id="personalResourceEmployeeSection" style="display: @(Model.Resource == "Personal" || (Model.Resource != null && Model.Resource.StartsWith("Personal")) ? "block" : "none");">
+                                <div class="d-flex align-items-center">
+                                    <div class="sejajar" style="width: 146px">
+                                        <label asp-for="PersonalResourceEmployeeID" class="form-label form-label-bold mb-0">Personal Resource</label>
+                                    </div>
+                                    <select asp-for="PersonalResourceEmployeeID" asp-items="Model.UserList" class="form-select form-control1 mb-0" style="width:70%">
+                                        <option value="">-- Select Employee --</option>
+                                    </select>
+                                </div>
+                                <span asp-validation-for="PersonalResourceEmployeeID" class="text-danger"></span>
                             </div>
 
-                            <!-- Category Dropdown -->
                             <div class="mb-3">
                                 <div class="d-flex align-items-center">
                                     <div class="sejajar" style="width: 146px">
-                                        <label for="category" class="form-label form-label-bold mb-0">Category</label>
+                                        <label asp-for="RFQCategoryID" class="form-label form-label-bold mb-0">Category</label>
                                     </div>
                                     <div class="wrapp project-type-dropdown" style="width: 70%;">
                                         <div class="select-btn">
-                                            <span></span>
+                                            <span>@(Model.RFQCategoryList?.FirstOrDefault(x => x.Value == Model.RFQCategoryID.ToString())?.Text ?? "Select Category")</span>
                                             <i class='bx bx-chevron-down'></i>
                                         </div>
                                         <div class="content-search">
                                             <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
-                                                <li>Project</li>
-                                                <li>Mid Project</li>
-                                                <li>Non-Project</li>
+                                                @foreach (var item in Model.RFQCategoryList ?? Enumerable.Empty<SelectListItem>())
+                                                { <li data-value="@item.Value">@item.Text</li> }
                                             </ul>
                                         </div>
                                     </div>
+                                    <input type="hidden" asp-for="RFQCategoryID" />
                                 </div>
+                                <span asp-validation-for="RFQCategoryID" class="text-danger"></span>
                             </div>
 
-                            <!-- Opportunity Dropdown -->
                             <div class="mb-3">
                                 <div class="d-flex align-items-center">
                                     <div class="sejajar" style="width: 146px">
-                                        <label for="opportunity" class="form-label form-label-bold mb-0">Opportunity</label>
+                                        <label asp-for="RFQOpportunityID" class="form-label form-label-bold mb-0">Opportunity</label>
                                     </div>
                                     <div class="wrapp" id="opportunity-dropdown" style="width: 70%;">
                                         <div class="select-btn">
-                                            <span></span>
+                                            <span>@(Model.RFQOpportunityList?.FirstOrDefault(x => x.Value == Model.RFQOpportunityID.ToString())?.Text ?? "Select Opportunity")</span>
                                             <i class='bx bx-chevron-down'></i>
                                         </div>
                                         <div class="content-search">
                                             <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
-                                                <li>General</li>
-                                                <li>Bundle Installation</li>
-                                                <li>Professional Service</li>
-                                                <li>Service Center</li>
+                                                @foreach (var item in Model.RFQOpportunityList ?? Enumerable.Empty<SelectListItem>())
+                                                { <li data-value="@item.Value">@item.Text</li> }
                                             </ul>
                                         </div>
                                     </div>
+                                    <input type="hidden" asp-for="RFQOpportunityID" />
                                 </div>
+                                <span asp-validation-for="RFQOpportunityID" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
 
                     <h5 class="note-title underline mb-4">Notes</h5>
+
                     <div class="row mx-md-4">
                         <div class="col-12 col-sm-6">
                             <div class="mb-3">
                                 <div class="d-flex align-items-center">
                                     <div class="sejajar" style="width: 190px">
-                                        <label for="budget" class="form-label form-label-bold pe-4">Budget</label>
+                                        <label asp-for="OverallBudget" class="form-label form-label-bold pe-4">Budget</label>
                                     </div>
-                                    <input type="number" class="form-control1" style="width:50%" id="budget">
+                                    <input asp-for="OverallBudget" type="number" class="form-control1" style="width:50%" id="budget">
+                                    <span asp-validation-for="OverallBudget" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
@@ -770,194 +810,126 @@
                             <div class="mb-3">
                                 <div class="d-flex align-items-center">
                                     <div class="sejajar" style="width: 146px">
-                                        <label for="leadtime" class="form-label form-label-bold">Leadtime</label>
+                                        <label asp-for="OverallLeadTime" class="form-label form-label-bold">Leadtime</label>
                                     </div>
-                                    <input type='text' class='form-control1' style='width:100%' id='leadtime'>
+                                    <input asp-for="OverallLeadTime" type='text' class='form-control1' style='width:100%' id='leadtime'>
+                                    <span asp-validation-for="OverallLeadTime" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="tabel-item col-12">
                         <table class="table item">
-                            <thead class="table-light">
+                             <thead class="table-light">
                                 <tr>
-                                    <th>No</th>
-                                    <th>Item Name</th>
-                                    <th>Item Description</th>
-                                    <th>Qty</th>
-                                    <th>UoM</th>
-                                    <th>Budget</th>
-                                    <th>Leadtime</th>
-                                    <th></th>
+                                    <th>No</th><th>Item Name</th><th>Item Description</th><th>Qty</th><th>UoM</th><th>Budget</th><th>Leadtime</th><th></th>
                                 </tr>
                             </thead>
                             <tbody id="itemTableBody">
-                                <tr>
-                                    <td>1</td>
-                                    <td class="name"><input type='text' class='size form-control1'></td>
-                                    <td class="desc"><input type='text' class='size form-control1'></td>
-                                    <td class="qty"><input type='number' class='size form-control1'></td>
-                                    <td class="uom"><input type='text' class='size tengah form-control1'></td>
-                                    <td class="budget"><input type='number' class='size form-control1'></td>
-                                    <td class="leadtime"><input type='text' class='size tengah form-control1'></td>
-                                    <td class="delete"><button type="button" onclick="removeRow(this)" class="btn"><i class='bx bx-trash'></i></button>
-                                </tr>
-                                <!-- Baris akan ditambahkan di sini -->
+                                @for (int i = 0; i < (Model.NotesSectionItems?.Count ?? 1); i++)
+                                {
+                                    <tr>
+                                        <td>@(i + 1)</td>
+                                        <td class="name"><input asp-for="@Model.NotesSectionItems[i].ItemName" class='size form-control1' /></td>
+                                        <td class="desc"><input asp-for="@Model.NotesSectionItems[i].ItemDescription" class='size form-control1' /></td>
+                                        <td class="qty"><input asp-for="@Model.NotesSectionItems[i].Quantity" type='number' class='size form-control1' /></td>
+                                        <td class="uom"><input asp-for="@Model.NotesSectionItems[i].UoM" class='size tengah form-control1' /></td>
+                                        <td class="budget"><input asp-for="@Model.NotesSectionItems[i].BudgetTarget" type='number' class='size form-control1' /></td>
+                                        <td class="leadtime"><input asp-for="@Model.NotesSectionItems[i].LeadTimeTarget" class='size tengah form-control1' /></td>
+                                        <td class="delete">
+                                            <button type="button" onclick="removeRow(this)" class="btn"><i class='bx bx-trash'></i></button>
+                                        </td>
+                                    </tr>
+                                }
                             </tbody>
-
                         </table>
                     </div>
                     <button type="button" id="addRowBtn" class="btn btn-dark mt-1 btn-uniform">Add Row</button>
 
                     <div class="wrapper-2 mt-3 mb-4">
                         <div class="form-upload">
-                            <input class="file-input" type="file" name="file" hidden>
+                            <input class="file-input" type="file" name="AttachmentFiles" hidden multiple>
                             <div class="rounding"><i class="fa-solid fa-paperclip"></i></div>
                             <div class="desc">
                                 <p class="mt-3">Attachment: <span class="attachment-count">0</span></p>
-
                                 <p class="description">Drag/Drop files here. You can upload a maximum of 5 files, 5MB each</p>
                             </div>
                         </div>
-
-                        <div id="attached-files" style="display: none;">
-                            <!-- File info divs will be added here dynamically -->
-                        </div>
+                        <div id="attached-files" style="display: none;"></div>
                         <section class="progress-area"></section>
                         <section class="uploaded-area"></section>
                     </div>
+
+                    <div class="col-12 mb-4">
+                        <h4 class="delegation-title underline">Delegation</h4>
+                    </div>
+
+                    <div class="tabel item-list col-12">
+                        <h5 class="item-list-title underline">Item List</h5>
+                        <table class="table item-list">
+                            <thead class="table-light">
+                                <tr><th>No</th><th>Item Name</th><th>Item Description</th><th>Qty</th><th>UoM</th><th>U/Price</th><th>Notes</th><th>Details</th><th>Our Warranty</th><th>Amount</th><th></th></tr>
+                            </thead>
+                            <tbody id="itemListTableBody">
+                                 @for (int i = 0; i < (Model.ItemListSectionItems?.Count ?? 0); i++) // ?? 0 agar tidak render baris default jika list kosong
+                                {
+                                    <tr>
+                                        <td>@(i+1)</td>
+                                        <td class="name"><select asp-for="@Model.ItemListSectionItems[i].ItemID" asp-items="Model.ItemMasterList" class='size form-control1 form-select'><option value="">--Select Item--</option></select></td>
+                                        <td class="desc"><input asp-for="@Model.ItemListSectionItems[i].Details" class='size form-control1' /></td>
+                                        <td class="qty"><input asp-for="@Model.ItemListSectionItems[i].Quantity" type='number' class='size form-control1' /></td>
+                                        <td class="uom"><input asp-for="@Model.ItemListSectionItems[i].UoM" class='size tengah form-control1' /></td>
+                                        <td class="price"><input asp-for="@Model.ItemListSectionItems[i].TargetUnitPrice" type='number' class='size form-control1' /></td>
+                                        <td class="notes"><input asp-for="@Model.ItemListSectionItems[i].Notes" class='size form-control1' /></td>
+                                        <td class="details"><input asp-for="@Model.ItemListSectionItems[i].Details" class='size form-control1' /></td>
+                                        <td class="warranty"><input asp-for="@Model.ItemListSectionItems[i].SalesWarranty" class='size form-control1' /></td>
+                                        <td class="amount"><input type='number' class='size form-control1' readonly /></td>
+                                        <td class="delete"><button type="button" onclick="removeRowItemList(this)" class="btn"><i class='bx bx-trash'></i></button></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <button type="button" id="addRowBtnItem" class="btn btn-dark mb-5 mt-1 btn-uniform">Add Item</button>
+                    </div>
+
+                    <div class="tabel req-item col-12">
+                        <h5 class="item-list-title underline">Request Item to Purchasing</h5>
+                        <table class="table item-list">
+                             <thead class="table-light">
+                                <tr><th>Action</th><th>No</th><th>Req Code</th><th>Item Name</th><th>Item Description</th><th>Qty</th><th>UoM</th><th>Reason for Request</th><th>Notes (Internal)</th><th>PIC</th><th>Status</th><th></th></tr>
+                            </thead>
+                            <tbody id="reqTableBody">
+                                @for (int i = 0; i < (Model.PurchasingRequestSectionItems?.Count ?? 0); i++) // ?? 0 agar tidak render baris default
+                                {
+                                    <tr>
+                                        <td class="action"><button type="button" class="btn"><i class='bx bx-plus-circle'></i></button></td>
+                                        <td class="nomor" style="padding: 14px 9px;">@(i+1)</td>
+                                        <td class="reqCode"><input type='text' class='tengah size form-control1' /></td>
+                                        <td class="name"><input asp-for="@Model.PurchasingRequestSectionItems[i].RequestedItemName" class='size form-control1' /></td>
+                                        <td class="desc"><input asp-for="@Model.PurchasingRequestSectionItems[i].RequestedItemDescription" class='size form-control1' /></td>
+                                        <td class="qty"><input asp-for="@Model.PurchasingRequestSectionItems[i].Quantity" type='number' class='size form-control1' /></td>
+                                        <td class="uom"><input asp-for="@Model.PurchasingRequestSectionItems[i].UoM" class='size tengah form-control1' /></td>
+                                        <td class="reason"><input asp-for="@Model.PurchasingRequestSectionItems[i].ReasonForRequest" class='size form-control1' /></td>
+                                        <td class="notes"><input asp-for="@Model.PurchasingRequestSectionItems[i].SalesNotes" class='size form-control1' /></td>
+                                        <td class="pic"><select asp-for="@Model.PurchasingRequestSectionItems[i].AssignedToPurchasingUserID" asp-items="Model.UserList" class='size form-control1 form-select'><option value="">--Select PIC--</option></select></td>
+                                        <td class="status"><input type='text' class='size form-control1' /></td>
+                                        <td class="delete"><button type="button" onclick="removeRowReq(this)" class="btn btn-remo"><i class='bx bx-trash'></i></button></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <button type="button" id="addRowBtnReq" class="btn btn-dark mb-5 mt-1 btn-uniform">Add Item</button>
+                    </div>
+                    
+                    @* Tambahkan section Survey di sini jika perlu, dengan logika disable yang sama *@
+
                 </div>
-
-                <div class="col-12 mb-4">
-                    <h4 class="delegation-title underline">Delegation</h4>
-                </div>
-
-                <div class="tabel item-list col-12">
-                    <h5 class="item-list-title underline">Item List</h5>
-                    <table class="table item-list">
-                        <thead class="table-light">
-                            <tr>
-                                <th>No</th>
-                                <th>Item Name</th>
-                                <th>Item Description</th>
-                                <th>Qty</th>
-                                <th>UoM</th>
-                                <th>U/Price</th>
-                                <th>Notes</th>
-                                <th>Details</th>
-                                <th>Our Warranty</th>
-                                <th>Amount</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="itemListTableBody">
-                            <tr>
-                                <td>1</td>
-                                <td class="name"><input type='text' class='size form-control1'></td>
-                                <td class="desc"><input type='text' class='size form-control1'></td>
-                                <td class="qty"><input type='number' class='size form-control1'></td>
-                                <td class="uom"><input type='text' class='size tengah form-control1'></td>
-                                <td class="price"><input type='number' class='size form-control1'></td>
-                                <td class="notes"><input type='text' class='size form-control1'></td>
-                                <td class="details"><input type='text' class='size form-control1'></td>
-                                <td class="warranty"><input type='text' class='size form-control1'></td>
-                                <td class="amount"><input type='number' class='size form-control1'></td>
-                                <td class="delete"><button type="button" onclick="removeRowItemList(this)" class="btn"><i class='bx bx-trash'></i></button></td>
-                            </tr>
-                            <!-- Baris akan ditambahkan di sini -->
-                        </tbody>
-                    </table>
-
-                    <button type="button" id="addRowBtnItem" class="btn btn-dark mb-5 mt-1 btn-uniform">Add Item</button>
-                </div>
-
-                <div class="tabel req-item col-12">
-                    <h5 class="item-list-title underline">Request Item to Purchasing</h5>
-                    <table class="table item-list">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Action</th>
-                                <th>No</th>
-                                <th>Req Code</th>
-                                <th>Item Name</th>
-                                <th>Item Description</th>
-                                <th>Qty</th>
-                                <th>UoM</th>
-                                <th>Reason for Request</th>
-                                <th>Notes (Internal)</th>
-                                <th>PIC</th>
-                                <th>Status</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="reqTableBody">
-                            <tr>
-                                <td class="action"><button type="button" class="btn"><i class='bx bx-plus-circle'></i></button></td>
-                                <td class="nomor" style="padding: 14px 9px;">1</td>
-                                <td class="reqCode"><input type='text' class='tengah size form-control1'></td>
-                                <td class="name"><input type='text' class='size form-control1'></td>
-                                <td class="desc"><input type='text' class='size form-control1'></td>
-                                <td class="qty"><input type='number' class='size form-control1'></td>
-                                <td class="uom"><input type='text' class='size tengah form-control1'></td>
-                                <td class="reason"><input type='text' class='size form-control1'></td>
-                                <td class="notes"><input type='text' class='size form-control1'></td>
-                                <td class="pic"><input type='text' class='size form-control1'></td>
-                                <td class="status"><input type='text' class='size form-control1'></td>
-                                <td class="delete"><button type="button" onclick="removeRowReq(this)" class="btn btn-remo"><i class='bx bx-trash'></i></button></td>
-                            </tr>
-                            <!-- Baris akan ditambahkan di sini -->
-                        </tbody>
-                    </table>
-
-                    <button type="button" id="addRowBtnReq" class="btn btn-dark mb-5 mt-1 btn-uniform">Add Item</button>
-                </div>
-
-                <table class="table item-list">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Action</th>
-                            <th>No</th>
-                            @* <th>Req Code</th> *@
-                            <th>Item Name</th>
-                            <th>Item Description</th>
-                            <th>Qty</th>
-                            <th>UoM</th>
-                            <th>Reason for Request</th>
-                            <th>Notes (Internal)</th>
-                            @* <th>Image</th> *@
-                            <th>PIC</th>
-                            <th>Status</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var product in Model)
-                        {
-                            <tr>
-                                <td class="action"><button type="button" class="btn"><i class='bx bx-plus-circle'></i></button></td>
-                                <td class="nomor" style="padding: 14px 9px;">1</td>
-                                @* <td class="reqCode">@product.Id</td> *@
-                                <td class="name">@product.Name</td>
-                                <td class="desc">@product.Description</td>
-                                <td class="qty">@product.Quantity</td>
-                                <td class="uom">@product.UoM</td>
-                                <td class="reason">@product.reasonForReq</td>
-                                <td class="notes">@product.notes</td>
-                                @* <td class="image">@product.ImageFile</td> *@
-                                <td class="pic">@product.PIC</td>
-                                <td class="status">@product.status</td>
-                                <td class="delete"><button type="button" onclick="removeRowReq(this)" class="btn btn-remo"><i class='bx bx-trash'></i></button></td>
-                            </tr>
-                        }
-                        <!-- Baris akan ditambahkan di sini -->
-                    </tbody>
-                </table>
 
                 <div class="col-12 mb-5">
                     <div class="mt-2">
                         <div class="card-body text-center">
-                            <button type="button" class="btn btn-dark btn-uniform">Save</button>
-                            <button type="button" class="btn btn-danger btn-uniform">Discard</button>
+                            <button type="submit" class="btn btn-dark btn-uniform">Save</button>
+                            <a asp-controller="RFQ" asp-action="Index" class="btn btn-danger btn-uniform">Discard</a>
                         </div>
                     </div>
                 </div>
@@ -965,3 +937,63 @@
         </form>
     </div>
 </main>
+
+@section Scripts {
+    <script>
+        window.serverSideCustomerData = [];
+        @if (Model.CustomerList != null)
+        {
+                foreach (var customer in Model.CustomerList.Cast<SelectListItem>())
+                {
+                        @:serverSideCustomerData.push({ value: "@Html.Raw(customer.Value)", text: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(customer.Text))" });
+                }
+        }
+
+            function populateEndUserDropdown(customerId) {
+            console.log("populateEndUserDropdown called with customerId:", customerId); // Ini sudah muncul dengan benar
+            var endUserSelect = $('#endUserDropdown');
+            endUserSelect.empty();
+
+            if (customerId && customerId !== "" && customerId !== "0") {
+                endUserSelect.append($('<option></option>').val('').text('-- Loading End Users... --'));
+                $.ajax({
+                    url: '@Url.Action("GetContactPersonsByCustomerId", "RFQ")',
+                    type: 'GET',
+                    data: { customerId: customerId },
+                    success: function (data) {
+                        console.log("AJAX success, data diterima:", data); // TAMBAHKAN INI
+                        endUserSelect.empty();
+                        endUserSelect.append($('<option></option>').val('').text('-- Select End User --'));
+                        if (data && data.length > 0) {
+                            $.each(data, function (index, item) {
+                                console.log("Menambahkan opsi:", item.text, "value:", item.value); // TAMBAHKAN INI
+                                endUserSelect.append($('<option></option>').val(item.value).text(item.text));
+                            });
+                        } else {
+                            console.log("Tidak ada data end user atau data kosong."); // TAMBAHKAN INI
+                            endUserSelect.empty().append($('<option></option>').val('').text('-- No End Users Found --'));
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching end users: ", xhr, status, error);
+                        endUserSelect.empty().append($('<option></option>').val('').text('-- Error Loading --'));
+                    }
+                });
+            } else {
+                endUserSelect.append($('<option></option>').val('').text('-- Select Company First --'));
+            }
+        }
+
+        // Panggil populateEndUserDropdown saat dokumen siap JIKA #hiddenCustomerId sudah punya nilai valid.
+        // Ini berguna jika halaman bisa dimuat dengan customer yang sudah terpilih (misalnya halaman edit).
+        $(document).ready(function() {
+            var initialCustomerId = $('#hiddenCustomerId').val();
+            if (initialCustomerId && initialCustomerId !== "0") {
+                // populateEndUserDropdown(initialCustomerId); // Kita panggil dari updateName saja agar konsisten
+            } else {
+                // Pastikan dropdown End User dalam keadaan default jika tidak ada customer awal
+                populateEndUserDropdown(""); // Atau $('#endUserDropdown').empty().append(...opsi default...);
+            }
+        });
+    </script>
+}

@@ -1,14 +1,26 @@
 ﻿@model BQuick.Models.RfqCreateFullViewModel
-@* @model List<PurchasingRequest> *@
+
 
 @{
     ViewData["Title"] = "Create RFQ";
-    bool isReadOnlyForAdminSalesTahap1 = true;
 }
 
 <main class="content-div mx-3">
     <div class="container-fluid mt-4">
-        
+        <div class="d-flex justify-content-between align-items-center mt-4 mb-4 w-100">
+            <div class="header page-header" style="font-size: 29px;">
+                <a class="text-decoration-none" asp-controller="RFQ" asp-action="Index">
+                    <span class="text-danger rfq-link">RFQ</span>
+                </a> <span>></span>
+                <span class="tes text-decoration">Create RFQ</span>
+            </div>
+            <div class="d-flex gap-3" id="buttonGroup">
+                <button type="submit" id="save-rfq-btn" class="btn border-0 shadow-none btn-text" style="font-size: 20px; font-weight: 500;">Save</button>
+                <button type="button" class="btn border-0 shadow-none btn-text" style="font-size: 20px; font-weight: 500;" id="discard-btn">
+                    <a class="text-decoration-none text-black" asp-controller="RFQ" asp-action="Index">Discard</a>
+                </button>
+            </div>
+        </div>
 
         <div class="add-customer-form-pop-up px-5 py-3">
             <form method="post" enctype="multipart/form-data" class="add-customer-form">
@@ -118,9 +130,21 @@
                                 </div>
                             </div>
 
-                            <div>
-                                <label for="formFile" class="form-label form-label-bold">Attachment</label>
-                                <input class="form-control" type="file" id="formFile" name="attachment">
+                            <div class="wrapper-2" style="max-width: 410px !important">
+                                <div class="form-upload">
+                                    <input class="file-input" type="file" name="file" hidden>
+                                    <div class="rounding"><i class="fa-solid fa-paperclip"></i></div>
+                                    <div class="desc">
+                                        <p class="mt-3">Attachment: <span class="attachment-count">0</span></p>
+
+                                        <p class="description">Drag/Drop files here. You can upload a maximum of 5 files, 5MB each</p>
+                                    </div>
+                                </div>
+
+                                <div id="attached-files" style="display: none;">
+                                </div>
+                                <section class="progress-area"></section>
+                                <section class="uploaded-area"></section>
                             </div>
                         </div>
 
@@ -290,13 +314,13 @@
 
                                 <div class="show-customer-contact-form-pop-up">
                                     <div id="customer-end-user-panel" class="customer-contact-panel" role="tabpanel" aria-labelledby="tab-end-user">
-                                        <div class="mb-5 d-flex align-items-center gap-1" style="font-size: 20px;">
+                                        <div class="mb-5 d-flex align-items-center gap-1">
                                             <span class="fw-bold">
                                                 End User Information
                                             </span>
 
-                                            <i class='bx bx-chevron-right ms-auto' id="customer-contact-information-form-close-chevron"></i>
-                                            <i class='bx bx-minus ms-auto' id="customer-contact-information-form-open-minus"></i>
+                                            <i class='bx bx-chevron-right ms-auto' id="customer-contact-information-form-close-chevron-end-user" style="font-size: 20px;"></i>
+                                            <i class='bx bx-minus ms-auto' id="customer-contact-information-form-open-minus-end-user" style="font-size: 20px;"></i>
                                         </div>
 
                                         <div class="show-customer-contact-information-form-pop-up">
@@ -365,134 +389,152 @@
                                     </div>
 
                                     <div id="customer-purchasing-panel" class="customer-contact-panel" role="tabpanel" aria-labelledby="tab-purchasing" hidden>
-                                        <div class="mb-5 fw-bold">Purchasing Information</div>
+                                        <div class="mb-5 d-flex align-items-center gap-1">
+                                            <span class="fw-bold">
+                                                Purchasing Information
+                                            </span>
 
-                                        <div class="mb-3">
-                                            <label class="form-label form-label-bold">Customer Name</label>
-                                            <input class="form-control" placeholder="Customer Name" required />
+                                            <i class='bx bx-chevron-right ms-auto' id="customer-contact-information-form-close-chevron-purchasing" style="font-size: 20px;"></i>
+                                            <i class='bx bx-minus ms-auto' id="customer-contact-information-form-open-minus-purchasing" style="font-size: 20px;"></i>
                                         </div>
 
-                                        <div class="mb-5">
-                                            <label class="form-label form-label-bold">Profile Picture</label>
-                                            <input class="form-control" type="file" name="purchasing-profile-picture">
-                                        </div>
-
-                                        <div class="mb-5 row">
-                                            <div class="mb-1 d-flex align-items-center gap-1" style="font-size: 20px;">
-                                                <i class='bx bx-info-circle fw-bold'></i>
-                                                <span class="fw-bold">
-                                                    Basic Information
-                                                </span>
+                                        <div class="show-customer-contact-information-form-pop-up">
+                                            <div class="mb-3">
+                                                <label class="form-label form-label-bold">Customer Name</label>
+                                                <input class="form-control" placeholder="Customer Name" id="customer-contact-name" required />
                                             </div>
 
-                                            <div class="col-12 col-sm-6">
-                                                <div class="mb-3">
-                                                    <label class="form-label form-label-bold">Email</label>
-                                                    <input type="email" class="form-control" placeholder="Email">
+                                            <div class="mb-5">
+                                                <label class="form-label form-label-bold">Profile Picture</label>
+                                                <input class="form-control" type="file" name="purchasing-profile-picture">
+                                            </div>
+
+                                            <div class="mb-5 row">
+                                                <div class="mb-1 d-flex align-items-center gap-1" style="font-size: 20px;">
+                                                    <i class='bx bx-info-circle fw-bold'></i>
+                                                    <span class="fw-bold">
+                                                        Basic Information
+                                                    </span>
                                                 </div>
 
-                                                <div class="mb-3">
-                                                    <label class="form-label form-label-bold">Phone</label>
-                                                    <input type="tel" class="form-control" placeholder="Phone">
+                                                <div class="col-12 col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Email</label>
+                                                        <input type="email" class="form-control" placeholder="Email">
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Phone</label>
+                                                        <input type="tel" class="form-control" placeholder="Phone">
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Mobile</label>
+                                                        <input type="tel" class="form-control" placeholder="Mobile">
+                                                    </div>
                                                 </div>
 
-                                                <div class="mb-3">
-                                                    <label class="form-label form-label-bold">Mobile</label>
-                                                    <input type="tel" class="form-control" placeholder="Mobile">
+                                                <div class="col-12 col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Title</label>
+                                                        <select class="form-select" id="customer-contact-title">
+                                                            <option value="" hidden>Title</option>
+                                                            <option value="Mr">Mr</option>
+                                                            <option value="Mrs">Mrs</option>
+                                                            <option value="Ms">Ms</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Job Position</label>
+                                                        <input type="text" class="form-control" placeholder="Job Position">
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Notes</label>
+                                                        <input type="text" class="form-control" placeholder="Notes">
+                                                    </div>
                                                 </div>
                                             </div>
 
-                                            <div class="col-12 col-sm-6">
-                                                <div class="mb-3">
-                                                    <label class="form-label form-label-bold">Title</label>
-                                                    <select class="form-select">
-                                                        <option value="" hidden>Title</option>
-                                                        <option value="Mr">Mr</option>
-                                                        <option value="Mrs">Mrs</option>
-                                                        <option value="Ms">Ms</option>
-                                                    </select>
-                                                </div>
-
-                                                <div class="mb-3">
-                                                    <label class="form-label form-label-bold">Job Position</label>
-                                                    <input type="text" class="form-control" placeholder="Job Position">
-                                                </div>
-
-                                                <div class="mb-3">
-                                                    <label class="form-label form-label-bold">Notes</label>
-                                                    <input type="text" class="form-control" placeholder="Notes">
-                                                </div>
+                                            <div class="d-flex justify-content-start">
+                                                <button type="button" class="btn btn-success">Add User</button>
                                             </div>
-                                        </div>
-
-                                        <div class="d-flex justify-content-start">
-                                            <button type="button" class="btn btn-success">Add User</button>
                                         </div>
                                     </div>
 
                                     <div id="customer-it-engineer-panel" class="customer-contact-panel" role="tabpanel" aria-labelledby="tab-it-engineer" hidden>
-                                        <div class="mb-5 fw-bold">IT Engineer Information</div>
+                                        <div class="mb-5 d-flex align-items-center gap-1">
+                                            <span class="fw-bold">
+                                                IT Engineer Information
+                                            </span>
 
-                                        <div class="mb-3">
-                                            <label class="form-label form-label-bold">Customer Name</label>
-                                            <input class="form-control" placeholder="Customer Name" required />
+                                            <i class='bx bx-chevron-right ms-auto' id="customer-contact-information-form-close-chevron-it-engineer" style="font-size: 20px;"></i>
+                                            <i class='bx bx-minus ms-auto' id="customer-contact-information-form-open-minus-it-engineer" style="font-size: 20px;"></i>
                                         </div>
 
-                                        <div class="mb-5">
-                                            <label class="form-label form-label-bold">Profile Picture</label>
-                                            <input class="form-control" type="file" name="itengineer-profile-picture">
-                                        </div>
-
-                                        <div class="mb-5 row">
-                                            <div class="mb-1 d-flex align-items-center gap-1" style="font-size: 20px;">
-                                                <i class='bx bx-info-circle fw-bold'></i>
-                                                <span class="fw-bold">
-                                                    Basic Information
-                                                </span>
+                                        <div class="show-customer-contact-information-form-pop-up">
+                                            <div class="mb-3">
+                                                <label class="form-label form-label-bold">Customer Name</label>
+                                                <input class="form-control" placeholder="Customer Name" id="customer-contact-name" required />
                                             </div>
 
-                                            <div class="col-12 col-sm-6">
-                                                <div class="mb-3">
-                                                    <label class="form-label form-label-bold">Email</label>
-                                                    <input type="email" class="form-control" placeholder="Email">
+                                            <div class="mb-5">
+                                                <label class="form-label form-label-bold">Profile Picture</label>
+                                                <input class="form-control" type="file" name="it-engineer-profile-picture">
+                                            </div>
+
+                                            <div class="mb-5 row">
+                                                <div class="mb-1 d-flex align-items-center gap-1" style="font-size: 20px;">
+                                                    <i class='bx bx-info-circle fw-bold'></i>
+                                                    <span class="fw-bold">
+                                                        Basic Information
+                                                    </span>
                                                 </div>
 
-                                                <div class="mb-3">
-                                                    <label class="form-label form-label-bold">Phone</label>
-                                                    <input type="tel" class="form-control" placeholder="Phone">
+                                                <div class="col-12 col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Email</label>
+                                                        <input type="email" class="form-control" placeholder="Email">
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Phone</label>
+                                                        <input type="tel" class="form-control" placeholder="Phone">
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Mobile</label>
+                                                        <input type="tel" class="form-control" placeholder="Mobile">
+                                                    </div>
                                                 </div>
 
-                                                <div class="mb-3">
-                                                    <label class="form-label form-label-bold">Mobile</label>
-                                                    <input type="tel" class="form-control" placeholder="Mobile">
+                                                <div class="col-12 col-sm-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Title</label>
+                                                        <select class="form-select" id="customer-contact-title">
+                                                            <option value="" hidden>Title</option>
+                                                            <option value="Mr">Mr</option>
+                                                            <option value="Mrs">Mrs</option>
+                                                            <option value="Ms">Ms</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Job Position</label>
+                                                        <input type="text" class="form-control" placeholder="Job Position">
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Notes</label>
+                                                        <input type="text" class="form-control" placeholder="Notes">
+                                                    </div>
                                                 </div>
                                             </div>
 
-                                            <div class="col-12 col-sm-6">
-                                                <div class="mb-3">
-                                                    <label class="form-label form-label-bold">Title</label>
-                                                    <select class="form-select">
-                                                        <option value="" hidden>Title</option>
-                                                        <option value="Mr">Mr</option>
-                                                        <option value="Mrs">Mrs</option>
-                                                        <option value="Ms">Ms</option>
-                                                    </select>
-                                                </div>
-
-                                                <div class="mb-3">
-                                                    <label class="form-label form-label-bold">Job Position</label>
-                                                    <input type="text" class="form-control" placeholder="Job Position">
-                                                </div>
-
-                                                <div class="mb-3">
-                                                    <label class="form-label form-label-bold">Notes</label>
-                                                    <input type="text" class="form-control" placeholder="Notes">
-                                                </div>
+                                            <div class="d-flex justify-content-start">
+                                                <button type="button" class="btn btn-success">Add User</button>
                                             </div>
-                                        </div>
-
-                                        <div class="d-flex justify-content-start">
-                                            <button type="button" class="btn btn-success">Add User</button>
                                         </div>
                                     </div>
                                 </div>
@@ -513,75 +555,311 @@
             </form>
         </div>
 
-        @* <div>
-            <button id="request-item-to-purchasing-option">
-                Request to Purchasing (Temporary Button)
-            </button>
-        </div> *@
-
-        <div class="request-item-to-purchasing-form-pop-up px-5 py-3">
-            <form method="post" enctype="multipart/form-data" class="request-item-to-purchasing-form">
-                <div class="mb-4 d-flex" style="font-size: 25px;">
-                    <span class="fw-bold">
-                        Request to Purchasing
-                    </span>
-
-                    <div class="request-item-to-purchasing-form-close-btn">
+        <div class="configure-item-form-pop-up">
+            <form method="post" enctype="multipart/form-data" class="configure-item-form">
+                <div class="configure-item-header d-flex align-items-center px-5 py-1" style="font-size: 25px;">
+                    <span class="configure-item-title fw-bold">Configure</span>
+                    <div class="configure-item-form-close-btn ms-auto" id="configure-item-form-close-btn">
                         <i class='bx bx-x fw-bold' style="border: 1px solid #000; border-radius: 3px;"></i>
                     </div>
                 </div>
 
-                <div class="row justify-content-center">
+                <div class="row justify-content-center px-5 pt-4 pb-3">
                     <div class="col-12">
-                        <div class="mb-3">
-                            <label class="form-label form-label-bold">
-                                Item Name
-                            </label>
-                            <input class="form-control" required />
+                        <div class="mb-4">
+                            <div class="row mb-2 item-header" style="border-bottom: 2px solid #000;">
+                                <div class="col-6 col-md-7">
+                                    <label class="form-label form-label-bold mb-0">Item</label>
+                                </div>
+                                <div class="col-3 col-md-3 text-center">
+                                    <label class="form-label form-label-bold mb-0">Quantity</label>
+                                </div>
+                                <div class="col-3 col-md-2 text-center">
+                                    <label class="form-label form-label-bold mb-0">Amount</label>
+                                </div>
+                            </div>
+
+                            <div class="row item-content align-items-center">
+                                <div class="col-6 col-md-7">
+                                    <div class="d-flex">
+                                        <div class="item-image me-3">
+                                            <img src="~/img/Barcode-Scanner-CK65-LON-BSC210E.jpg" alt="Item Image" id="configure-item-image" class="img-thumbnail p-0" style="width: 80px; height: 120px; border: none;">
+                                        </div>
+                                        <div class="item-name-code" id="configure-item-name-code" style="font-weight: 600;">
+                                            Barcode Scanner CK65-LON-BSC210E [HWY00001]
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-3 col-md-3 text-center">
+                                    <div class="js-quantity-counter">
+                                        <button type="button" class="js-minus rounded-0">
+                                            <i class='bx bx-minus fw-bold text-black'></i>
+                                        </button>
+                                        <input type="text" class="js-result form-control rounded-0 shadow-none" id="configure-item-quantity" value="1" style="width: 60px; font-weight: 600;">
+                                        <button type="button" class="js-plus rounded-0">
+                                            <i class='bx bx-plus fw-bold text-black'></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="col-3 col-md-2 text-center">
+                                    <span id="configure-item-amount" style="font-weight: 600;"></span>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label form-label-bold">
-                                Item Description
-                            </label>
-                            <input class="form-control" required />
+                        <div class="stock-warehouse-box mb-5" style="width: 300px;">
+                            <div class="stock-header pt-2 pb-2 ps-3 text-white" id="stock-header">
+                                Stock Warehouse <i class="fa-solid fa-boxes-stacked ms-2" style="color: #ffffff;"></i>
+                            </div>
+
+                            <div class="stock-body pt-2 pb-2 ps-3">
+                                <div class="stock-label">Total Item</div>
+                                <div class="stock-value" id="stock-total-item">15</div>
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label form-label-bold">
-                                Quantity
-                            </label>
-                            <input type="number" min="1" class="form-control" required />
+                        <div class="vendor-recommendation mb-5">
+                            <div class="mb-3" style="font-size: 20px; font-weight: 600;">Vendor Recommendation</div>
+
+                            <div class="vendor-info mb-3">
+                                <div class="row mb-0">
+                                    <div class="col-2">
+                                        <label class="form-label">Vendor Name</label>
+                                    </div>
+                                    <div class="col-10">
+                                        <span id="vendor-name">PT. Synnex Metrodata Indonesia</span>
+                                    </div>
+                                </div>
+                                <div class="row mb-0">
+                                    <div class="col-2">
+                                        <label class="form-label">Location</label>
+                                    </div>
+                                    <div class="col-10">
+                                        <span id="vendor-location">Batam</span>
+                                    </div>
+                                </div>
+                                <div class="row mb-0">
+                                    <div class="col-2">
+                                        <label class="form-label">Price</label>
+                                    </div>
+                                    <div class="col-10">
+                                        <span id="vendor-price">10000000</span>
+                                    </div>
+                                </div>
+                                <div class="row mb-0">
+                                    <div class="col-2">
+                                        <label class="form-label">Validity Date</label>
+                                    </div>
+                                    <div class="col-10">
+                                        <span id="vendor-validity">30/07/2024</span>
+                                    </div>
+                                </div>
+                                <div class="row mb-0">
+                                    <div class="col-2">
+                                        <label class="form-label">Leadtime</label>
+                                    </div>
+                                    <div class="col-10">
+                                        <span id="vendor-leadtime">1-2 Weeks</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="vendor-actions mb-3 d-flex">
+                                <button type="button" id="other-vendor-btn" class="btn btn-outline-dark d-flex justify-content-center align-items-center me-3" style="border-radius: 4px; font-size: 20px; font-weight: 500; height: 35px;">Other Vendor</button>
+                                <button type="button" id="request-to-purchasing-btn" class="btn btn-outline-dark d-flex justify-content-center align-items-center" style="border-radius: 4px; font-size: 20px; font-weight: 500; height: 35px;">Request to purchasing</button>
+                            </div>
+
+                            <div class="other-vendors-table mb-4" style="display: none;">
+                                <table class="table table-bordered text-center">
+                                    <tbody>
+                                        <tr>
+                                            <td class="vendor-table-label fw-bold" style="background-color: #eaeaea;">Vendor Name</td>
+                                            <td style="background-color: #eaeaea; font-weight: 500;">PT. Synnex Metrodata Indonesia</td>
+                                            <td style="background-color: #eaeaea; font-weight: 500;">PT. Techtitan</td>
+                                            <td style="background-color: #eaeaea; font-weight: 500;">PT. Metrodata</td>
+                                            <td style="background-color: #eaeaea; font-weight: 500;">PT. Epson</td>
+                                            <td style="background-color: #eaeaea; font-weight: 500;">PT. Odoo</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="vendor-table-label fw-bold">Price</td>
+                                            <td>10000000</td>
+                                            <td>9700000</td>
+                                            <td>9800000</td>
+                                            <td>8800000</td>
+                                            <td>11800000</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="vendor-table-label fw-bold">Validity Date</td>
+                                            <td>30/07/2024</td>
+                                            <td>30/07/2024</td>
+                                            <td>30/07/2024</td>
+                                            <td>30/07/2024</td>
+                                            <td>30/07/2024</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="vendor-table-label fw-bold">Leadtime</td>
+                                            <td>1-2 Weeks</td>
+                                            <td>4-5 weeks</td>
+                                            <td>6-8 Weeks</td>
+                                            <td>8-15 Weeks</td>
+                                            <td>6-12 Weeks</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="vendor-table-label fw-bold">Location</td>
+                                            <td>Batam</td>
+                                            <td>Tangerang Selatan</td>
+                                            <td>Jakarta Selatan</td>
+                                            <td>Bogor</td>
+                                            <td>Singapura</td>
+                                        </tr>
+                                        <tr class="choose-row">
+                                            <td></td>
+                                            <td><button type="button" class="btn btn-sm btn-choose p-0" data-index="0" style="font-size: 16px; font-weight: 500;">Choose</button></td>
+                                            <td><button type="button" class="btn btn-sm btn-choose p-0" data-index="1" style="font-size: 16px; font-weight: 500;">Choose</button></td>
+                                            <td><button type="button" class="btn btn-sm btn-choose p-0" data-index="2" style="font-size: 16px; font-weight: 500;">Choose</button></td>
+                                            <td><button type="button" class="btn btn-sm btn-choose p-0" data-index="3" style="font-size: 16px; font-weight: 500;">Choose</button></td>
+                                            <td><button type="button" class="btn btn-sm btn-choose p-0" data-index="4" style="font-size: 16px; font-weight: 500;">Choose</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="request-to-purchasing-form mb-4" style="display: none;">
+                                <div class="mb-3">
+                                    <label class="form-label form-label-bold">Reason for Request</label>
+                                    <select class="form-select" id="reason-for-request">
+                                        <option value="" hidden>Reason for Request</option>
+                                        <option value="Not yet in the Database">Not yet in the Database</option>
+                                        <option value="Invalid Price">Invalid Price</option>
+                                        <option value="Leadtime not suitable">Leadtime not suitable</option>
+                                        <option value="Out of Stock">Out of Stock</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3" id="other-reason-container" style="display: none;">
+                                    <label class="form-label form-label-bold" for="other-reason-input">Reason for Request</label>
+                                    <input type="text" class="form-control" id="other-reason-input" placeholder="Reason for Request" />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label form-label-bold">Details/Notes</label>
+                                    <input type="text" class="form-control" id="request-details-notes" placeholder="Details/Notes">
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label form-label-bold">
-                                UoM
-                            </label>
-                            <input class="form-control" required />
+                        <div class="item-description mb-5">
+                            <div class="mb-3" style="font-size: 20px; font-weight: 600;">Item Description</div>
+                            <div id="configure-item-description">
+                                CK65-4GB/32GB, 53 key, FlexRange XLR, Camera, SCP, GMS, Standard Environment, WW Mode
+                                <br />
+                                <br>
+                                CK65, 4GB/32GB Memory, 53 key, 1D/2D area imager, FlexRange XLR, Camera, SCP, GMS, Disinfectant Ready, Standard Environment WW Mode.
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label form-label-bold">
-                                Detail
-                            </label>
-                            <input class="form-control" required />
-                        </div>
-
-                        <div class="mb-5">
-                            <label class="form-label form-label-bold">
-                                Attachment
-                            </label>
-                            <input class="form-control" type="file" id="request-item-to-purchasing-attachment" name="attachment">
+                        <div class="add-ons">
+                            <div class="mb-2" style="font-size: 20px; font-weight: 600;">Add Ons</div>
+                            <div class="table-responsive mb-4">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th style="background-color: #eaeaea;">
+                                                <div class="d-flex justify-content-center">
+                                                    <input type="checkbox" class="add-on-checkbox" id="select-all-item-add-on-checkbox">
+                                                </div>
+                                            </th>
+                                            <th class="text-center" style="background-color: #eaeaea;">No</th>
+                                            <th style="background-color: #eaeaea;">Item Name</th>
+                                            <th style="background-color: #eaeaea;">Item Description</th>
+                                            <th style="background-color: #eaeaea;">Qty</th>
+                                            <th style="background-color: #eaeaea;">UoM</th>
+                                            <th style="background-color: #eaeaea;">U/Price</th>
+                                            <th style="background-color: #eaeaea;">Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="add-ons-table-body">
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex justify-content-center">
+                                                    <input type="checkbox" class="add-on-checkbox">
+                                                </div>
+                                            </td>
+                                            <td class="text-center" style="font-weight: 500;">1</td>
+                                            <td>871-228-201</td>
+                                            <td>[HWY0000101] CK65 charger</td>
+                                            <td>15</td>
+                                            <td>Ea</td>
+                                            <td>4031750</td>
+                                            <td>0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex justify-content-center">
+                                                    <input type="checkbox" class="add-on-checkbox">
+                                                </div>
+                                            </td>
+                                            <td class="text-center" style="font-weight: 500;">2</td>
+                                            <td>851-061-502</td>
+                                            <td>[HWY0000102] Hand strap</td>
+                                            <td>15</td>
+                                            <td>Ea</td>
+                                            <td>4031750</td>
+                                            <td>0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex justify-content-center">
+                                                    <input type="checkbox" class="add-on-checkbox">
+                                                </div>
+                                            </td>
+                                            <td class="text-center" style="font-weight: 500;">3</td>
+                                            <td>UK Power Cord</td>
+                                            <td>[HWY0000103] UK standard power cord</td>
+                                            <td>15</td>
+                                            <td>Ea</td>
+                                            <td>241905</td>
+                                            <td>0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex justify-content-center">
+                                                    <input type="checkbox" class="add-on-checkbox">
+                                                </div>
+                                            </td>
+                                            <td class="text-center" style="font-weight: 500;">3</td>
+                                            <td>Additional Battery Pack (318-052-031)</td>
+                                            <td>[HWY0000104] Extra battery pack for CK65</td>
+                                            <td>15</td>
+                                            <td>Ea</td>
+                                            <td>241905</td>
+                                            <td>0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex justify-content-center">
+                                                    <input type="checkbox" class="add-on-checkbox">
+                                                </div>
+                                            </td>
+                                            <td class="text-center" style="font-weight: 500;">3</td>
+                                            <td>Protective Case (318-046-003)</td>
+                                            <td>[HWY0000105] Rugged protective case</td>
+                                            <td>15</td>
+                                            <td>Ea</td>
+                                            <td>806350</td>
+                                            <td>0</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
 
                         <div class="d-flex justify-content-center gap-2">
-                            <button class="btn btn-danger request-item-to-purchasing-form-cancel-btn">
-                                Cancel
+                            <button type="button" class="btn btn-success btn-uniform configure-item-form-confirm-btn">
+                                Confirm
                             </button>
-
-                            <button class="btn btn-success">
-                                Sent
+                            <button type="button" class="btn btn-danger btn-uniform configure-item-form-cancel-btn" id="configure-item-form-close-btn">
+                                Cancel
                             </button>
                         </div>
                     </div>
@@ -589,62 +867,88 @@
             </form>
         </div>
 
+        <div class="request-item-to-purchasing-form-pop-up ">
+            <form method="post" enctype="multipart/form-data" class="request-item-to-purchasing-form">
+                <div class="request-item-to-purchasing-header d-flex align-items-center px-5 py-1" style="font-size: 25px;">
+                    <span class="request-item-to-purchasing-title fw-bold">Request to Purchasing</span>
+                    <div class="request-item-to-purchasing-form-close-btn  ms-auto" id="request-item-to-purchasing-form-close-btn">
+                        <i class='bx bx-x fw-bold' style="border: 1px solid #000; border-radius: 3px;"></i>
+                    </div>
+                </div>
 
+                <div class="row justify-content-center px-5 pt-4 pb-3">
+                    <div class="col-12">
+                        <div class="mb-3">
+                            <label class="form-label form-label-bold">Item Name</label>
+                            <input class="form-control" id="request-item-name" required />
+                        </div>
 
+                        <div class="mb-3">
+                            <label class="form-label form-label-bold">Item Description</label>
+                            <input class="form-control" id="request-item-desc" required />
+                        </div>
 
+                        <div class="mb-3">
+                            <label class="form-label form-label-bold">Quantity</label>
+                            <input type="number" class="form-control" id="request-item-qty" required />
+                        </div>
 
+                        <div class="mb-3">
+                            <label class="form-label form-label-bold">UoM</label>
+                            <input class="form-control" id="request-item-uom" required />
+                        </div>
 
+                        <div class="mb-3">
+                            <label class="form-label form-label-bold">Detail</label>
+                            <input class="form-control" id="request-item-detail" />
+                        </div>
 
+                        <div class="wrapper-2 mt-5 mb-5">
+                            <div class="form-upload">
+                                <input class="file-input" type="file" name="file" hidden>
+                                <div class="rounding"><i class="fa-solid fa-paperclip"></i></div>
+                                <div class="desc">
+                                    <p class="mt-3">Attachment: <span class="attachment-count">0</span></p>
 
+                                    <p class="description">Drag/Drop files here. You can upload a maximum of 5 files, 5MB each</p>
+                                </div>
+                            </div>
 
+                            <div id="attached-files" style="display: none;">
+                            </div>
+                            <section class="progress-area"></section>
+                            <section class="uploaded-area"></section>
+                        </div>
 
+                        <div class="d-flex justify-content-center gap-2">
+                            <button type="submit" class="btn btn-success request-item-to-purchasing-form-save-btn btn-uniform">
+                                Sent
+                            </button>
 
-
-
-
-
-
-        <form asp-action="Create" method="post" enctype="multipart/form-data">
-            @if (Model.RFQID_FromEdit.HasValue)
-            {
-                <input type="hidden" asp-for="RFQID_FromEdit" />
-            }
-            @* <div class="col-12 mb-5">
-                    <div class="mt-2">
-                        <div class="col-12 d-flex justify-content-end">
-                            <button type="submit" class="btn-link-style me-3">Save</button>
-                            <a asp-controller="RFQ" asp-action="Index" class="btn-link-style text-danger">Discard</a>
+                            <button type="button" class="btn btn-danger request-item-to-purchasing-form-close-btn btn-uniform">
+                                Cancel
+                            </button>
                         </div>
                     </div>
-            </div> *@
+                </div>
+            </form>
+        </div>
 
-            <div class="header mt-4 mb-4 w-100 page-header" style="font-size: 29px;">
-                <a class="text-decoration-none" asp-controller="RFQ" asp-action="Index"><span class="text-danger rfq-link">RFQ</span></a>&nbsp;<span>&gt;</span>&nbsp;<span class="tes text-decoration">Create RFQ</span>
-                @if (!string.IsNullOrEmpty(Model.RFQCode))
-                {
-                    <label class="float-sm-end rfq-id" asp-for="RFQCode">@Model.RFQCode</label>
-                    <input type="hidden" asp-for="RFQCode" />
-
-                }
-                else if (!Model.RFQID_FromEdit.HasValue) // Hanya tampilkan placeholder jika benar-benar baru & belum di-generate
-                {
-                    <span class="float-sm-end rfq-id">RFQYYXXXX</span>
-                }
-                @* <span class="float-sm-end rfq-id">@ViewBag.RFQCode</span> *@
-            </div>
-
-            
-
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
             <div class="row justify-content-center">
                 <div class="col-12">
-                    <div class="input-field my-4">
-                        <input asp-for="RFQName" type="text" class="input-float" style="width: 100%" id="rfq-name" required spellcheck="false">
-                        <label asp-for="RFQName">RFQ Name</label>
-                        <span asp-validation-for="RFQName" class="text-danger"></span>
+                    <div class="d-flex align-items-center justify-content-between my-4">
+                        <div class="input-field" style="flex: 1;">
+                            <input asp-for="RFQName" type="text" class="input-float" style="width: 100%" id="rfq-name" required spellcheck="false">
+                            <label asp-for="RFQName">RFQ Name</label>
+                            <span asp-validation-for="RFQName" class="text-danger"></span>
+                        </div>
+                        <span class="rfq-id ms-4" style="font-size: 29px;">RFQYY0000</span>
+                        @* <span class="rfq-id ms-4" style="font-size: 29px;">@ViewBag.RFQCode</span> *@
                     </div>
 
-                    <div class="row mt-5 mb-4 mx-1">
-                        <div class="col-12 col-sm-6">
+                    <div class="row mt-5 mb-4 mx-1 justify-content-center">
+                        <div class="col-12 col-sm-6 ps-0 pe-0">
                             <div class="mb-3">
                                 <div class="d-flex align-items-center">
                                     <div class="sejajar" style="width: 146px">
@@ -664,6 +968,7 @@
                                         </div>
                                         <input type="hidden" asp-for="CustomerID" id="hiddenCustomerId" />
                                     </div>
+
                                 </div>
                                 <span asp-validation-for="CustomerID" class="text-danger"></span>
                             </div>
@@ -701,14 +1006,14 @@
                             </div>
                         </div>
 
-                        <div class="col-12 col-sm-6">
+                        <div class="col-12 col-sm-6 ps-0 pe-0">
                             <div class="mb-3">
                                 <div class="d-flex align-items-center">
                                     <div class="sejajar" style="width: 146px">
                                         <label asp-for="Resource" class="form-label form-label-bold mb-0">Resource</label>
                                     </div>
                                     <div class="wrapp resource-dropdown" style="width: 70%;">
-                                        <div class="select-btn">
+                                        <div class="select-btn" style="height: 40px;">
                                             <span>@(Model.Resource ?? "Select Resource")</span>
                                             <i class='bx bx-chevron-down'></i>
                                         </div>
@@ -720,9 +1025,33 @@
                                                 <li class="has-sub" id="resource-personal-option">
                                                     Personal
                                                     <ul class="sub-option" id="resource-personal-sub-dropdown">
-                                                        <li class="has-sub" id="resource-personal-email"> Email <ul class="sub-option second-level"> <li onclick="updateResourcePersonalUser(this)">Seheni</li> <li onclick="updateResourcePersonalUser(this)">Nadya</li> <li onclick="updateResourcePersonalUser(this)">Meli</li> <li onclick="updateResourcePersonalUser(this)">Elpera</li> </ul> </li>
-                                                        <li class="has-sub" id="resource-personal-phone"> Phone <ul class="sub-option second-level"> <li onclick="updateResourcePersonalUser(this)">Seheni</li> <li onclick="updateResourcePersonalUser(this)">Nadya</li> <li onclick="updateResourcePersonalUser(this)">Meli</li> <li onclick="updateResourcePersonalUser(this)">Elpera</li> </ul> </li>
-                                                        <li class="has-sub" id="resource-personal-direct"> Direct <ul class="sub-option second-level"> <li onclick="updateResourcePersonalUser(this)">Seheni</li> <li onclick="updateResourcePersonalUser(this)">Nadya</li> <li onclick="updateResourcePersonalUser(this)">Meli</li> <li onclick="updateResourcePersonalUser(this)">Elpera</li> </ul> </li>
+                                                        <li class="has-sub" id="resource-personal-email">
+                                                            Email
+                                                            <ul class="sub-option second-level">
+                                                                <li onclick="updateResourcePersonalUser(this)">Seheni</li>
+                                                                <li onclick="updateResourcePersonalUser(this)">Nadya</li>
+                                                                <li onclick="updateResourcePersonalUser(this)">Meli</li>
+                                                                <li onclick="updateResourcePersonalUser(this)">Elpera</li>
+                                                            </ul>
+                                                        </li>
+                                                        <li class="has-sub" id="resource-personal-phone">
+                                                            Phone
+                                                            <ul class="sub-option second-level">
+                                                                <li onclick="updateResourcePersonalUser(this)">Seheni</li>
+                                                                <li onclick="updateResourcePersonalUser(this)">Nadya</li>
+                                                                <li onclick="updateResourcePersonalUser(this)">Meli</li>
+                                                                <li onclick="updateResourcePersonalUser(this)">Elpera</li>
+                                                            </ul>
+                                                        </li>
+                                                        <li class="has-sub" id="resource-personal-direct">
+                                                            Direct
+                                                            <ul class="sub-option second-level">
+                                                                <li onclick="updateResourcePersonalUser(this)">Seheni</li>
+                                                                <li onclick="updateResourcePersonalUser(this)">Nadya</li>
+                                                                <li onclick="updateResourcePersonalUser(this)">Meli</li>
+                                                                <li onclick="updateResourcePersonalUser(this)">Elpera</li>
+                                                            </ul>
+                                                        </li>
                                                     </ul>
                                                 </li>
                                             </ul>
@@ -732,18 +1061,6 @@
                                     <input type="hidden" asp-for="PersonalResourceEmployeeID" />
                                 </div>
                                 <span asp-validation-for="Resource" class="text-danger"></span>
-                            </div>
-                            
-                            <div class="mb-3" id="personalResourceEmployeeSection" style="display: @(Model.Resource == "Personal" || (Model.Resource != null && Model.Resource.StartsWith("Personal")) ? "block" : "none");">
-                                <div class="d-flex align-items-center">
-                                    <div class="sejajar" style="width: 146px">
-                                        <label asp-for="PersonalResourceEmployeeID" class="form-label form-label-bold mb-0">Personal Resource</label>
-                                    </div>
-                                    <select asp-for="PersonalResourceEmployeeID" asp-items="Model.UserList" class="form-select form-control1 mb-0" style="width:70%">
-                                        <option value="">-- Select Employee --</option>
-                                    </select>
-                                </div>
-                                <span asp-validation-for="PersonalResourceEmployeeID" class="text-danger"></span>
                             </div>
 
                             <div class="mb-3">
@@ -759,13 +1076,17 @@
                                         <div class="content-search">
                                             <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
                                                 @foreach (var item in Model.RFQCategoryList ?? Enumerable.Empty<SelectListItem>())
-                                                { <li data-value="@item.Value">@item.Text</li> }
+                                                {
+                                                    <li data-value="@item.Value">@item.Text</li>
+                                                }
                                             </ul>
                                         </div>
                                     </div>
                                     <input type="hidden" asp-for="RFQCategoryID" />
+
                                 </div>
                                 <span asp-validation-for="RFQCategoryID" class="text-danger"></span>
+
                             </div>
 
                             <div class="mb-3">
@@ -781,7 +1102,9 @@
                                         <div class="content-search">
                                             <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
                                                 @foreach (var item in Model.RFQOpportunityList ?? Enumerable.Empty<SelectListItem>())
-                                                { <li data-value="@item.Value">@item.Text</li> }
+                                                {
+                                                    <li data-value="@item.Value">@item.Text</li>
+                                                }
                                             </ul>
                                         </div>
                                     </div>
@@ -819,9 +1142,16 @@
                     </div>
                     <div class="tabel-item col-12">
                         <table class="table item">
-                             <thead class="table-light">
+                            <thead class="table-light">
                                 <tr>
-                                    <th>No</th><th>Item Name</th><th>Item Description</th><th>Qty</th><th>UoM</th><th>Budget</th><th>Leadtime</th><th></th>
+                                    <th>No</th>
+                                    <th>Item Name</th>
+                                    <th>Item Description</th>
+                                    <th>Qty</th>
+                                    <th>UoM</th>
+                                    <th>Budget</th>
+                                    <th>Leadtime</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody id="itemTableBody">
@@ -841,96 +1171,1318 @@
                                     </tr>
                                 }
                             </tbody>
+
                         </table>
                     </div>
                     <button type="button" id="addRowBtn" class="btn btn-dark mt-1 btn-uniform">Add Row</button>
 
-                    <div class="wrapper-2 mt-3 mb-4">
+                    <div class="wrapper-2 mt-3 mb-5">
                         <div class="form-upload">
-                            <input class="file-input" type="file" name="AttachmentFiles" hidden multiple>
+                            <input class="file-input" type="file" name="file" hidden>
                             <div class="rounding"><i class="fa-solid fa-paperclip"></i></div>
                             <div class="desc">
                                 <p class="mt-3">Attachment: <span class="attachment-count">0</span></p>
+
                                 <p class="description">Drag/Drop files here. You can upload a maximum of 5 files, 5MB each</p>
                             </div>
                         </div>
-                        <div id="attached-files" style="display: none;"></div>
+
+                        <div id="attached-files" style="display: none;">
+                        </div>
                         <section class="progress-area"></section>
                         <section class="uploaded-area"></section>
                     </div>
-
-                    <div class="col-12 mb-4">
-                        <h4 class="delegation-title underline">Delegation</h4>
-                    </div>
-
-                    <div class="tabel item-list col-12">
-                        <h5 class="item-list-title underline">Item List</h5>
-                        <table class="table item-list">
-                            <thead class="table-light">
-                                <tr><th>No</th><th>Item Name</th><th>Item Description</th><th>Qty</th><th>UoM</th><th>U/Price</th><th>Notes</th><th>Details</th><th>Our Warranty</th><th>Amount</th><th></th></tr>
-                            </thead>
-                            <tbody id="itemListTableBody">
-                                 @for (int i = 0; i < (Model.ItemListSectionItems?.Count ?? 0); i++) // ?? 0 agar tidak render baris default jika list kosong
-                                {
-                                    <tr>
-                                        <td>@(i+1)</td>
-                                        <td class="name"><select asp-for="@Model.ItemListSectionItems[i].ItemID" asp-items="Model.ItemMasterList" class='size form-control1 form-select'><option value="">--Select Item--</option></select></td>
-                                        <td class="desc"><input asp-for="@Model.ItemListSectionItems[i].Details" class='size form-control1' /></td>
-                                        <td class="qty"><input asp-for="@Model.ItemListSectionItems[i].Quantity" type='number' class='size form-control1' /></td>
-                                        <td class="uom"><input asp-for="@Model.ItemListSectionItems[i].UoM" class='size tengah form-control1' /></td>
-                                        <td class="price"><input asp-for="@Model.ItemListSectionItems[i].TargetUnitPrice" type='number' class='size form-control1' /></td>
-                                        <td class="notes"><input asp-for="@Model.ItemListSectionItems[i].Notes" class='size form-control1' /></td>
-                                        <td class="details"><input asp-for="@Model.ItemListSectionItems[i].Details" class='size form-control1' /></td>
-                                        <td class="warranty"><input asp-for="@Model.ItemListSectionItems[i].SalesWarranty" class='size form-control1' /></td>
-                                        <td class="amount"><input type='number' class='size form-control1' readonly /></td>
-                                        <td class="delete"><button type="button" onclick="removeRowItemList(this)" class="btn"><i class='bx bx-trash'></i></button></td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                        <button type="button" id="addRowBtnItem" class="btn btn-dark mb-5 mt-1 btn-uniform">Add Item</button>
-                    </div>
-
-                    <div class="tabel req-item col-12">
-                        <h5 class="item-list-title underline">Request Item to Purchasing</h5>
-                        <table class="table item-list">
-                             <thead class="table-light">
-                                <tr><th>Action</th><th>No</th><th>Req Code</th><th>Item Name</th><th>Item Description</th><th>Qty</th><th>UoM</th><th>Reason for Request</th><th>Notes (Internal)</th><th>PIC</th><th>Status</th><th></th></tr>
-                            </thead>
-                            <tbody id="reqTableBody">
-                                @for (int i = 0; i < (Model.PurchasingRequestSectionItems?.Count ?? 0); i++) // ?? 0 agar tidak render baris default
-                                {
-                                    <tr>
-                                        <td class="action"><button type="button" class="btn"><i class='bx bx-plus-circle'></i></button></td>
-                                        <td class="nomor" style="padding: 14px 9px;">@(i+1)</td>
-                                        <td class="reqCode"><input type='text' class='tengah size form-control1' /></td>
-                                        <td class="name"><input asp-for="@Model.PurchasingRequestSectionItems[i].RequestedItemName" class='size form-control1' /></td>
-                                        <td class="desc"><input asp-for="@Model.PurchasingRequestSectionItems[i].RequestedItemDescription" class='size form-control1' /></td>
-                                        <td class="qty"><input asp-for="@Model.PurchasingRequestSectionItems[i].Quantity" type='number' class='size form-control1' /></td>
-                                        <td class="uom"><input asp-for="@Model.PurchasingRequestSectionItems[i].UoM" class='size tengah form-control1' /></td>
-                                        <td class="reason"><input asp-for="@Model.PurchasingRequestSectionItems[i].ReasonForRequest" class='size form-control1' /></td>
-                                        <td class="notes"><input asp-for="@Model.PurchasingRequestSectionItems[i].SalesNotes" class='size form-control1' /></td>
-                                        <td class="pic"><select asp-for="@Model.PurchasingRequestSectionItems[i].AssignedToPurchasingUserID" asp-items="Model.UserList" class='size form-control1 form-select'><option value="">--Select PIC--</option></select></td>
-                                        <td class="status"><input type='text' class='size form-control1' /></td>
-                                        <td class="delete"><button type="button" onclick="removeRowReq(this)" class="btn btn-remo"><i class='bx bx-trash'></i></button></td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                        <button type="button" id="addRowBtnReq" class="btn btn-dark mb-5 mt-1 btn-uniform">Add Item</button>
-                    </div>
-                    
-                    @* Tambahkan section Survey di sini jika perlu, dengan logika disable yang sama *@
-
                 </div>
 
                 <div class="col-12 mb-5">
-                    <div class="mt-2">
-                        <div class="card-body text-center">
-                            <button type="submit" class="btn btn-dark btn-uniform">Save</button>
-                            <a asp-controller="RFQ" asp-action="Index" class="btn btn-danger btn-uniform">Discard</a>
+                    <button type="button" class="btn btn-outline-dark delegation-btn d-flex justify-content-center align-items-center" style="border-radius: 4px; font-size: 20px; font-weight: 500; height: 35px;">Delegation</button>
+                </div>
+
+                <div class="tabel item-list col-12">
+                    <h5 class="item-list-title underline">Item List</h5>
+                    <table class="table item-list">
+                        <thead class="table-light">
+                            <tr>
+                                <th>No</th>
+                                <th>Item Name</th>
+                                <th>Item Description</th>
+                                <th>Qty</th>
+                                <th>UoM</th>
+                                <th>U/Price</th>
+                                <th>Notes</th>
+                                <th>Details</th>
+                                <th>Our Warranty</th>
+                                <th>Amount</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemListTableBody">
+                            <tr>
+                                <td class="text-center" style="font-weight: 500;">1</td>
+                                <td class="name">
+                                    <div class="wrapp item-dropdown" style="width: 100%;">
+                                        <div class="select-btn d-flex align-items-center">
+                                            <span></span>
+                                            <i class='bx bx-chevron-down'></i>
+                                        </div>
+                                        <div class="content-search">
+                                            <div class="search">
+                                                <i class="bx bx-search-alt-2"></i>
+                                                <input type="text" placeholder="Search" />
+                                            </div>
+                                            <ul class="option" style="margin-bottom: 10px;"></ul>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="desc"><input type='text' class='size form-control1'></td>
+                                <td class="qty"><input type='number' class='size text-center form-control1'></td>
+                                <td class="uom"><input type='text' class='size form-control1'></td>
+                                <td class="price"><input type='number' class='size form-control1'></td>
+                                <td class="notes"><input type='text' class='size form-control1'></td>
+                                <td class="details"><input type='text' class='size form-control1'></td>
+                                <td class="warranty"><input type='text' class='size form-control1'></td>
+                                <td class="amount"><span class="item-price-amount"></span></td>
+                                <td class="delete"><button type="button" class="btn btn-remove-row-itemlist"><i class='bx bx-trash'></i></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="d-flex justify-content-between align-items-center mb-5 mt-1">
+                        <button type="button" id="addRowBtnItem" class="btn btn-dark btn-uniform">Add Item</button>
+                        <div id="itemListTotalBox" class="total-box">
+                            <span class="total-label">Total</span>
+                            <div class="total-value justify-content-center">0</div>
                         </div>
                     </div>
+                </div>
+
+                <div class="tabel req-item col-12 mb-5">
+                    <h5 class="item-list-title underline">Request Item to Purchasing</h5>
+                    <table class="table item-list">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Action</th>
+                                <th>No</th>
+                                <th>Req Code</th>
+                                <th>Item Name</th>
+                                <th>Item Description</th>
+                                <th>Qty</th>
+                                <th>UoM</th>
+                                <th>Reason for Request</th>
+                                <th>Notes (Internal)</th>
+                                <th>PIC</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="reqTableBody">
+                            <tr>
+                                <td class="action">
+                                    <button type="button" class="btn">
+                                        <i class='bx bx-plus text-black' style="border: 2px solid #000; border-radius: 3px;"></i>
+                                    </button>
+                                </td>
+                                <td class="nomor text-center" style="font-weight: 500;">1</td>
+                                <td class="reqCode">REQ240001</td>
+                                <td class="name"><input type='text' class='size form-control1' value="RJ40G Laptop Battery"></td>
+                                <td class="desc"><input type='text' class='size form-control1' value="Voltage: 15.2v, Capacity: 63Wh/3941mAh, Battery Condition: 100% Brand New."></td>
+                                <td class="qty"><input type='number' class='size text-center form-control1' value="2"></td>
+                                <td class="uom"><input type='text' class='size form-control1' value="Ea"></td>
+                                <td class="reason"><input type='text' class='size form-control1' value="Not yet in the Database"></td>
+                                <td class="notes"><input type='text' class='size form-control1'></td>
+                                <td class="pic">None</td>
+                                <td class="reqStatus">
+                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                                        <span id="open" class="rounded-pill status">Open</span>
+                                    </div>
+                                </td>
+                                <td class="delete"><button type="button" class="btn btn-remove-row-req"><i class='bx bx-trash'></i></button></td>
+                            </tr>
+                            <tr>
+                                <td class="action">
+                                    <button type="button" class="btn">
+                                        <i class='bx bx-plus text-black' style="border: 2px solid #000; border-radius: 3px;"></i>
+                                    </button>
+                                </td>
+                                <td class="nomor text-center" style="font-weight: 500;">2</td>
+                                <td class="reqCode">REQ240002</td>
+                                <td class="name"><input type='text' class='size form-control1' value="RJ40G Laptop Battery"></td>
+                                <td class="desc"><input type='text' class='size form-control1' value="Voltage: 15.2v, Capacity: 63Wh/3941mAh, Battery Condition: 100% Brand New."></td>
+                                <td class="qty"><input type='number' class='size text-center form-control1' value="2"></td>
+                                <td class="uom"><input type='text' class='size form-control1' value="Ea"></td>
+                                <td class="reason"><input type='text' class='size form-control1' value="Not yet in the Database"></td>
+                                <td class="notes"><input type='text' class='size form-control1'></td>
+                                <td class="pic">None</td>
+                                <td class="reqStatus">
+                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                                        <span id="on-progress" class="rounded-pill status">On Progress</span>
+                                    </div>
+                                </td>
+                                <td class="delete"><button type="button" class="btn btn-remove-row-req"><i class='bx bx-trash'></i></button></td>
+                            </tr>
+                            <tr>
+                                <td class="action">
+                                    <button type="button" class="btn">
+                                        <i class='bx bx-plus text-black' style="border: 2px solid #000; border-radius: 3px;"></i>
+                                    </button>
+                                </td>
+                                <td class="nomor text-center" style="font-weight: 500;">3</td>
+                                <td class="reqCode">REQ240003</td>
+                                <td class="name"><input type='text' class='size form-control1' value="RJ40G Laptop Battery"></td>
+                                <td class="desc"><input type='text' class='size form-control1' value="Voltage: 15.2v, Capacity: 63Wh/3941mAh, Battery Condition: 100% Brand New."></td>
+                                <td class="qty"><input type='number' class='size text-center form-control1' value="2"></td>
+                                <td class="uom"><input type='text' class='size form-control1' value="Ea"></td>
+                                <td class="reason"><input type='text' class='size form-control1' value="Not yet in the Database"></td>
+                                <td class="notes"><input type='text' class='size form-control1'></td>
+                                <td class="pic">None</td>
+                                <td class="reqStatus">
+                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                                        <span id="first-follow-up" class="rounded-pill status">1st Follow up</span>
+                                    </div>
+                                </td>
+                                <td class="delete"><button type="button" class="btn btn-remove-row-req"><i class='bx bx-trash'></i></button></td>
+                            </tr>
+                            <tr>
+                                <td class="action">
+                                    <button type="button" class="btn">
+                                        <i class='bx bx-plus text-black' style="border: 2px solid #000; border-radius: 3px;"></i>
+                                    </button>
+                                </td>
+                                <td class="nomor text-center" style="font-weight: 500;">4</td>
+                                <td class="reqCode">REQ240004</td>
+                                <td class="name"><input type='text' class='size form-control1' value="RJ40G Laptop Battery"></td>
+                                <td class="desc"><input type='text' class='size form-control1' value="Voltage: 15.2v, Capacity: 63Wh/3941mAh, Battery Condition: 100% Brand New."></td>
+                                <td class="qty"><input type='number' class='size text-center form-control1' value="2"></td>
+                                <td class="uom"><input type='text' class='size form-control1' value="Ea"></td>
+                                <td class="reason"><input type='text' class='size form-control1' value="Not yet in the Database"></td>
+                                <td class="notes"><input type='text' class='size form-control1'></td>
+                                <td class="pic">None</td>
+                                <td class="reqStatus">
+                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                                        <span id="second-follow-up" class="rounded-pill status">2nd Follow up</span>
+                                    </div>
+                                </td>
+                                <td class="delete"><button type="button" class="btn btn-remove-row-req"><i class='bx bx-trash'></i></button></td>
+                            </tr>
+                            <tr>
+                                <td class="action">
+                                    <button type="button" class="btn">
+                                        <i class='bx bx-plus text-black' style="border: 2px solid #000; border-radius: 3px;"></i>
+                                    </button>
+                                </td>
+                                <td class="nomor text-center" style="font-weight: 500;">5</td>
+                                <td class="reqCode">REQ240005</td>
+                                <td class="name"><input type='text' class='size form-control1' value="RJ40G Laptop Battery"></td>
+                                <td class="desc"><input type='text' class='size form-control1' value="Voltage: 15.2v, Capacity: 63Wh/3941mAh, Battery Condition: 100% Brand New."></td>
+                                <td class="qty"><input type='number' class='size text-center form-control1' value="2"></td>
+                                <td class="uom"><input type='text' class='size form-control1' value="Ea"></td>
+                                <td class="reason"><input type='text' class='size form-control1' value="Not yet in the Database"></td>
+                                <td class="notes"><input type='text' class='size form-control1'></td>
+                                <td class="pic">None</td>
+                                <td class="reqStatus">
+                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                                        <span id="third-follow-up" class="rounded-pill status">3rd Follow up</span>
+                                    </div>
+                                </td>
+                                <td class="delete"><button type="button" class="btn btn-remove-row-req"><i class='bx bx-trash'></i></button></td>
+                            </tr>
+                            <tr>
+                                <td class="action">
+                                    <button type="button" class="btn">
+                                        <i class='bx bx-plus text-black' style="border: 2px solid #000; border-radius: 3px;"></i>
+                                    </button>
+                                </td>
+                                <td class="nomor text-center" style="font-weight: 500;">6</td>
+                                <td class="reqCode">REQ240006</td>
+                                <td class="name"><input type='text' class='size form-control1' value="RJ40G Laptop Battery"></td>
+                                <td class="desc"><input type='text' class='size form-control1' value="Voltage: 15.2v, Capacity: 63Wh/3941mAh, Battery Condition: 100% Brand New."></td>
+                                <td class="qty"><input type='number' class='size text-center form-control1' value="2"></td>
+                                <td class="uom"><input type='text' class='size form-control1' value="Ea"></td>
+                                <td class="reason"><input type='text' class='size form-control1' value="Not yet in the Database"></td>
+                                <td class="notes"><input type='text' class='size form-control1'></td>
+                                <td class="pic">None</td>
+                                <td class="reqStatus">
+                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                                        <span id="excalation" class="rounded-pill status">Excalation</span>
+                                    </div>
+                                </td>
+                                <td class="delete"><button type="button" class="btn btn-remove-row-req"><i class='bx bx-trash'></i></button></td>
+                            </tr>
+                            <tr>
+                                <td class="action">
+                                    <button type="button" class="btn">
+                                        <i class='bx bx-plus text-black' style="border: 2px solid #000; border-radius: 3px;"></i>
+                                    </button>
+                                </td>
+                                <td class="nomor text-center" style="font-weight: 500;">7</td>
+                                <td class="reqCode">REQ240007</td>
+                                <td class="name"><input type='text' class='size form-control1' value="RJ40G Laptop Battery"></td>
+                                <td class="desc"><input type='text' class='size form-control1' value="Voltage: 15.2v, Capacity: 63Wh/3941mAh, Battery Condition: 100% Brand New."></td>
+                                <td class="qty"><input type='number' class='size text-center form-control1' value="2"></td>
+                                <td class="uom"><input type='text' class='size form-control1' value="Ea"></td>
+                                <td class="reason"><input type='text' class='size form-control1' value="Not yet in the Database"></td>
+                                <td class="notes"><input type='text' class='size form-control1'></td>
+                                <td class="pic">None</td>
+                                <td class="reqStatus">
+                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                                        <span id="completed" class="rounded-pill status">Completed</span>
+                                    </div>
+                                </td>
+                                <td class="delete"><button type="button" class="btn btn-remove-row-req"><i class='bx bx-trash'></i></button></td>
+                            </tr>
+                            <tr>
+                                <td class="action">
+                                    <button type="button" class="btn">
+                                        <i class='bx bx-plus text-black' style="border: 2px solid #000; border-radius: 3px;"></i>
+                                    </button>
+                                </td>
+                                <td class="nomor text-center" style="font-weight: 500;">8</td>
+                                <td class="reqCode">None</td>
+                                <td class="name"><input type='text' class='size form-control1' value="Dell Latitude 5430"></td>
+                                <td class="desc"><input type='text' class='size form-control1' value="Dell Latitude 5430"></td>
+                                <td class="qty"><input type='number' class='size text-center form-control1' value="2"></td>
+                                <td class="uom"><input type='text' class='size form-control1' value="Ea"></td>
+                                <td class="reason"><input type='text' class='size form-control1' value="Leadtime not suitable"></td>
+                                <td class="notes"><input type='text' class='size form-control1' value="Carikan Leadtime yang kurang dari 4 minggu"></td>
+                                <td class="pic">None</td>
+                                <td class="reqStatus">
+                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                                        <span id="not-yet" class="rounded-pill status">Not Yet</span>
+                                    </div>
+                                </td>
+                                <td class="delete"><button type="button" class="btn btn-remove-row-req"><i class='bx bx-trash'></i></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="tabel survey-list col-12 mb-5">
+                    <h5 class="item-list-title underline">Survey List</h5>
+                    <table class="table item-list">
+                        <thead class="table-light">
+                            <tr>
+                                <th>No</th>
+                                <th>Survey Code</th>
+                                <th>Survey Category</th>
+                                <th>Survey Name</th>
+                                <th>PIC</th>
+                                <th>Customer PIC</th>
+                                <th>Req Date & Time</th>
+                                <th>Detail Location</th>
+                                <th>Notes (Internal)</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="surveyTableBody">
+                            <tr>
+                                <td class="text-center" style="font-weight: 500;">1</td>
+                                <td class="survey-code">SVY240001</td>
+                                <td class="survey-category">
+                                    <div class="wrapp survey-category-dropdown">
+                                        <div class="select-btn py-0">
+                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Mechanical & Electrical, Security Access" />
+                                            <i class='bx bx-chevron-down'></i>
+                                        </div>
+                                        <div class="content-search">
+                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Network Security">
+                                                    <span>Network Security</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Mechanical & Electrical">
+                                                    <span>Mechanical & Electrical</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Security Access">
+                                                    <span>Security Access</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Endpoint">
+                                                    <span>Endpoint</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Data Center">
+                                                    <span>Data Center</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="survey-name"><input type="text" class="size form-control1" value="Installation CCTV"></td>
+                                <td class="survey-pic">
+                                    <div class="wrapp survey-pic-dropdown">
+                                        <div class="select-btn py-0">
+                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Ance, Feggy" />
+                                            <i class='bx bx-chevron-down'></i>
+                                        </div>
+                                        <div class="content-search">
+                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Ance">
+                                                    <span>Ance</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Feggy">
+                                                    <span>Feggy</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Geo">
+                                                    <span>Geo</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Nuriel">
+                                                    <span>Nuriel</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Robby">
+                                                    <span>Robby</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="survey-customer-pic"><input type="text" class="size form-control1" value="Pak John"></td>
+                                <td class="survey-req-date-time">
+                                    <div class="d-flex flex-column gap-1">
+                                        <input type="date" class="form-control form-control-sm survey-date" value="2024-08-13">
+                                        <div class="d-flex gap-1 align-items-center">
+                                            <input type="time" class="form-control form-control-sm survey-time-start" value="13:30">
+                                            <span>-</span>
+                                            <input type="time" class="form-control form-control-sm survey-time-end" value="15:45">
+                                        </div>
+                                        <input type="text" class="form-control form-control-sm survey-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;" value="Tuesday, 13 August 2024 01:30 PM - 03:45 PM">
+                                    </div>
+                                </td>
+                                <td class="survey-detail-location"><input type="text" class="size form-control1" value="Epson lot 1"></td>
+                                <td class="survey-notes"><input type="text" class="size form-control1" value="Memakai APD Lengkap"></td>
+                                <td class="survey-status">
+                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                                        <span id="open" class="rounded-pill status">Open</span>
+                                    </div>
+                                </td>
+                                <td class="survey-actions">
+                                    <div class="d-flex justify-content-center">
+                                        <button type="button" class="btn"><i class='bx bx-file'></i> </button>
+                                        <button type="button" class="btn btn-remove-row-survey"><i class='bx bx-trash'></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center" style="font-weight: 500;">2</td>
+                                <td class="survey-code">SVY240002</td>
+                                <td class="survey-category">
+                                    <div class="wrapp survey-category-dropdown">
+                                        <div class="select-btn py-0">
+                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Mechanical & Electrical, Security Access" />
+                                            <i class='bx bx-chevron-down'></i>
+                                        </div>
+                                        <div class="content-search">
+                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Network Security">
+                                                    <span>Network Security</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Mechanical & Electrical">
+                                                    <span>Mechanical & Electrical</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Security Access">
+                                                    <span>Security Access</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Endpoint">
+                                                    <span>Endpoint</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Data Center">
+                                                    <span>Data Center</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="survey-name"><input type="text" class="size form-control1" value="Installation CCTV"></td>
+                                <td class="survey-pic">
+                                    <div class="wrapp survey-pic-dropdown">
+                                        <div class="select-btn py-0">
+                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Ance, Feggy" />
+                                            <i class='bx bx-chevron-down'></i>
+                                        </div>
+                                        <div class="content-search">
+                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Ance">
+                                                    <span>Ance</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Feggy">
+                                                    <span>Feggy</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Geo">
+                                                    <span>Geo</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Nuriel">
+                                                    <span>Nuriel</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Robby">
+                                                    <span>Robby</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="survey-customer-pic"><input type="text" class="size form-control1" value="Pak John"></td>
+                                <td class="survey-req-date-time">
+                                    <div class="d-flex flex-column gap-1">
+                                        <input type="date" class="form-control form-control-sm survey-date" value="2024-08-13">
+                                        <div class="d-flex gap-1 align-items-center">
+                                            <input type="time" class="form-control form-control-sm survey-time-start" value="13:30">
+                                            <span>-</span>
+                                            <input type="time" class="form-control form-control-sm survey-time-end" value="15:45">
+                                        </div>
+                                        <input type="text" class="form-control form-control-sm survey-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;" value="Tuesday, 13 August 2024 01:30 PM - 03:45 PM">
+                                    </div>
+                                </td>
+                                <td class="survey-detail-location"><input type="text" class="size form-control1" value="Epson lot 1"></td>
+                                <td class="survey-notes"><input type="text" class="size form-control1" value="Memakai APD Lengkap"></td>
+                                <td class="survey-status">
+                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                                        <span id="waiting-approval" class="rounded-pill status">Waiting Approval</span>
+                                    </div>
+                                </td>
+                                <td class="survey-actions">
+                                    <div class="d-flex justify-content-center">
+                                        <button type="button" class="btn"><i class='bx bx-file'></i> </button>
+                                        <button type="button" class="btn btn-remove-row-survey"><i class='bx bx-trash'></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center" style="font-weight: 500;">3</td>
+                                <td class="survey-code">SVY240003</td>
+                                <td class="survey-category">
+                                    <div class="wrapp survey-category-dropdown">
+                                        <div class="select-btn py-0">
+                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Mechanical & Electrical, Security Access" />
+                                            <i class='bx bx-chevron-down'></i>
+                                        </div>
+                                        <div class="content-search">
+                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Network Security">
+                                                    <span>Network Security</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Mechanical & Electrical">
+                                                    <span>Mechanical & Electrical</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Security Access">
+                                                    <span>Security Access</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Endpoint">
+                                                    <span>Endpoint</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Data Center">
+                                                    <span>Data Center</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="survey-name"><input type="text" class="size form-control1" value="Installation CCTV"></td>
+                                <td class="survey-pic">
+                                    <div class="wrapp survey-pic-dropdown">
+                                        <div class="select-btn py-0">
+                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Ance, Feggy" />
+                                            <i class='bx bx-chevron-down'></i>
+                                        </div>
+                                        <div class="content-search">
+                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Ance">
+                                                    <span>Ance</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Feggy">
+                                                    <span>Feggy</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Geo">
+                                                    <span>Geo</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Nuriel">
+                                                    <span>Nuriel</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Robby">
+                                                    <span>Robby</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="survey-customer-pic"><input type="text" class="size form-control1" value="Pak John"></td>
+                                <td class="survey-req-date-time">
+                                    <div class="d-flex flex-column gap-1">
+                                        <input type="date" class="form-control form-control-sm survey-date" value="2024-08-13">
+                                        <div class="d-flex gap-1 align-items-center">
+                                            <input type="time" class="form-control form-control-sm survey-time-start" value="13:30">
+                                            <span>-</span>
+                                            <input type="time" class="form-control form-control-sm survey-time-end" value="15:45">
+                                        </div>
+                                        <input type="text" class="form-control form-control-sm survey-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;" value="Tuesday, 13 August 2024 01:30 PM - 03:45 PM">
+                                    </div>
+                                </td>
+                                <td class="survey-detail-location"><input type="text" class="size form-control1" value="Epson lot 1"></td>
+                                <td class="survey-notes"><input type="text" class="size form-control1" value="Memakai APD Lengkap"></td>
+                                <td class="survey-status">
+                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                                        <span id="hold" class="rounded-pill status">Hold</span>
+                                    </div>
+                                </td>
+                                <td class="survey-actions">
+                                    <div class="d-flex justify-content-center">
+                                        <button type="button" class="btn"><i class='bx bx-file'></i> </button>
+                                        <button type="button" class="btn btn-remove-row-survey"><i class='bx bx-trash'></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center" style="font-weight: 500;">4</td>
+                                <td class="survey-code">SVY240004</td>
+                                <td class="survey-category">
+                                    <div class="wrapp survey-category-dropdown">
+                                        <div class="select-btn py-0">
+                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Mechanical & Electrical, Security Access" />
+                                            <i class='bx bx-chevron-down'></i>
+                                        </div>
+                                        <div class="content-search">
+                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Network Security">
+                                                    <span>Network Security</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Mechanical & Electrical">
+                                                    <span>Mechanical & Electrical</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Security Access">
+                                                    <span>Security Access</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Endpoint">
+                                                    <span>Endpoint</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Data Center">
+                                                    <span>Data Center</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="survey-name"><input type="text" class="size form-control1" value="Installation CCTV"></td>
+                                <td class="survey-pic">
+                                    <div class="wrapp survey-pic-dropdown">
+                                        <div class="select-btn py-0">
+                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Ance, Feggy" />
+                                            <i class='bx bx-chevron-down'></i>
+                                        </div>
+                                        <div class="content-search">
+                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Ance">
+                                                    <span>Ance</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Feggy">
+                                                    <span>Feggy</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Geo">
+                                                    <span>Geo</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Nuriel">
+                                                    <span>Nuriel</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Robby">
+                                                    <span>Robby</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="survey-customer-pic"><input type="text" class="size form-control1" value="Pak John"></td>
+                                <td class="survey-req-date-time">
+                                    <div class="d-flex flex-column gap-1">
+                                        <input type="date" class="form-control form-control-sm survey-date" value="2024-08-13">
+                                        <div class="d-flex gap-1 align-items-center">
+                                            <input type="time" class="form-control form-control-sm survey-time-start" value="13:30">
+                                            <span>-</span>
+                                            <input type="time" class="form-control form-control-sm survey-time-end" value="15:45">
+                                        </div>
+                                        <input type="text" class="form-control form-control-sm survey-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;" value="Tuesday, 13 August 2024 01:30 PM - 03:45 PM">
+                                    </div>
+                                </td>
+                                <td class="survey-detail-location"><input type="text" class="size form-control1" value="Epson lot 1"></td>
+                                <td class="survey-notes"><input type="text" class="size form-control1" value="Memakai APD Lengkap"></td>
+                                <td class="survey-status">
+                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                                        <span id="rescheduled" class="rounded-pill status">Rescheduled</span>
+                                    </div>
+                                </td>
+                                <td class="survey-actions">
+                                    <div class="d-flex justify-content-center">
+                                        <button type="button" class="btn"><i class='bx bx-file'></i> </button>
+                                        <button type="button" class="btn btn-remove-row-survey"><i class='bx bx-trash'></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center" style="font-weight: 500;">5</td>
+                                <td class="survey-code">SVY240005</td>
+                                <td class="survey-category">
+                                    <div class="wrapp survey-category-dropdown">
+                                        <div class="select-btn py-0">
+                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Mechanical & Electrical, Security Access" />
+                                            <i class='bx bx-chevron-down'></i>
+                                        </div>
+                                        <div class="content-search">
+                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Network Security">
+                                                    <span>Network Security</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Mechanical & Electrical">
+                                                    <span>Mechanical & Electrical</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Security Access">
+                                                    <span>Security Access</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Endpoint">
+                                                    <span>Endpoint</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Data Center">
+                                                    <span>Data Center</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="survey-name"><input type="text" class="size form-control1" value="Installation CCTV"></td>
+                                <td class="survey-pic">
+                                    <div class="wrapp survey-pic-dropdown">
+                                        <div class="select-btn py-0">
+                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Ance, Feggy" />
+                                            <i class='bx bx-chevron-down'></i>
+                                        </div>
+                                        <div class="content-search">
+                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Ance">
+                                                    <span>Ance</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Feggy">
+                                                    <span>Feggy</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Geo">
+                                                    <span>Geo</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Nuriel">
+                                                    <span>Nuriel</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Robby">
+                                                    <span>Robby</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="survey-customer-pic"><input type="text" class="size form-control1" value="Pak John"></td>
+                                <td class="survey-req-date-time">
+                                    <div class="d-flex flex-column gap-1">
+                                        <input type="date" class="form-control form-control-sm survey-date" value="2024-08-13">
+                                        <div class="d-flex gap-1 align-items-center">
+                                            <input type="time" class="form-control form-control-sm survey-time-start" value="13:30">
+                                            <span>-</span>
+                                            <input type="time" class="form-control form-control-sm survey-time-end" value="15:45">
+                                        </div>
+                                        <input type="text" class="form-control form-control-sm survey-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;" value="Tuesday, 13 August 2024 01:30 PM - 03:45 PM">
+                                    </div>
+                                </td>
+                                <td class="survey-detail-location"><input type="text" class="size form-control1" value="Epson lot 1"></td>
+                                <td class="survey-notes"><input type="text" class="size form-control1" value="Memakai APD Lengkap"></td>
+                                <td class="survey-status">
+                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                                        <span id="on-progress" class="rounded-pill status">On Progress</span>
+                                    </div>
+                                </td>
+                                <td class="survey-actions">
+                                    <div class="d-flex justify-content-center">
+                                        <button type="button" class="btn"><i class='bx bx-file'></i> </button>
+                                        <button type="button" class="btn btn-remove-row-survey"><i class='bx bx-trash'></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center" style="font-weight: 500;">6</td>
+                                <td class="survey-code">SVY240006</td>
+                                <td class="survey-category">
+                                    <div class="wrapp survey-category-dropdown">
+                                        <div class="select-btn py-0">
+                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Mechanical & Electrical, Security Access" />
+                                            <i class='bx bx-chevron-down'></i>
+                                        </div>
+                                        <div class="content-search">
+                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Network Security">
+                                                    <span>Network Security</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Mechanical & Electrical">
+                                                    <span>Mechanical & Electrical</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Security Access">
+                                                    <span>Security Access</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Endpoint">
+                                                    <span>Endpoint</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Data Center">
+                                                    <span>Data Center</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="survey-name"><input type="text" class="size form-control1" value="Installation CCTV"></td>
+                                <td class="survey-pic">
+                                    <div class="wrapp survey-pic-dropdown">
+                                        <div class="select-btn py-0">
+                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Ance, Feggy" />
+                                            <i class='bx bx-chevron-down'></i>
+                                        </div>
+                                        <div class="content-search">
+                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Ance">
+                                                    <span>Ance</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Feggy">
+                                                    <span>Feggy</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Geo">
+                                                    <span>Geo</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Nuriel">
+                                                    <span>Nuriel</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Robby">
+                                                    <span>Robby</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="survey-customer-pic"><input type="text" class="size form-control1" value="Pak John"></td>
+                                <td class="survey-req-date-time">
+                                    <div class="d-flex flex-column gap-1">
+                                        <input type="date" class="form-control form-control-sm survey-date" value="2024-08-13">
+                                        <div class="d-flex gap-1 align-items-center">
+                                            <input type="time" class="form-control form-control-sm survey-time-start" value="13:30">
+                                            <span>-</span>
+                                            <input type="time" class="form-control form-control-sm survey-time-end" value="15:45">
+                                        </div>
+                                        <input type="text" class="form-control form-control-sm survey-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;" value="Tuesday, 13 August 2024 01:30 PM - 03:45 PM">
+                                    </div>
+                                </td>
+                                <td class="survey-detail-location"><input type="text" class="size form-control1" value="Epson lot 1"></td>
+                                <td class="survey-notes"><input type="text" class="size form-control1" value="Memakai APD Lengkap"></td>
+                                <td class="survey-status">
+                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                                        <span id="completed" class="rounded-pill status">Completed</span>
+                                    </div>
+                                </td>
+                                <td class="survey-actions">
+                                    <div class="d-flex justify-content-center">
+                                        <button type="button" class="btn"><i class='bx bx-file'></i> </button>
+                                        <button type="button" class="btn btn-remove-row-survey"><i class='bx bx-trash'></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center" style="font-weight: 500;">7</td>
+                                <td class="survey-code">SVY240007</td>
+                                <td class="survey-category">
+                                    <div class="wrapp survey-category-dropdown">
+                                        <div class="select-btn py-0">
+                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Network Security, Security Access, Endpoint, Data Center" />
+                                            <i class='bx bx-chevron-down'></i>
+                                        </div>
+                                        <div class="content-search">
+                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Network Security">
+                                                    <span>Network Security</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Mechanical & Electrical">
+                                                    <span>Mechanical & Electrical</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Security Access">
+                                                    <span>Security Access</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Endpoint">
+                                                    <span>Endpoint</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Data Center">
+                                                    <span>Data Center</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="survey-name"><input type="text" class="size form-control1" value="Control Room"></td>
+                                <td class="survey-pic">
+                                    <div class="wrapp survey-pic-dropdown">
+                                        <div class="select-btn py-0">
+                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Ance, Feggy" />
+                                            <i class='bx bx-chevron-down'></i>
+                                        </div>
+                                        <div class="content-search">
+                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Ance">
+                                                    <span>Ance</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Feggy">
+                                                    <span>Feggy</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Geo">
+                                                    <span>Geo</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Nuriel">
+                                                    <span>Nuriel</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Robby">
+                                                    <span>Robby</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="survey-customer-pic"><input type="text" class="size form-control1" value="Pak John"></td>
+                                <td class="survey-req-date-time">
+                                    <div class="d-flex flex-column gap-1">
+                                        <input type="date" class="form-control form-control-sm survey-date" value="2024-08-13">
+                                        <div class="d-flex gap-1 align-items-center">
+                                            <input type="time" class="form-control form-control-sm survey-time-start" value="13:30">
+                                            <span>-</span>
+                                            <input type="time" class="form-control form-control-sm survey-time-end" value="15:45">
+                                        </div>
+                                        <input type="text" class="form-control form-control-sm survey-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;" value="Tuesday, 13 August 2024 01:30 PM - 03:45 PM">
+                                    </div>
+                                </td>
+                                <td class="survey-detail-location"><input type="text" class="size form-control1" value="Epson Lot 151"></td>
+                                <td class="survey-notes"><input type="text" class="size form-control1" value="Memakai APD Lengkap"></td>
+                                <td class="survey-status">
+                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                                        <span id="not-yet" class="rounded-pill status">Not Yet</span>
+                                    </div>
+                                </td>
+                                <td class="survey-actions">
+                                    <div class="d-flex justify-content-center">
+                                        <button type="button" class="btn"><i class='bx bx-file'></i> </button>
+                                        <button type="button" class="btn btn-remove-row-survey"><i class='bx bx-trash'></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button type="button" id="addRowBtnSurvey" class="btn btn-dark btn-uniform">Add Survey</button>
+                </div>
+
+                <div class="tabel meeting-list col-12 mb-5">
+                    <h5 class="item-list-title underline">Meeting List</h5>
+                    <table class="table item-list">
+                        <thead class="table-light">
+                            <tr>
+                                <th>No</th>
+                                <th>Meeting Code</th>
+                                <th>Meeting Name</th>
+                                <th>PIC</th>
+                                <th>Req Date & Time</th>
+                                <th>Detail Location</th>
+                                <th>Notes (Internal)</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="meetingTableBody">
+                            <tr>
+                                <td class="text-center" style="font-weight: 500;">1</td>
+                                <td class="meeting-code">M240001</td>
+                                <td class="meeting-name"><input type="text" class="size form-control1" value="Replacement and Maintenance"></td>
+                                <td class="meeting-pic">
+                                    <div class="wrapp meeting-pic-dropdown">
+                                        <div class="select-btn py-0">
+                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Feggy, Geo" />
+                                            <i class='bx bx-chevron-down'></i>
+                                        </div>
+                                        <div class="content-search">
+                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem; height: 135px;">
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Ance">
+                                                    <span>Ance</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Feggy">
+                                                    <span>Feggy</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Geo">
+                                                    <span>Geo</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Nuriel">
+                                                    <span>Nuriel</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Robby">
+                                                    <span>Robby</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="meeting-req-date-time">
+                                    <div class="d-flex flex-column gap-1">
+                                        <input type="date" class="form-control form-control-sm meeting-date" value="2024-08-13">
+                                        <div class="d-flex gap-1 align-items-center">
+                                            <input type="time" class="form-control form-control-sm meeting-time-start" value="13:30">
+                                            <span>-</span>
+                                            <input type="time" class="form-control form-control-sm meeting-time-end" value="15:45">
+                                        </div>
+                                        <input type="text" class="form-control form-control-sm meeting-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;" value="Tuesday, 13 August 2024 01:30 PM - 03:45 PM">
+                                    </div>
+                                </td>
+                                <td class="meeting-detail-location">
+                                    <input type="text" class="form-control1" value="Online Link Zoom: https://www.zoom.com/">
+                                </td>
+                                <td class="meeting-notes">
+                                    <input type="text" class="form-control1">
+                                </td>
+                                <td class="meeting-status">
+                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                                        <span id="open" class="rounded-pill status">Open</span>
+                                    </div>
+                                </td>
+                                <td class="meeting-actions">
+                                    <div class="d-flex justify-content-center">
+                                        <button type="button" class="btn"><i class='bx bx-file'></i> </button>
+                                        <button type="button" class="btn btn-remove-row-meeting"><i class='bx bx-trash'></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center" style="font-weight: 500;">2</td>
+                                <td class="meeting-code">M240002</td>
+                                <td class="meeting-name"><input type="text" class="size form-control1" value="Replacement and Maintenance"></td>
+                                <td class="meeting-pic">
+                                    <div class="wrapp meeting-pic-dropdown">
+                                        <div class="select-btn py-0">
+                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Feggy, Geo" />
+                                            <i class='bx bx-chevron-down'></i>
+                                        </div>
+                                        <div class="content-search">
+                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem; height: 135px;">
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Ance">
+                                                    <span>Ance</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Feggy">
+                                                    <span>Feggy</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Geo">
+                                                    <span>Geo</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Nuriel">
+                                                    <span>Nuriel</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Robby">
+                                                    <span>Robby</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="meeting-req-date-time">
+                                    <div class="d-flex flex-column gap-1">
+                                        <input type="date" class="form-control form-control-sm meeting-date" value="2024-08-13">
+                                        <div class="d-flex gap-1 align-items-center">
+                                            <input type="time" class="form-control form-control-sm meeting-time-start" value="13:30">
+                                            <span>-</span>
+                                            <input type="time" class="form-control form-control-sm meeting-time-end" value="15:45">
+                                        </div>
+                                        <input type="text" class="form-control form-control-sm meeting-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;" value="Tuesday, 13 August 2024 01:30 PM - 03:45 PM">
+                                    </div>
+                                </td>
+                                <td class="meeting-detail-location">
+                                    <input type="text" class="form-control1" value="Online Link Zoom: https://www.zoom.com/">
+                                </td>
+                                <td class="meeting-notes">
+                                    <input type="text" class="form-control1">
+                                </td>
+                                <td class="meeting-status">
+                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                                        <span id="waiting-approval" class="rounded-pill status">Waiting Approval</span>
+                                    </div>
+                                </td>
+                                <td class="meeting-actions">
+                                    <div class="d-flex justify-content-center">
+                                        <button type="button" class="btn"><i class='bx bx-file'></i> </button>
+                                        <button type="button" class="btn btn-remove-row-meeting"><i class='bx bx-trash'></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center" style="font-weight: 500;">3</td>
+                                <td class="meeting-code">M240003</td>
+                                <td class="meeting-name"><input type="text" class="size form-control1" value="Replacement and Maintenance"></td>
+                                <td class="meeting-pic">
+                                    <div class="wrapp meeting-pic-dropdown">
+                                        <div class="select-btn py-0">
+                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Feggy, Geo" />
+                                            <i class='bx bx-chevron-down'></i>
+                                        </div>
+                                        <div class="content-search">
+                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem; height: 135px;">
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Ance">
+                                                    <span>Ance</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Feggy">
+                                                    <span>Feggy</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Geo">
+                                                    <span>Geo</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Nuriel">
+                                                    <span>Nuriel</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Robby">
+                                                    <span>Robby</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="meeting-req-date-time">
+                                    <div class="d-flex flex-column gap-1">
+                                        <input type="date" class="form-control form-control-sm meeting-date" value="2024-08-13">
+                                        <div class="d-flex gap-1 align-items-center">
+                                            <input type="time" class="form-control form-control-sm meeting-time-start" value="13:30">
+                                            <span>-</span>
+                                            <input type="time" class="form-control form-control-sm meeting-time-end" value="15:45">
+                                        </div>
+                                        <input type="text" class="form-control form-control-sm meeting-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;" value="Tuesday, 13 August 2024 01:30 PM - 03:45 PM">
+                                    </div>
+                                </td>
+                                <td class="meeting-detail-location">
+                                    <input type="text" class="form-control1" value="Online Link Zoom: https://www.zoom.com/">
+                                </td>
+                                <td class="meeting-notes">
+                                    <input type="text" class="form-control1">
+                                </td>
+                                <td class="meeting-status">
+                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                                        <span id="on-progress" class="rounded-pill status">On Progress</span>
+                                    </div>
+                                </td>
+                                <td class="meeting-actions">
+                                    <div class="d-flex justify-content-center">
+                                        <button type="button" class="btn"><i class='bx bx-file'></i> </button>
+                                        <button type="button" class="btn btn-remove-row-meeting"><i class='bx bx-trash'></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center" style="font-weight: 500;">4</td>
+                                <td class="meeting-code">M240004</td>
+                                <td class="meeting-name"><input type="text" class="size form-control1" value="Replacement and Maintenance"></td>
+                                <td class="meeting-pic">
+                                    <div class="wrapp meeting-pic-dropdown">
+                                        <div class="select-btn py-0">
+                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Feggy, Geo" />
+                                            <i class='bx bx-chevron-down'></i>
+                                        </div>
+                                        <div class="content-search">
+                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem; height: 135px;">
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Ance">
+                                                    <span>Ance</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Feggy">
+                                                    <span>Feggy</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Geo">
+                                                    <span>Geo</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Nuriel">
+                                                    <span>Nuriel</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Robby">
+                                                    <span>Robby</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="meeting-req-date-time">
+                                    <div class="d-flex flex-column gap-1">
+                                        <input type="date" class="form-control form-control-sm meeting-date" value="2024-08-13">
+                                        <div class="d-flex gap-1 align-items-center">
+                                            <input type="time" class="form-control form-control-sm meeting-time-start" value="13:30">
+                                            <span>-</span>
+                                            <input type="time" class="form-control form-control-sm meeting-time-end" value="15:45">
+                                        </div>
+                                        <input type="text" class="form-control form-control-sm meeting-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;" value="Tuesday, 13 August 2024 01:30 PM - 03:45 PM">
+                                    </div>
+                                </td>
+                                <td class="meeting-detail-location">
+                                    <input type="text" class="form-control1" value="Online Link Zoom: https://www.zoom.com/">
+                                </td>
+                                <td class="meeting-notes">
+                                    <input type="text" class="form-control1">
+                                </td>
+                                <td class="meeting-status">
+                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                                        <span id="completed" class="rounded-pill status">Completed</span>
+                                    </div>
+                                </td>
+                                <td class="meeting-actions">
+                                    <div class="d-flex justify-content-center">
+                                        <button type="button" class="btn"><i class='bx bx-file'></i> </button>
+                                        <button type="button" class="btn btn-remove-row-meeting"><i class='bx bx-trash'></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center" style="font-weight: 500;">5</td>
+                                <td class="meeting-code">M240005</td>
+                                <td class="meeting-name"><input type="text" class="size form-control1" value="Replacement and Maintenance"></td>
+                                <td class="meeting-pic">
+                                    <div class="wrapp meeting-pic-dropdown">
+                                        <div class="select-btn py-0">
+                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Feggy, Geo" />
+                                            <i class='bx bx-chevron-down'></i>
+                                        </div>
+                                        <div class="content-search">
+                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem; height: 135px;">
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Ance">
+                                                    <span>Ance</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Feggy">
+                                                    <span>Feggy</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Geo">
+                                                    <span>Geo</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Nuriel">
+                                                    <span>Nuriel</span>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Robby">
+                                                    <span>Robby</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="meeting-req-date-time">
+                                    <div class="d-flex flex-column gap-1">
+                                        <input type="date" class="form-control form-control-sm meeting-date" value="2024-08-13">
+                                        <div class="d-flex gap-1 align-items-center">
+                                            <input type="time" class="form-control form-control-sm meeting-time-start" value="13:30">
+                                            <span>-</span>
+                                            <input type="time" class="form-control form-control-sm meeting-time-end" value="15:45">
+                                        </div>
+                                        <input type="text" class="form-control form-control-sm meeting-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;" value="Tuesday, 13 August 2024 01:30 PM - 03:45 PM">
+                                    </div>
+                                </td>
+                                <td class="meeting-detail-location">
+                                    <input type="text" class="form-control1" value="Online Link Zoom: https://www.zoom.com/">
+                                </td>
+                                <td class="meeting-notes">
+                                    <input type="text" class="form-control1">
+                                </td>
+                                <td class="meeting-status">
+                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                                        <span id="not-yet" class="rounded-pill status">Not Yet</span>
+                                    </div>
+                                </td>
+                                <td class="meeting-actions">
+                                    <div class="d-flex justify-content-center">
+                                        <button type="button" class="btn"><i class='bx bx-file'></i> </button>
+                                        <button type="button" class="btn btn-remove-row-meeting"><i class='bx bx-trash'></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button type="button" id="addMeetingBtn" class="btn btn-dark mt-1 btn-uniform">Add Meeting</button>
                 </div>
             </div>
         </form>
@@ -942,13 +2494,13 @@
         window.serverSideCustomerData = [];
         @if (Model.CustomerList != null)
         {
-                foreach (var customer in Model.CustomerList.Cast<SelectListItem>())
-                {
-                        @:serverSideCustomerData.push({ value: "@Html.Raw(customer.Value)", text: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(customer.Text))" });
-                }
+                    foreach (var customer in Model.CustomerList.Cast<SelectListItem>())
+                    {
+                                @:serverSideCustomerData.push({ value: "@Html.Raw(customer.Value)", text: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(customer.Text))" });
+                    }
         }
 
-                function populateEndUserDropdown(customerId) {
+            function populateEndUserDropdown(customerId) {
             console.log("populateEndUserDropdown called with customerId:", customerId); // Ini sudah muncul dengan benar
             var endUserSelect = $('#endUserDropdown');
             endUserSelect.empty();
@@ -996,3 +2548,4 @@
         });
     </script>
 }
+ 

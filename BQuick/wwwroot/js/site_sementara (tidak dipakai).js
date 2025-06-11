@@ -298,13 +298,18 @@ document.addEventListener("DOMContentLoaded", function () {
         const companySearchInp = companyWrapper.querySelector("input");
         const companyOptions = companyWrapper.querySelector(".option");
 
-        window.companies = [
-            "PT. Accenture", "PT. Adhya Tirta Batam", "PT. Agiva Indonesia", "PT. Pelangi Fortuna Global",
-            "PT. Indoshipsupply", "PT. Bintan Sukses Ancol", "PT. Citra Maritime", "PT. Bintai Kindenko Engineering Indonesia",
-            "PT. Karya Abadi", "PT. Digital Solutions", "PT. Nusantara Shipping", "PT. Mandiri Sejahtera", "PT. Pertiwi",
-            "PT. Megah", "PT. Maju Sejahtera", "PT. Harmoni", "PT. Prima", "PT. Sentosa", "PT. Nusantara",
-            "PT. Satu", "PT. Global Investama", "PT. Intertech", "PT. Jaya Abadi"
-        ];
+        if (typeof serverSideCustomerData !== 'undefined' && serverSideCustomerData.length > 0) {
+            window.companies = serverSideCustomerData.map(c => c.text);
+        } else if (!window.companies) {
+            // Fallback ke hardcoded list jika serverSideCustomerData tidak ada
+            window.companies = [
+                "PT. Accenture", "PT. Adhya Tirta Batam", "PT. Agiva Indonesia", "PT. Pelangi Fortuna Global",
+                "PT. Indoshipsupply", "PT. Bintan Sukses Ancol", "PT. Citra Maritime", "PT. Bintai Kindenko Engineering Indonesia",
+                "PT. Karya Abadi", "PT. Digital Solutions", "PT. Nusantara Shipping", "PT. Mandiri Sejahtera", "PT. Pertiwi",
+                "PT. Megah", "PT. Maju Sejahtera", "PT. Harmoni", "PT. Prima", "PT. Sentosa", "PT. Nusantara",
+                "PT. Satu", "PT. Global Investama", "PT. Intertech", "PT. Jaya Abadi"
+            ];
+        }
 
         window.addCompany = function (selectedCompany) {
             companyOptions.innerHTML = "";
@@ -318,12 +323,63 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         };
 
-        function updateName(selectedLi) {
+        function updateName(selectedLi) { // selectedLi adalah elemen <li> yang diklik
+            console.log("updateName dipanggil dengan elemen:", selectedLi); // DEBUG: Pastikan ini muncul
+
+            if (!companySearchInp || !companyWrapper || !companySelectBtn) {
+                console.error("Variabel dropdown perusahaan (companySearchInp, companyWrapper, companySelectBtn) tidak terdefinisi di scope updateName!");
+                return;
+            }
+
             companySearchInp.value = "";
-            addCompany(selectedLi.textContent);
+            // PENTING: selectedLi.textContent adalah nama perusahaan yang dipilih
+            const selectedCompanyName = selectedLi.textContent;
+            console.log("Nama Perusahaan yang Dipilih:", selectedCompanyName); // DEBUG
+
+            // addCompany(selectedCompanyName); // Ini akan memanggil addCompany lagi, yang akan memanggil updateName lagi -> rekursi tak terbatas. Ini sepertinya salah.
+            // Fungsi addCompany seharusnya hanya untuk mengisi daftar opsi.
+            // Anda mungkin tidak perlu memanggil addCompany lagi di sini,
+            // cukup update tampilan dan nilai yang dipilih.
+            // Atau, jika addCompany hanya untuk refresh tampilan, pastikan tidak ada rekursi.
+            // Untuk sementara, saya akan disable baris ini untuk menghindari rekursi.
+            // Jika Anda membutuhkannya untuk menandai item sebagai 'selected', kita perlu cara lain.
+
             companyWrapper.classList.remove("active");
-            const code = getCompanyCode(selectedLi.textContent);
-            companySelectBtn.firstElementChild.innerText = code ? `${selectedLi.textContent} (${code})` : selectedLi.textContent;
+            const code = getCompanyCode(selectedCompanyName); // Fungsi getCompanyCode sudah ada
+
+            companySelectBtn.firstElementChild.innerText = code ? `${selectedCompanyName} (${code})` : selectedCompanyName;
+
+            // --- Logika untuk mendapatkan CustomerID dan memanggil populateEndUserDropdown ---
+            var selectedCustomerDataObj = null;
+            if (typeof window.serverSideCustomerData !== 'undefined' && Array.isArray(window.serverSideCustomerData)) {
+                console.log("Mencari di window.serverSideCustomerData:", window.serverSideCustomerData); // DEBUG
+                selectedCustomerDataObj = window.serverSideCustomerData.find(c => c.text.trim() === selectedCompanyName.trim()); // Tambahkan .trim() untuk keamanan
+                console.log("Hasil pencarian:", selectedCustomerDataObj); // DEBUG
+            } else {
+                console.warn("window.serverSideCustomerData tidak terdefinisi atau bukan array di updateName.");
+            }
+
+            var customerIdToUse = "";
+            const hiddenCustomerIdInput = document.getElementById('hiddenCustomerId');
+
+            if (selectedCustomerDataObj && selectedCustomerDataObj.value) {
+                customerIdToUse = selectedCustomerDataObj.value;
+                if (hiddenCustomerIdInput) {
+                    hiddenCustomerIdInput.value = customerIdToUse;
+                }
+                console.log("CustomerID ditemukan dan diset ke hidden input:", customerIdToUse); // DEBUG
+            } else {
+                if (hiddenCustomerIdInput) {
+                    hiddenCustomerIdInput.value = ""; // Kosongkan jika tidak ditemukan
+                }
+                console.warn("CustomerID TIDAK ditemukan untuk perusahaan:", selectedCompanyName);
+            }
+
+            if (typeof populateEndUserDropdown === "function") {
+                populateEndUserDropdown(customerIdToUse);
+            } else {
+                console.error("Fungsi populateEndUserDropdown tidak terdefinisi. Periksa @section Scripts di Create.cshtml.");
+            }
         }
 
         function createCompanyOption(name) {
@@ -544,17 +600,17 @@ document.addEventListener("DOMContentLoaded", function () {
     const itemTableBody = document.getElementById('itemTableBody');
     if (addRowBtn && itemTableBody) {
         addRowBtn.addEventListener('click', () => {
-            const rowCount = itemTableBody.children.length + 1;
+            const rowCount = itemTableBody.children.length + 1; // Nomor baris berikutnya
             const newRow = document.createElement('tr');
             newRow.innerHTML = `
                 <td>${rowCount}</td>
-                <td class="name"><input type='text' class='size form-control1'></td>
-                <td class="desc"><input type='text' class='size form-control1'></td>
-                <td class="qty"><input type='number' class='size form-control1'></td>
-                <td class="uom"><input type='text' class='size tengah form-control1'></td>
-                <td class="budget"><input type='number' class='size form-control1'></td>
-                <td class="leadtime"><input type='text' class='size tengah form-control1'></td>
-                <td class="delete"><button type="button" onclick="removeRow(this)" class="btn"><i class='bx bx-trash'></i></button>
+                <td class="name"><input type='text' class='size form-control1' name="NotesSectionItems[${rowCount - 1}].ItemName"></td>
+                <td class="desc"><input type='text' class='size form-control1' name="NotesSectionItems[${rowCount - 1}].ItemDescription"></td>
+                <td class="qty"><input type='number' class='size form-control1' name="NotesSectionItems[${rowCount - 1}].Quantity" value="1"></td>
+                <td class="uom"><input type='text' class='size tengah form-control1' name="NotesSectionItems[${rowCount - 1}].UoM" value="Unit"></td>
+                <td class="budget"><input type='number' class='size form-control1' name="NotesSectionItems[${rowCount - 1}].BudgetTarget"></td>
+                <td class="leadtime"><input type='text' class='size tengah form-control1' name="NotesSectionItems[${rowCount - 1}].LeadTimeTarget"></td>
+                <td class="delete"><button type="button" onclick="removeRow(this)" class="btn"><i class='bx bx-trash'></i></button></td>
             `;
             itemTableBody.appendChild(newRow);
         });
@@ -821,9 +877,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-     //=======================
-     //Request Item to Purchasing Pop-up (temporary)
-     //=======================
+    //=======================
+    //Request Item to Purchasing Pop-up (temporary)
+    //=======================
     const requestItemBtn = document.querySelector("#request-item-to-purchasing-option");
     const requestItemModal = document.querySelector(".request-item-to-purchasing-form-pop-up");
     const requestItemCloseBtn = document.querySelector(".request-item-to-purchasing-form-close-btn");
@@ -848,3 +904,4 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
