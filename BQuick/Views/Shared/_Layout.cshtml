@@ -1,22 +1,22 @@
-﻿
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - BQuick</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="icon" href="~/img/logo.svg" />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Outfit:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
 <body>
+    <div class="sidebar-overlay ms-1" id="sidebarOverlay"></div>
+
     <div class="wrapper">
         <aside id="sidebar">
             <div class="d-flex justify-content-between p-4">
@@ -27,8 +27,8 @@
                     </a>
                 </div>
 
-                <button class="toggle-btn border-0 wdth" type="button">
-                    <i id="icon" class="bx bx-chevrons-right"></i>
+                <button class="toggle-btn border-0 wdth shadow-none" type="button">
+                    <i id="sidebar-icon" class="bx bx-chevrons-right"></i>
                 </button>
             </div>
 
@@ -39,7 +39,7 @@
                             <i class="bx bx-user-circle"></i>
                             <span>Role</span>
                         </div>
-                        <button class="change-btn">Change</button>
+                        <button type="button" class="change-btn">Change</button>
                     </div>
                     <p class="mt-2 mb-0">Sales Manager</p>
                     <p class="mb-0">Seheni</p>
@@ -151,43 +151,935 @@
             </ul>
         </aside>
 
-        <div class="main">
-            <nav class="navbar navbar-expand-sm navbar-dark bg-light">
-                <div class="container-fluid">
-                    <a class="navbar-brand px-2" href="#" style="color:rgb(35, 35, 35);">Halcom Integrated Solution</a>
+        <div id="notifications-bar" class="notifications-bar">
+            <div class="notifications-header">
+                <span class="me-2">Notifications</span>
+                <button class="notifications-close-btn fw-bold" type="button">&times;</button>
+            </div>
+            <div class="notifications-tabs">
+                <button class="notifications-tab active" data-tab="request">Request</button>
+                <button class="notifications-tab" data-tab="reminder">Reminder</button>
+                <button class="notifications-tab" data-tab="tasks">Tasks</button>
+                <button class="notifications-tab" data-tab="schedule">Schedule</button>
+                <button class="notifications-tab" data-tab="progress">Progress</button>
+            </div>
+            <div class="notifications-content">
+                <div class="notifications-panel active" data-panel="request">
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3">
+                            <span class="fw-bold">REQUEST TYPE</span> - Customer Assignment
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Novi<br>Admin Sales
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                REF Code : RFQ240021
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">Times past since</div>
+                            <button type="button" class="btn shadow-none"><a asp-controller="Request" asp-action="Index" style="text-decoration: none; color: #fff;">Open</a></button>
+                        </div>
+                    </div>
 
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3">
+                            <span class="fw-bold">JENIS REQUEST</span> - Nama Form / Task
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Nama Requestor 2 kata<br>Job Position
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Disini tempat masukin keterangan - keterangan mungkin, kira-kira harusnya 3 / 4 barisan dengan ukuran tulisan segini
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">Times past since</div>
+                            <button type="button" class="btn shadow-none">Open</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3">
+                            <span class="fw-bold">APPROVAL REQUEST</span> - General Advance Form
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Kevin Praditha<br>Tech - Staff
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Disini tempat masukin keterangan - keterangan mungkin, kira-kira harusnya 3 / 4 barisan dengan ukuran tulisan segini
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">1 day ago</div>
+                            <button type="button" class="btn shadow-none">Open</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3">
+                            <span class="fw-bold">APPROVAL REQUEST</span> - General Advance Form
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Kevin Praditha<br>Tech - Manager
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Disini tempat masukin keterangan - keterangan mungkin, kira-kira harusnya 3 / 4 barisan dengan ukuran tulisan segini
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">10 hours ago</div>
+                            <button type="button" class="btn shadow-none">Open</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3">
+                            <span class="fw-bold">JENIS REQUEST</span> - Nama Form / Task
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Nama Requestor 2 kata<br>Job Position
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Disini tempat masukin keterangan - keterangan mungkin, kira-kira harusnya 3 / 4 barisan dengan ukuran tulisan segini
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">Times past since</div>
+                            <button type="button" class="btn shadow-none">Open</button>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="navbar-collapse collapse">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item dropdown">
-                            <button href="#" data-bs-toggle="dropdown" class="nav-icon border-0 pe-md-0" style="background:none">
-                                <img src="https://i.pinimg.com/originals/1c/8e/41/1c8e41e79c16353df53460e1aaad4034.jpg" class="avatar img-fluid" alt="">
-                            </button>
+                <div class="notifications-panel" data-panel="reminder">
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3 d-flex justify-content-center align-items-center rounded-pill" id="survey">
+                            <span class="fw-bold">NAMA KEGIATAN REMINDER</span>
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Nama Koordinator<br>Job Position
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Detail keterangan singkat tentang reminder<br />Warna title sesuai warna task reminder
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">ddd, dd/mm/yy hh:mm AM/PM - hh:mm AM/PM<br />Due time</div>
+                            <button type="button" class="btn shadow-none">Clear</button>
+                        </div>
+                    </div>
 
-                            <div class="dropdown-menu dropdown-menu-end rounded-0 border-0 shadow mt-3">
-                                <a href="#" class="dropdown-item">
-                                    <i class="bx bx-data"></i>
-                                    <span>Analytics</span>
-                                </a>
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3 d-flex justify-content-center align-items-center rounded-pill" id="survey">
+                            <span class="fw-bold">NAMA KEGIATAN REMINDER</span>
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Nama Koordinator<br>Job Position
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Detail keterangan singkat tentang reminder<br />Warna title sesuai warna task reminder
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">ddd, dd/mm/yy hh:mm AM/PM - hh:mm AM/PM<br />Due time</div>
+                            <button type="button" class="btn shadow-none">Clear</button>
+                        </div>
+                    </div>
 
-                                <a href="#" class="dropdown-item">
-                                    <i class="bx bx-cog"></i>
-                                    <span>Setting</span>
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3 d-flex justify-content-center align-items-center rounded-pill" id="survey">
+                            <span class="fw-bold">SURVEY</span>&nbsp;- Epson Batam
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Kevin Praditha<br>Tech - Staff
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Survey lapangan ke PT. Epson Batam
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">Fri, 11/10/2024 11:00 AM - 16:00 PM<br />Due in 10 days</div>
+                            <button type="button" class="btn shadow-none">Clear</button>
+                        </div>
+                    </div>
 
-                                    <div class="dropdown-divider"></div>
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3 d-flex justify-content-center align-items-center rounded-pill" id="biztrip">
+                            <span class="fw-bold">BIZTRIP</span>&nbsp;- ByteDance Singapore
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Kevin Praditha<br>Tech - Manager
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Business trip ByteDance Singapore
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">Tue, 10/12/24 09:00 AM - Finish<br />Due in 1 days</div>
+                            <button type="button" class="btn shadow-none">Clear</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3 d-flex justify-content-center align-items-center rounded-pill" id="meeting">
+                            <span class="fw-bold">MEETING</span>&nbsp;- New Office Technical Meeting
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Kevin Praditha<br>Tech - Staff
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Meeting onsite bersama tim Technical
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">Fri, 11/10/24 11:00 AM - 16:00 PM<br />Due in 1 days</div>
+                            <button type="button" class="btn shadow-none">Clear</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3 d-flex justify-content-center align-items-center rounded-pill" id="biztrip">
+                            <span class="fw-bold">BIZTRIP</span>&nbsp;- ByteDance Singapore
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Kevin Praditha<br>Tech - Manager
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Business trip ByteDance Singapore
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">Tue, 10/12/24 09:00 AM - Finish<br />Due in 1 days</div>
+                            <button type="button" class="btn shadow-none">Clear</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3 d-flex justify-content-center align-items-center rounded-pill" id="meeting">
+                            <span class="fw-bold">MEETING</span>&nbsp;- New Office Technical Meeting
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Kevin Praditha<br>Tech - Staff
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Meeting onsite bersama tim Technical
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">Fri, 11/10/24 11:00 AM - 16:00 PM<br />Due in 1 days</div>
+                            <button type="button" class="btn shadow-none">Clear</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="notifications-panel active" data-panel="tasks">
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3">
+                            <span class="fw-bold">APPROVAL REQUEST</span> - Quotation Q240021
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Rias<br>Admin Sales
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Please review this quotation.<br />Amount : Rp100.000.000<br />Customer : PT. Epson Batam
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">2 hours ago</div>
+                            <button type="button" class="btn shadow-none">Open</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3">
+                            <span class="fw-bold">REQUEST ITEM</span> - Task
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Rias<br>Sales Staff
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                1 RFQ for purchasing division
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">5 minutes ago</div>
+                            <button type="button" class="btn shadow-none">Open</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3">
+                            <span class="fw-bold">REPORT REVIEW</span> - Survey Report Review
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Nuriel<br>Technical
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Please review Survey Titled CCTV Survey 25 point at PT. Epson Batam
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">1 hour ago</div>
+                            <button type="button" class="btn shadow-none">Open</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3">
+                            <span class="fw-bold">APPROVAL REQUEST</span> - Survey
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Rias<br>Sales - Staff
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                There is a request for a survey
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">1 hour ago</div>
+                            <button type="button" class="btn shadow-none"><a asp-controller="Request" asp-action="Index" style="text-decoration: none; color: #fff;">Open</a></button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3">
+                            <span class="fw-bold">PIC REQUEST</span> - Approve PIC
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Rias<br>Admin Sales
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Request PIC Robby and Nuriel for Survey titled Control Room dan Rehibilitasi Ruang Skada at PT. Epson Batam
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">1 hour ago</div>
+                            <button type="button" class="btn shadow-none"><a asp-controller="Request" asp-action="Index" style="text-decoration: none; color: #fff;">Open</a></button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3">
+                            <span class="fw-bold">JENIS TASK</span> - Nama Form / Task / Delegation
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Nama Requestor 2 kata<br>Job Position
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Disini tempat masukin keterangan - keterangan mungkin, kira-kira harusnya 3 / 4 barisan dengan ukuran tulisan segini
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">Times past since</div>
+                            <button type="button" class="btn shadow-none">Open</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3">
+                            <span class="fw-bold">APPROVAL REQUEST</span> - General Advance Form
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Kevin Praditha<br>Tech - Staff
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Disini tempat masukin keterangan - keterangan mungkin, kira-kira harusnya 3 / 4 barisan dengan ukuran tulisan segini
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">1 day ago</div>
+                            <button type="button" class="btn shadow-none">Open</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3">
+                            <span class="fw-bold">APPROVAL REQUEST</span> - General Advance Form
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Kevin Praditha<br>Tech - Manager
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Disini tempat masukin keterangan - keterangan mungkin, kira-kira harusnya 3 / 4 barisan dengan ukuran tulisan segini
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">10 hours ago</div>
+                            <button type="button" class="btn shadow-none">Open</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3">
+                            <span class="fw-bold">JENIS TASK</span> - Nama Form / Task / Delegation
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Nama Requestor 2 kata<br>Job Position
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Disini tempat masukin keterangan - keterangan mungkin, kira-kira harusnya 3 / 4 barisan dengan ukuran tulisan segini
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">Times past since</div>
+                            <button type="button" class="btn shadow-none">Open</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="notifications-panel" data-panel="schedule">
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3 d-flex justify-content-center align-items-center rounded-pill" id="survey">
+                            <span class="fw-bold">NAMA KEGIATAN SCHEDULE</span>
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Nama Koordinator<br>Job Position
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Detail keterangan singkat tentang schedule<br />Warna title sesuai warna task schedule
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">ddd, dd/mm/yy hh:mm AM/PM - hh:mm AM/PM<br />Due time</div>
+                            <button type="button" class="btn shadow-none">Clear</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3 d-flex justify-content-center align-items-center rounded-pill" id="survey">
+                            <span class="fw-bold">NAMA KEGIATAN SCHEDULE</span>
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Nama Koordinator<br>Job Position
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Detail keterangan singkat tentang schedule<br />Warna title sesuai warna task schedule
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">ddd, dd/mm/yy hh:mm AM/PM - hh:mm AM/PM<br />Due time</div>
+                            <button type="button" class="btn shadow-none">Clear</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3 d-flex justify-content-center align-items-center rounded-pill" id="survey">
+                            <span class="fw-bold">SURVEY</span>&nbsp;- Epson Batam
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Kevin Praditha<br>Tech - Staff
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Survey lapangan ke PT. Epson Batam
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">Fri, 11/10/2024 11:00 AM - 16:00 PM<br />Due in 10 days</div>
+                            <button type="button" class="btn shadow-none">Clear</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3 d-flex justify-content-center align-items-center rounded-pill" id="biztrip">
+                            <span class="fw-bold">BIZTRIP</span>&nbsp;- ByteDance Singapore
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Kevin Praditha<br>Tech - Manager
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Business trip ByteDance Singapore
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">Tue, 10/12/24 09:00 AM - Finish<br />Due in 1 days</div>
+                            <button type="button" class="btn shadow-none">Clear</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3 d-flex justify-content-center align-items-center rounded-pill" id="meeting">
+                            <span class="fw-bold">MEETING</span>&nbsp;- New Office Technical Meeting
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Kevin Praditha<br>Tech - Staff
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Meeting onsite bersama tim Technical
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">Fri, 11/10/24 11:00 AM - 16:00 PM<br />Due in 1 days</div>
+                            <button type="button" class="btn shadow-none">Clear</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3 d-flex justify-content-center align-items-center rounded-pill" id="biztrip">
+                            <span class="fw-bold">BIZTRIP</span>&nbsp;- ByteDance Singapore
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Kevin Praditha<br>Tech - Manager
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Business trip ByteDance Singapore
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">Tue, 10/12/24 09:00 AM - Finish<br />Due in 1 days</div>
+                            <button type="button" class="btn shadow-none">Clear</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3 d-flex justify-content-center align-items-center rounded-pill" id="meeting">
+                            <span class="fw-bold">MEETING</span>&nbsp;- New Office Technical Meeting
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Kevin Praditha<br>Tech - Staff
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Meeting onsite bersama tim Technical
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">Fri, 11/10/24 11:00 AM - 16:00 PM<br />Due in 1 days</div>
+                            <button type="button" class="btn shadow-none">Clear</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="notifications-panel active" data-panel="progress">
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3">
+                            <span class="fw-bold">APPROVED</span> - Your Quotation has been Approved
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Q240021<br>PT. Epson Batam
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Your Quotation has been Approved by all manager. Please continue and send it to the customer
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">1 hours ago</div>
+                            <button type="button" class="btn shadow-none">Open</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3">
+                            <span class="fw-bold">All Requests Completed - RFQ240021</span>
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Seheni<br>Sales Manager
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                All requests for this RFQ have been fulfilled. It's time to transition the RFQ into a Quotation
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">20 minutes ago</div>
+                            <button type="button" class="btn shadow-none"><a asp-controller="Request" asp-action="Index" style="text-decoration: none; color: #fff;">Open</a></button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3">
+                            <span class="fw-bold">Survey Report Completion - RFQ240021</span>
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Nama Requestor 2 kata<br>Job Position
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Make sure to check the survey report for any critical details or follow-up actions that may be necessary
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">Times past since</div>
+                            <button type="button" class="btn shadow-none">Open</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3">
+                            <span class="fw-bold">Purchasing Task Completion - RFQ240021</span>
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Kevin Praditha<br>Tech - Staff
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                You can now proceed with the next phase, ensuring that all requested items are prepared and available
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">1 day ago</div>
+                            <button type="button" class="btn shadow-none">Open</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3">
+                            <span class="fw-bold">NEW Customer Assignment : PT. Epson Batam</span>
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Seheni<br>Sales Manager
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                You have been assigned to New customer : PT. Epson Batam. Start by managing the first inquiry titled, 'IT Procurement at PT. Epson Batam'.
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">20 minutes ago</div>
+                            <button type="button" class="btn shadow-none"><a asp-controller="Request" asp-action="Index" style="text-decoration: none; color: #fff;">Open</a></button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3">
+                            <span class="fw-bold">JENIS TASK</span> - Nama Form / Task / Delegation
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Nama Requestor 2 kata<br>Job Position
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Disini tempat masukin keterangan - keterangan mungkin, kira-kira harusnya 3 / 4 barisan dengan ukuran tulisan segini
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">Times past since</div>
+                            <button type="button" class="btn shadow-none">Open</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3">
+                            <span class="fw-bold">APPROVAL REQUEST</span> - General Advance Form
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Kevin Praditha<br>Tech - Staff
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Disini tempat masukin keterangan - keterangan mungkin, kira-kira harusnya 3 / 4 barisan dengan ukuran tulisan segini
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">1 day ago</div>
+                            <button type="button" class="btn shadow-none">Open</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3">
+                            <span class="fw-bold">APPROVAL REQUEST</span> - General Advance Form
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Kevin Praditha<br>Tech - Manager
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Disini tempat masukin keterangan - keterangan mungkin, kira-kira harusnya 3 / 4 barisan dengan ukuran tulisan segini
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">10 hours ago</div>
+                            <button type="button" class="btn shadow-none">Open</button>
+                        </div>
+                    </div>
+
+                    <div class="notification-card custom-layout">
+                        <div class="title mb-3">
+                            <span class="fw-bold">JENIS TASK</span> - Nama Form / Task / Delegation
+                        </div>
+                        <div class="d-flex align-items-start mb-2">
+                            <div class="icon me-3 flex-shrink-0">
+                                <i class="bx bxs-user text-white"></i>
+                            </div>
+                            <div class="subtitle flex-grow-1">
+                                Nama Requestor 2 kata<br>Job Position
+                            </div>
+                        </div>
+                        <div class="desc-section mb-2">
+                            <div class="desc">
+                                Disini tempat masukin keterangan - keterangan mungkin, kira-kira harusnya 3 / 4 barisan dengan ukuran tulisan segini
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="meta">Times past since</div>
+                            <button type="button" class="btn shadow-none">Open</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main">
+            <nav class="navbar navbar-expand-sm navbar-dark bg-light">
+                <div class="container-fluid px-4">
+                    <button class="sidebar-mobile-toggle toggle-btn border-0 wdth shadow-none d-lg-none me-3" type="button" id="sidebarToggleMobile">
+                        <i id="sidebar-mobile-icon" class="bx bx-chevrons-right"></i>
+                    </button>
+
+                    <div class="navbar-brand-wrapper">
+                        <a class="navbar-brand text-start me-3 brand-long" href="#" style="color:rgb(35, 35, 35);">Halcom Integrated Solution</a>
+                        <a class="navbar-brand text-start me-3 brand-short" href="#" style="color:rgb(35, 35, 35); display:none;">HIS</a>
+                    </div>
+
+
+                    <div class="d-flex align-items-center justify-content-center ms-auto">
+                        <ul class="d-flex justify-content-center align-items-center m-0 p-0">
+                            <li class="me-3">
+                                <button type="button" style="border: 0; background: none;">
+                                    <i class='bx bx-envelope' style='font-size: 1.4rem;'></i>
+                                </button>
+                            </li>
+
+                            <li class="me-3">
+                                <button type="button" id="notifications-btn" style="border: 0; background: none;">
+                                    <i class='bx bx-bell' style='font-size: 1.4rem;'></i>
+                                </button>
+                            </li>
+
+                            <li class="dropdown">
+                                <button type="button" href="#" data-bs-toggle="dropdown" class="nav-icon border-0 pe-md-0" style="background:none">
+                                    <img src="https://i.pinimg.com/originals/1c/8e/41/1c8e41e79c16353df53460e1aaad4034.jpg" class="avatar img-fluid" alt="">
+                                </button>
+
+                                <div class="dropdown-menu dropdown-menu-end rounded-0 border-0 shadow mt-3">
+                                    <a href="#" class="dropdown-item">
+                                        <i class="bx bx-data"></i>
+                                        <span>Analytics</span>
+                                    </a>
 
                                     <a href="#" class="dropdown-item">
-                                        <i class="bx bx-circle"></i>
-                                        <span>Help Center</span>
+                                        <i class="bx bx-cog"></i>
+                                        <span>Setting</span>
+
+                                        <div class="dropdown-divider"></div>
+
+                                        <a href="#" class="dropdown-item">
+                                            <i class="bx bx-circle"></i>
+                                            <span>Help Center</span>
+                                        </a>
                                     </a>
-                                </a>
-                            </div>
-                        </li>
-                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </nav>
 
@@ -224,7 +1116,6 @@
             </footer>
         </div>
     </div>
-   
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

@@ -955,7 +955,7 @@
                                         <label asp-for="CustomerID" class="form-label form-label-bold mb-0">Company Name</label>
                                     </div>
                                     <div class="wrapp company-dropdown" style="width: 70%;">
-                                        <div class="select-btn">
+                                        <div class="select-btn" style="height: 40px;">
                                             <span></span>
                                             <i class='bx bx-chevron-down'></i>
                                         </div>
@@ -978,7 +978,7 @@
                                     <div class="sejajar" style="width: 146px">
                                         <label asp-for="EndUserContactPersonID" class="form-label form-label-bold mb-0">End User</label>
                                     </div>
-                                    <select asp-for="EndUserContactPersonID" asp-items="Model.EndUserContactPersonList" class="select-btn" style="width:70%" id="endUserDropdown">
+                                    <select asp-for="EndUserContactPersonID" asp-items="Model.EndUserContactPersonList" class="select-btn" style="width:70%; height: 40px;" id="endUserDropdown">
                                         <option value="">-- Select Company First --</option>
                                     </select>
                                     <span asp-validation-for="EndUserContactPersonID" class="text-danger"></span>
@@ -1069,7 +1069,7 @@
                                         <label asp-for="RFQCategoryID" class="form-label form-label-bold mb-0">Category</label>
                                     </div>
                                     <div class="wrapp project-type-dropdown" style="width: 70%;">
-                                        <div class="select-btn">
+                                        <div class="select-btn" style="height: 40px;">
                                             <span>@(Model.RFQCategoryList?.FirstOrDefault(x => x.Value == Model.RFQCategoryID.ToString())?.Text ?? "Select Category")</span>
                                             <i class='bx bx-chevron-down'></i>
                                         </div>
@@ -1095,7 +1095,7 @@
                                         <label asp-for="RFQOpportunityID" class="form-label form-label-bold mb-0">Opportunity</label>
                                     </div>
                                     <div class="wrapp" id="opportunity-dropdown" style="width: 70%;">
-                                        <div class="select-btn">
+                                        <div class="select-btn" style="height: 40px;">
                                             <span>@(Model.RFQOpportunityList?.FirstOrDefault(x => x.Value == Model.RFQOpportunityID.ToString())?.Text ?? "Select Opportunity")</span>
                                             <i class='bx bx-chevron-down'></i>
                                         </div>
@@ -1217,33 +1217,39 @@
                             </tr>
                         </thead>
                         <tbody id="itemListTableBody">
-                            <tr>
-                                <td class="text-center" style="font-weight: 500;">1</td>
-                                <td class="name">
-                                    <div class="wrapp item-dropdown" style="width: 100%;">
-                                        <div class="select-btn d-flex align-items-center">
-                                            <span></span>
-                                            <i class='bx bx-chevron-down'></i>
-                                        </div>
-                                        <div class="content-search">
-                                            <div class="search">
-                                                <i class="bx bx-search-alt-2"></i>
-                                                <input type="text" placeholder="Search" />
+                            @for (int i = 0; i < Model.ItemListSectionItems.Count; i++)
+                            {
+                                <tr>
+                                    <td class="text-center" style="font-weight: 500;">@(i + 1)</td>
+                                    <td class="name">
+
+                                        <input type="hidden" asp-for="@Model.ItemListSectionItems[i].ItemID" class="item-id-hidden" />
+
+                                        <div class="wrapp item-dropdown" style="width: 100%;">
+                                            <div class="select-btn d-flex align-items-center">
+                                                <span>Pilih Item</span>
+                                                <i class='bx bx-chevron-down'></i>
                                             </div>
-                                            <ul class="option" style="margin-bottom: 10px;"></ul>
+                                            <div class="content-search">
+                                                <div class="search">
+                                                    <i class="bx bx-search-alt-2"></i>
+                                                    <input type="text" placeholder="Search" />
+                                                </div>
+                                                <ul class="option" style="margin-bottom: 10px;"></ul>
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td class="desc"><input type='text' class='size form-control1'></td>
-                                <td class="qty"><input type='number' class='size text-center form-control1'></td>
-                                <td class="uom"><input type='text' class='size form-control1'></td>
-                                <td class="price"><input type='number' class='size form-control1'></td>
-                                <td class="notes"><input type='text' class='size form-control1'></td>
-                                <td class="details"><input type='text' class='size form-control1'></td>
-                                <td class="warranty"><input type='text' class='size form-control1'></td>
-                                <td class="amount"><span class="item-price-amount"></span></td>
-                                <td class="delete"><button type="button" class="btn btn-remove-row-itemlist"><i class='bx bx-trash'></i></button></td>
-                            </tr>
+                                    </td>
+                                    <td class="desc"><input asp-for="@Model.ItemListSectionItems[i].ItemDescription" class='size form-control1'></td>
+                                    <td class="qty"><input asp-for="@Model.ItemListSectionItems[i].Quantity" type='number' class='size text-center form-control1' oninput="updateRowAmount(this)"></td>
+                                    <td class="uom"><input asp-for="@Model.ItemListSectionItems[i].UoM" class='size form-control1'></td>
+                                    <td class="price"><input asp-for="@Model.ItemListSectionItems[i].TargetUnitPrice" type='number' class='size form-control1' oninput="updateRowAmount(this)"></td>
+                                    <td class="notes"><input asp-for="@Model.ItemListSectionItems[i].Notes" class='size form-control1'></td>
+                                    <td class="details"><input asp-for="@Model.ItemListSectionItems[i].Details" class='size form-control1'></td>
+                                    <td class="warranty"><input asp-for="@Model.ItemListSectionItems[i].SalesWarranty" class='size form-control1'></td>
+                                    <td class="amount"><span class="item-price-amount"></span></td>
+                                    <td class="delete"><button type="button" class="btn btn-remove-row-itemlist"><i class='bx bx-trash'></i></button></td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
 
@@ -1276,182 +1282,7 @@
                             </tr>
                         </thead>
                         <tbody id="reqTableBody">
-                            <tr>
-                                <td class="action">
-                                    <button type="button" class="btn">
-                                        <i class='bx bx-plus text-black' style="border: 2px solid #000; border-radius: 3px;"></i>
-                                    </button>
-                                </td>
-                                <td class="nomor text-center" style="font-weight: 500;">1</td>
-                                <td class="reqCode">REQ240001</td>
-                                <td class="name"><input type='text' class='size form-control1' value="RJ40G Laptop Battery"></td>
-                                <td class="desc"><input type='text' class='size form-control1' value="Voltage: 15.2v, Capacity: 63Wh/3941mAh, Battery Condition: 100% Brand New."></td>
-                                <td class="qty"><input type='number' class='size text-center form-control1' value="2"></td>
-                                <td class="uom"><input type='text' class='size form-control1' value="Ea"></td>
-                                <td class="reason"><input type='text' class='size form-control1' value="Not yet in the Database"></td>
-                                <td class="notes"><input type='text' class='size form-control1'></td>
-                                <td class="pic">None</td>
-                                <td class="reqStatus">
-                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                                        <span id="open" class="rounded-pill status">Open</span>
-                                    </div>
-                                </td>
-                                <td class="delete"><button type="button" class="btn btn-remove-row-req"><i class='bx bx-trash'></i></button></td>
-                            </tr>
-                            <tr>
-                                <td class="action">
-                                    <button type="button" class="btn">
-                                        <i class='bx bx-plus text-black' style="border: 2px solid #000; border-radius: 3px;"></i>
-                                    </button>
-                                </td>
-                                <td class="nomor text-center" style="font-weight: 500;">2</td>
-                                <td class="reqCode">REQ240002</td>
-                                <td class="name"><input type='text' class='size form-control1' value="RJ40G Laptop Battery"></td>
-                                <td class="desc"><input type='text' class='size form-control1' value="Voltage: 15.2v, Capacity: 63Wh/3941mAh, Battery Condition: 100% Brand New."></td>
-                                <td class="qty"><input type='number' class='size text-center form-control1' value="2"></td>
-                                <td class="uom"><input type='text' class='size form-control1' value="Ea"></td>
-                                <td class="reason"><input type='text' class='size form-control1' value="Not yet in the Database"></td>
-                                <td class="notes"><input type='text' class='size form-control1'></td>
-                                <td class="pic">None</td>
-                                <td class="reqStatus">
-                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                                        <span id="on-progress" class="rounded-pill status">On Progress</span>
-                                    </div>
-                                </td>
-                                <td class="delete"><button type="button" class="btn btn-remove-row-req"><i class='bx bx-trash'></i></button></td>
-                            </tr>
-                            <tr>
-                                <td class="action">
-                                    <button type="button" class="btn">
-                                        <i class='bx bx-plus text-black' style="border: 2px solid #000; border-radius: 3px;"></i>
-                                    </button>
-                                </td>
-                                <td class="nomor text-center" style="font-weight: 500;">3</td>
-                                <td class="reqCode">REQ240003</td>
-                                <td class="name"><input type='text' class='size form-control1' value="RJ40G Laptop Battery"></td>
-                                <td class="desc"><input type='text' class='size form-control1' value="Voltage: 15.2v, Capacity: 63Wh/3941mAh, Battery Condition: 100% Brand New."></td>
-                                <td class="qty"><input type='number' class='size text-center form-control1' value="2"></td>
-                                <td class="uom"><input type='text' class='size form-control1' value="Ea"></td>
-                                <td class="reason"><input type='text' class='size form-control1' value="Not yet in the Database"></td>
-                                <td class="notes"><input type='text' class='size form-control1'></td>
-                                <td class="pic">None</td>
-                                <td class="reqStatus">
-                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                                        <span id="first-follow-up" class="rounded-pill status">1st Follow up</span>
-                                    </div>
-                                </td>
-                                <td class="delete"><button type="button" class="btn btn-remove-row-req"><i class='bx bx-trash'></i></button></td>
-                            </tr>
-                            <tr>
-                                <td class="action">
-                                    <button type="button" class="btn">
-                                        <i class='bx bx-plus text-black' style="border: 2px solid #000; border-radius: 3px;"></i>
-                                    </button>
-                                </td>
-                                <td class="nomor text-center" style="font-weight: 500;">4</td>
-                                <td class="reqCode">REQ240004</td>
-                                <td class="name"><input type='text' class='size form-control1' value="RJ40G Laptop Battery"></td>
-                                <td class="desc"><input type='text' class='size form-control1' value="Voltage: 15.2v, Capacity: 63Wh/3941mAh, Battery Condition: 100% Brand New."></td>
-                                <td class="qty"><input type='number' class='size text-center form-control1' value="2"></td>
-                                <td class="uom"><input type='text' class='size form-control1' value="Ea"></td>
-                                <td class="reason"><input type='text' class='size form-control1' value="Not yet in the Database"></td>
-                                <td class="notes"><input type='text' class='size form-control1'></td>
-                                <td class="pic">None</td>
-                                <td class="reqStatus">
-                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                                        <span id="second-follow-up" class="rounded-pill status">2nd Follow up</span>
-                                    </div>
-                                </td>
-                                <td class="delete"><button type="button" class="btn btn-remove-row-req"><i class='bx bx-trash'></i></button></td>
-                            </tr>
-                            <tr>
-                                <td class="action">
-                                    <button type="button" class="btn">
-                                        <i class='bx bx-plus text-black' style="border: 2px solid #000; border-radius: 3px;"></i>
-                                    </button>
-                                </td>
-                                <td class="nomor text-center" style="font-weight: 500;">5</td>
-                                <td class="reqCode">REQ240005</td>
-                                <td class="name"><input type='text' class='size form-control1' value="RJ40G Laptop Battery"></td>
-                                <td class="desc"><input type='text' class='size form-control1' value="Voltage: 15.2v, Capacity: 63Wh/3941mAh, Battery Condition: 100% Brand New."></td>
-                                <td class="qty"><input type='number' class='size text-center form-control1' value="2"></td>
-                                <td class="uom"><input type='text' class='size form-control1' value="Ea"></td>
-                                <td class="reason"><input type='text' class='size form-control1' value="Not yet in the Database"></td>
-                                <td class="notes"><input type='text' class='size form-control1'></td>
-                                <td class="pic">None</td>
-                                <td class="reqStatus">
-                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                                        <span id="third-follow-up" class="rounded-pill status">3rd Follow up</span>
-                                    </div>
-                                </td>
-                                <td class="delete"><button type="button" class="btn btn-remove-row-req"><i class='bx bx-trash'></i></button></td>
-                            </tr>
-                            <tr>
-                                <td class="action">
-                                    <button type="button" class="btn">
-                                        <i class='bx bx-plus text-black' style="border: 2px solid #000; border-radius: 3px;"></i>
-                                    </button>
-                                </td>
-                                <td class="nomor text-center" style="font-weight: 500;">6</td>
-                                <td class="reqCode">REQ240006</td>
-                                <td class="name"><input type='text' class='size form-control1' value="RJ40G Laptop Battery"></td>
-                                <td class="desc"><input type='text' class='size form-control1' value="Voltage: 15.2v, Capacity: 63Wh/3941mAh, Battery Condition: 100% Brand New."></td>
-                                <td class="qty"><input type='number' class='size text-center form-control1' value="2"></td>
-                                <td class="uom"><input type='text' class='size form-control1' value="Ea"></td>
-                                <td class="reason"><input type='text' class='size form-control1' value="Not yet in the Database"></td>
-                                <td class="notes"><input type='text' class='size form-control1'></td>
-                                <td class="pic">None</td>
-                                <td class="reqStatus">
-                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                                        <span id="excalation" class="rounded-pill status">Excalation</span>
-                                    </div>
-                                </td>
-                                <td class="delete"><button type="button" class="btn btn-remove-row-req"><i class='bx bx-trash'></i></button></td>
-                            </tr>
-                            <tr>
-                                <td class="action">
-                                    <button type="button" class="btn">
-                                        <i class='bx bx-plus text-black' style="border: 2px solid #000; border-radius: 3px;"></i>
-                                    </button>
-                                </td>
-                                <td class="nomor text-center" style="font-weight: 500;">7</td>
-                                <td class="reqCode">REQ240007</td>
-                                <td class="name"><input type='text' class='size form-control1' value="RJ40G Laptop Battery"></td>
-                                <td class="desc"><input type='text' class='size form-control1' value="Voltage: 15.2v, Capacity: 63Wh/3941mAh, Battery Condition: 100% Brand New."></td>
-                                <td class="qty"><input type='number' class='size text-center form-control1' value="2"></td>
-                                <td class="uom"><input type='text' class='size form-control1' value="Ea"></td>
-                                <td class="reason"><input type='text' class='size form-control1' value="Not yet in the Database"></td>
-                                <td class="notes"><input type='text' class='size form-control1'></td>
-                                <td class="pic">None</td>
-                                <td class="reqStatus">
-                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                                        <span id="completed" class="rounded-pill status">Completed</span>
-                                    </div>
-                                </td>
-                                <td class="delete"><button type="button" class="btn btn-remove-row-req"><i class='bx bx-trash'></i></button></td>
-                            </tr>
-                            <tr>
-                                <td class="action">
-                                    <button type="button" class="btn">
-                                        <i class='bx bx-plus text-black' style="border: 2px solid #000; border-radius: 3px;"></i>
-                                    </button>
-                                </td>
-                                <td class="nomor text-center" style="font-weight: 500;">8</td>
-                                <td class="reqCode">None</td>
-                                <td class="name"><input type='text' class='size form-control1' value="Dell Latitude 5430"></td>
-                                <td class="desc"><input type='text' class='size form-control1' value="Dell Latitude 5430"></td>
-                                <td class="qty"><input type='number' class='size text-center form-control1' value="2"></td>
-                                <td class="uom"><input type='text' class='size form-control1' value="Ea"></td>
-                                <td class="reason"><input type='text' class='size form-control1' value="Leadtime not suitable"></td>
-                                <td class="notes"><input type='text' class='size form-control1' value="Carikan Leadtime yang kurang dari 4 minggu"></td>
-                                <td class="pic">None</td>
-                                <td class="reqStatus">
-                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                                        <span id="not-yet" class="rounded-pill status">Not Yet</span>
-                                    </div>
-                                </td>
-                                <td class="delete"><button type="button" class="btn btn-remove-row-req"><i class='bx bx-trash'></i></button></td>
-                            </tr>
+         
                         </tbody>
                     </table>
                 </div>
@@ -2446,7 +2277,7 @@
                                                 <li>
                                                     <input type="checkbox" class="survey-list-checkboxes me-2" value="Robby">
                                                     <span>Robby</span>
-                                                </li>
+                                                </li>req
                                             </ul>
                                         </div>
                                     </div>
@@ -2494,10 +2325,10 @@
         window.serverSideCustomerData = [];
         @if (Model.CustomerList != null)
         {
-                    foreach (var customer in Model.CustomerList.Cast<SelectListItem>())
-                    {
-                                @:serverSideCustomerData.push({ value: "@Html.Raw(customer.Value)", text: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(customer.Text))" });
-                    }
+                            foreach (var customer in Model.CustomerList.Cast<SelectListItem>())
+                            {
+                                                @:serverSideCustomerData.push({ value: "@Html.Raw(customer.Value)", text: "@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(customer.Text))" });
+                            }
         }
 
             function populateEndUserDropdown(customerId) {
@@ -2546,6 +2377,8 @@
                 populateEndUserDropdown(""); // Atau $('#endUserDropdown').empty().append(...opsi default...);
             }
         });
+
+         var itemMasterDataFromServer = @Html.Raw(Json.Serialize(Model.ItemMasterList.Select(item => new { value = item.Value, text = item.Text })));
+         var purchasingUsersFromServer = @Html.Raw(Json.Serialize(Model.PurchasingUserList.Select(item => new { value = item.Value, text = item.Text })));
     </script>
 }
- 

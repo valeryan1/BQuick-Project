@@ -876,7 +876,7 @@
                                     <tr>
                                         <td>@(i+1)</td>
                                         <td class="name"><select asp-for="@Model.ItemListSectionItems[i].ItemID" asp-items="Model.ItemMasterList" class='size form-control1 form-select'><option value="">--Select Item--</option></select></td>
-                                        <td class="desc"><input asp-for="@Model.ItemListSectionItems[i].Details" class='size form-control1' /></td>
+                                        <td class="desc"><input asp-for="@Model.ItemListSectionItems[i].ItemDescription" class='size form-control1' /></td>
                                         <td class="qty"><input asp-for="@Model.ItemListSectionItems[i].Quantity" type='number' class='size form-control1' /></td>
                                         <td class="uom"><input asp-for="@Model.ItemListSectionItems[i].UoM" class='size tengah form-control1' /></td>
                                         <td class="price"><input asp-for="@Model.ItemListSectionItems[i].TargetUnitPrice" type='number' class='size form-control1' /></td>

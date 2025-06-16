@@ -34,6 +34,8 @@ namespace BQuick.Models
         [Range(0.01, double.MaxValue, ErrorMessage = "Kuantitas harus lebih besar dari 0.")]
         public decimal Quantity { get; set; } = 1;
 
+        public string ItemDescription { get; set; }
+
         [StringLength(20)]
         public string UoM { get; set; } = "Unit";
 
@@ -159,6 +161,7 @@ namespace BQuick.Models
         public SelectList? RFQOpportunityList { get; set; }
         public SelectList? ItemMasterList { get; set; }
         public SelectList? SurveyCategoryList { get; set; }
+        public SelectList? PurchasingUserList { get; set; }
 
         public RfqCreateFullViewModel()
         {

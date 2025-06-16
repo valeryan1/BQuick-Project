@@ -651,35 +651,44 @@ function addToItemList(name, description, quantity, price, uom = 'Ea') {
     }
 }
 
-function addToRequestPurchasing(name, description, quantity, reason, notes, uom = 'Ea', isAddOn = false) {
+// Di dalam file wwwroot/js/site.js
+
+function addToRequestPurchasing(itemData) {
     const reqTableBody = document.getElementById('reqTableBody');
     if (!reqTableBody) return;
 
-    const rowCount = reqTableBody.querySelectorAll('tr').length + 1;
+    const newIndex = reqTableBody.querySelectorAll('tr').length;
+
+    // --- MEMBUAT OPSI UNTUK DROPDOWN PIC ---
+    let picOptionsHtml = '<option value="">--Pilih PIC--</option>'; // Opsi default
+    if (typeof purchasingUsersFromServer !== 'undefined') {
+        purchasingUsersFromServer.forEach(user => {
+            picOptionsHtml += `<option value="${user.value}">${user.text}</option>`;
+        });
+    }
+    // --- AKHIR BAGIAN PEMBUATAN OPSI ---
 
     const newRow = document.createElement('tr');
-    if (isAddOn) {
-        newRow.classList.add('addon-row');
-    }
     newRow.innerHTML = `
         <td class="action">
-            <button type="button" class="btn">
-                <i class='bx bx-plus text-black' style="border: 2px solid #000; border-radius: 3px;"></i>
-            </button>
+            <button type="button" class="btn"><i class='bx bx-plus text-black' style="border: 2px solid #000; border-radius: 3px;"></i></button>
         </td>
-        <td class="nomor text-center" style="font-weight: 500;">${rowCount}</td>
+        <td class="nomor text-center" style="font-weight: 500;">${newIndex + 1}</td>
         <td class="reqCode">None</td>
-        <td class="name"><input type='text' class='size form-control1' value="${name}"></td>
-        <td class="desc"><input type='text' class='size form-control1' value="${description}"></td>
-        <td class="qty"><input type='number' class='size text-center form-control1' value="${quantity}"></td>
-        <td class="uom"><input type='text' class='size form-control1' value="${uom}"></td>
-        <td class="reason"><input type='text' class='size form-control1' value="${reason}"></td>
-        <td class="notes"><input type='text' class='size form-control1' value="${notes}"></td>
-        <td class="pic">None</td>
+        <td class="name"><input type="text" class="size form-control1" name="PurchasingRequestSectionItems[${newIndex}].RequestedItemName" value="${itemData.name}" readonly></td>
+        <td class="desc"><input type="text" class="size form-control1" name="PurchasingRequestSectionItems[${newIndex}].RequestedItemDescription" value="${itemData.description}" readonly></td>
+        <td class="qty"><input type="number" class="size text-center form-control1" name="PurchasingRequestSectionItems[${newIndex}].Quantity" value="${itemData.quantity}"></td>
+        <td class="uom"><input type="text" class="size form-control1" name="PurchasingRequestSectionItems[${newIndex}].UoM" value="${itemData.uom}"></td>
+        <td class="reason"><input type="text" class="size form-control1" name="PurchasingRequestSectionItems[${newIndex}].ReasonForRequest" value="${itemData.reason}"></td>
+        <td class="notes"><input type="text" class="size form-control1" name="PurchasingRequestSectionItems[${newIndex}].SalesNotes" value="${itemData.notes}"></td>
+        
+        <td class="pic">
+            <select class="form-select size" name="PurchasingRequestSectionItems[${newIndex}].AssignedToPurchasingUserID">
+                ${picOptionsHtml}
+            </select>
+        </td>
         <td class="reqStatus">
-            <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                <span id="not-yet" class="rounded-pill status">Not Yet</span>
-            </div>
+            <div class="d-flex justify-content-center align-items-center flex-column gap-1"><span id="not-yet" class="rounded-pill status">Not Yet</span></div>
         </td>
         <td class="delete"><button type="button" class="btn btn-remove-row-req"><i class='bx bx-trash'></i></button></td>
     `;
@@ -701,7 +710,7 @@ function isMeetingRowEmpty(row) {
 window.currentCompanyIsNew = false;
 window.lastActiveItemDropdown = null;
 
-window.items = [
+/*window.items = [
     "Hikvision CCTV", "Arm Chair", "Printer Zebra", "Scanner CK-96",
     "Raspberry Pi 3", "RFID Scanner", "Raspberry Pi 4", "Raspberry Pi 5",
     "Raspberry Pi 6", "Barcode Scanner Zebra MC9300", "Barcode Scanner Datalogic Skorpio X5", "Barcode Scanner Cognex MX-1502",
@@ -718,7 +727,7 @@ window.items = [
     "Apple Watch SE", "Apple Pencil", "Arm Cortex-A78", "Aruba Instant On AP22",
     "Arduino Uno", "ARKit", "Arlo Pro 1", "Arlo Pro 2",
     "Arlo Pro 3", "Arlo Pro 4"
-];
+];*/
 
 window.companies = [
     "PT. Accenture", "PT. Adhya Tirta Batam", "PT. Agiva Indonesia", "PT. Air Batam Hilir",
@@ -792,12 +801,38 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     const hamburger = document.querySelector(".toggle-btn");
-    const toggler = document.querySelector("#icon");
-    if (hamburger && toggler) {
+    const toggler = document.querySelector("#sidebar-icon");
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    if (hamburger && sidebar) {
         hamburger.addEventListener("click", function () {
-            document.querySelector("#sidebar").classList.toggle("expand");
-            toggler.classList.toggle("bx-chevrons-right");
-            toggler.classList.toggle("bx-chevrons-left");
+            // Logika untuk toggle di layar mobile (lebar <= 991.98px)
+            if (window.innerWidth <= 991.98) {
+                if (sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active', 'expand');
+                    if (overlay) overlay.classList.remove('active');
+                } else {
+                    sidebar.classList.add('active', 'expand');
+                    if (overlay) overlay.classList.add('active');
+                    sidebar.scrollTop = 0;
+                }
+            } else {
+                // Logika untuk toggle di layar desktop
+                sidebar.classList.toggle("expand");
+                if (toggler) {
+                    toggler.classList.toggle("bx-chevrons-right");
+                    toggler.classList.toggle("bx-chevrons-left");
+                }
+            }
+        });
+    }
+
+    // Event listener tambahan untuk overlay di mobile
+    if (overlay) {
+        overlay.addEventListener('click', function () {
+            sidebar.classList.remove('active', 'expand');
+            this.classList.remove('active');
         });
     }
 
@@ -1215,14 +1250,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
         window.addCompany = function (selectedCompany) {
             companyOptions.innerHTML = "";
-            companies.forEach(Company => {
-                let isSelected = Company == selectedCompany ? "selected" : "";
-                let li = document.createElement("li");
-                li.textContent = Company;
-                li.className = isSelected;
-                li.onclick = function () { updateName(this); };
-                companyOptions.appendChild(li);
-            });
+
+            // Gunakan 'serverSideCustomerData' yang sudah berisi ID dan Nama
+            if (typeof serverSideCustomerData !== 'undefined') {
+                serverSideCustomerData.forEach(customer => {
+                    // Bandingkan berdasarkan nama (text)
+                    let isSelected = customer.text == selectedCompany ? "selected" : "";
+                    let li = document.createElement("li");
+                    li.textContent = customer.text;
+
+                    // --- PERUBAHAN PENTING DIMULAI DI SINI ---
+                    // Simpan CustomerID di dalam data-attribute
+                    li.setAttribute('data-value', customer.value);
+                    // --- AKHIR PERUBAHAN PENTING ---
+
+                    li.className = isSelected;
+                    li.onclick = function () { updateName(this); };
+                    companyOptions.appendChild(li);
+                });
+            }
         };
 
         companySearchInp.addEventListener("input", () => {
@@ -1233,14 +1279,28 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         function updateName(selectedLi) {
+            // --- PERUBAHAN PENTING DIMULAI DI SINI ---
+            const customerId = selectedLi.getAttribute('data-value');
+            const customerName = selectedLi.textContent;
+            const hiddenCustomerIdInput = document.getElementById('hiddenCustomerId');
+
+            // Simpan ID yang dipilih ke input tersembunyi untuk form submission
+            if (hiddenCustomerIdInput) {
+                hiddenCustomerIdInput.value = customerId;
+            }
+            // --- AKHIR PERUBAHAN PENTING ---
+
             companySearchInp.value = "";
-            addCompany(selectedLi.textContent);
+            addCompany(customerName);
             companyWrapper.classList.remove("active");
-            const code = getCompanyCode(selectedLi.textContent);
-            companySelectBtn.firstElementChild.innerText = code ? `${selectedLi.textContent} (${code})` : selectedLi.textContent;
+            const code = getCompanyCode(customerName);
+            companySelectBtn.firstElementChild.innerText = code ? `${customerName} (${code})` : customerName;
 
             window.currentCompanyIsNew = false;
             updateCompanyStatusLabel(null);
+
+            // --- PANGGIL FUNGSI AJAX DI SINI ---
+            populateEndUserDropdown(customerId);
         }
 
         function createCompanyOption(name) {
@@ -1353,15 +1413,22 @@ document.addEventListener("DOMContentLoaded", function () {
     function addItemOptions(wrapper, selectedItem) {
         const itemOptions = wrapper.querySelector(".option");
         itemOptions.innerHTML = "";
-        window.items.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
-        window.items.forEach(Item => {
-            let isSelected = Item == selectedItem ? "selected" : "";
-            let li = document.createElement("li");
-            li.textContent = Item;
-            li.className = isSelected;
-            li.onclick = function () { updateItemName(wrapper, this); };
-            itemOptions.appendChild(li);
-        });
+        // Cek apakah variabel dari server sudah ada
+        if (typeof itemMasterDataFromServer !== 'undefined' && Array.isArray(itemMasterDataFromServer)) {
+            // Urutkan data dari server
+            itemMasterDataFromServer.sort((a, b) => a.text.localeCompare(b.text, undefined, { sensitivity: 'base' }));
+
+            // Loop melalui data dari server, bukan window.items
+            itemMasterDataFromServer.forEach(item => {
+                let isSelected = item.text == selectedItem ? "selected" : "";
+                let li = document.createElement("li");
+                li.textContent = item.text; // Tampilkan nama item
+                li.setAttribute('data-value', item.value); // SIMPAN ID ITEM DI SINI
+                li.className = isSelected;
+                li.onclick = function () { updateItemName(wrapper, this); };
+                itemOptions.appendChild(li);
+            });
+        }
     }
 
     function updateItemName(wrapper, selectedLi) {
@@ -1427,74 +1494,82 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function setupItemDropdown(wrapper) {
         const selectBtn = wrapper.querySelector(".select-btn");
-        const searchInp = wrapper.querySelector("input");
+        const searchInp = wrapper.querySelector("input[type='text']");
         const itemOptions = wrapper.querySelector(".option");
+        // Cari input tersembunyi yang sesuai dengan dropdown ini
+        const hiddenInput = wrapper.closest('td').querySelector(".item-id-hidden");
 
+        // Panggil addItemOptions saat pertama kali dijalankan
         addItemOptions(wrapper);
 
-        searchInp.addEventListener("input", () => {
-            if (!searchInp.value.trim()) {
-                wrapper.dataset.isNew = "false";
+        // Fungsi yang dijalankan saat item di-klik
+        function updateItemName(selectedLi) {
+            const selectedValue = selectedLi.getAttribute('data-value');
+            const selectedText = selectedLi.textContent;
+
+            // Perbarui tampilan dan nilai
+            selectBtn.querySelector("span").innerText = selectedText;
+            if (hiddenInput) {
+                hiddenInput.value = selectedValue; // PERBARUI NILAI ID DI INPUT TERSEMBUNYI
             }
-        });
+
+            // Tutup dropdown
+            wrapper.classList.remove("active");
+
+            // (Anda bisa menambahkan logika lain di sini jika perlu)
+        }
 
         searchInp.addEventListener("keyup", () => {
             let searchWord = searchInp.value.trim();
-            let arr = window.items.filter(data =>
-                data.toLowerCase().includes(searchWord.toLowerCase())
+            let searchWordLower = searchWord.toLowerCase();
+
+            // Filter item yang cocok dari data server
+            let arr = (typeof itemMasterDataFromServer !== 'undefined' ? itemMasterDataFromServer : []).filter(data =>
+                data.text.toLowerCase().includes(searchWordLower)
             ).map(data => {
                 let li = document.createElement("li");
-                li.textContent = data;
-                li.className = (data == selectBtn.firstElementChild.innerText) ? "selected" : "";
-                li.onclick = function () {
-                    updateItemName(wrapper, this);
-                    setTimeout(updateAddItemButtonState, 100);
-                };
+                li.textContent = data.text;
+                li.setAttribute('data-value', data.value);
+                li.onclick = function () { updateItemName(wrapper, this); }; // Memanggil fungsi updateItemName yang sudah benar
                 return li;
             });
 
-            itemOptions.innerHTML = "";
+            itemOptions.innerHTML = ""; // Kosongkan daftar pilihan
+
+            // --- LOGIKA YANG DIKEMBALIKAN ---
+            // Jika pengguna mengetik sesuatu, tampilkan opsi untuk me-request item baru
             if (searchWord.length > 0) {
                 let createLi = document.createElement("li");
-                createLi.className = "create-option";
+                createLi.className = "create-option"; // Class untuk styling jika ada
                 createLi.textContent = `Request "${searchWord}"`;
+
+                // Saat di-klik, panggil fungsi 'createItemOption' yang akan membuka pop-up request
                 createLi.onclick = function () {
+                    // 'createItemOption' adalah fungsi dari file asli Anda yang membuka pop-up
+                    // Pastikan fungsi ini masih ada di site.js
                     createItemOption(wrapper, searchWord);
-                    setTimeout(updateAddItemButtonState, 100);
                 };
                 itemOptions.appendChild(createLi);
             }
+            // --- AKHIR LOGIKA YANG DIKEMBALIKAN ---
 
+            // Tampilkan hasil pencarian item yang cocok
             if (arr.length > 0) {
                 arr.forEach(li => itemOptions.appendChild(li));
             }
         });
 
+        // Event listener untuk tombol select/dropdown
         selectBtn.addEventListener("click", function (e) {
             e.stopPropagation();
             const isActive = wrapper.classList.contains("active");
-            closeAllDropdowns();
+            closeAllDropdowns(); // Fungsi ini dari kode Anda, sudah bagus
             if (!isActive) {
-                const selectBtnSpan = selectBtn.querySelector("span");
                 searchInp.value = "";
-                addItemOptions(wrapper, selectBtnSpan ? selectBtnSpan.innerText : undefined);
+                addItemOptions(wrapper, selectBtn.querySelector("span").innerText);
                 wrapper.classList.add("active");
             }
-
-            setTimeout(updateAddItemButtonState, 100);
         });
-
-        searchInp.addEventListener("click", function (e) {
-            e.stopPropagation();
-        });
-
-        if (itemOptions) {
-            itemOptions.addEventListener('click', function (e) {
-                if (e.target.tagName === 'LI') {
-                    setTimeout(updateAddItemButtonState, 100);
-                }
-            });
-        }
     }
 
     document.querySelectorAll(".wrapp.item-dropdown").forEach(setupItemDropdown);
@@ -1519,56 +1594,36 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.querySelectorAll('.request-item-to-purchasing-form-save-btn').forEach(btn => {
         btn.addEventListener('click', function (e) {
-            const name = document.getElementById('request-item-name').value.trim();
-            const desc = document.getElementById('request-item-desc').value.trim();
-            const qty = document.getElementById('request-item-qty').value.trim();
-            const uom = document.getElementById('request-item-uom').value.trim();
-            const detail = document.getElementById('request-item-detail').value.trim();
+            e.preventDefault(); // Mencegah form submit default
 
-            if (!(name || desc || qty || uom || detail)) {
-                document.querySelector('.request-item-to-purchasing-form-pop-up').classList.remove('active');
+            const modal = this.closest('.request-item-to-purchasing-form-pop-up');
+
+            // 1. Ambil semua data dari form di pop-up
+            const name = modal.querySelector('#request-item-name').value.trim();
+            const desc = modal.querySelector('#request-item-desc').value.trim();
+            const qty = modal.querySelector('#request-item-qty').value.trim();
+            const uom = modal.querySelector('#request-item-uom').value.trim();
+            const detail = modal.querySelector('#request-item-detail').value.trim();
+
+            if (!name) return; // Jangan lakukan apa-apa jika nama kosong
+
+            // 2. Panggil fungsi addToRequestPurchasing yang sudah kita perbaiki sebelumnya
+            // Fungsi ini sudah bisa membuat dropdown PIC dengan benar.
+            addToRequestPurchasing({
+                name: name,
+                description: desc,
+                quantity: qty,
+                uom: uom,
+                reason: "Not yet in the Database", // Alasan default untuk item baru
+                notes: detail
+            });
+
+            // 3. Reset dan tutup pop-up
+            if (modal) {
+                resetRequestItemToPurchasingForm();
+                modal.classList.remove('active');
                 document.body.classList.remove('pop-up-active');
-                return;
             }
-
-            const reqTableBody = document.getElementById('reqTableBody');
-            const rowCount = reqTableBody.querySelectorAll('tr').length + 1;
-            const newRow = document.createElement('tr');
-            newRow.innerHTML = `
-                <td class="action">
-                    <button type="button" class="btn">
-                        <i class='bx bx-plus text-black' style="border: 2px solid #000; border-radius: 3px;"></i>
-                    </button>
-                </td>
-                <td class="nomor text-center" style="font-weight: 500;">${rowCount}</td>
-                <td class="reqCode">None</td>
-                <td class="name"><input type='text' class='size form-control1' value="${name}"></td>
-                <td class="desc"><input type='text' class='size form-control1' value="${desc}"></td>
-                <td class="qty"><input type='number' class='size text-center form-control1' value="${qty}"></td>
-                <td class="uom"><input type='text' class='size form-control1' value="${uom}"></td>
-                <td class="reason"><input type='text' class='size form-control1' value="Not yet in the Database"></td>
-                <td class="notes"><input type='text' class='size form-control1'></td>
-                <td class="pic">None</td>
-                <td class="reqStatus">
-                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                        <span id="not-yet" class="rounded-pill status">Not Yet</span>
-                    </div>
-                </td>
-                <td class="delete"><button type="button" class="btn btn-remove-row-req"><i class='bx bx-trash'></i></button></td>
-            `;
-            reqTableBody.appendChild(newRow);
-
-            renumberReqTable();
-
-
-            document.getElementById('request-item-name').value = '';
-            document.getElementById('request-item-desc').value = '';
-            document.getElementById('request-item-qty').value = '';
-            document.getElementById('request-item-uom').value = '';
-            document.getElementById('request-item-detail').value = '';
-
-            document.querySelector('.request-item-to-purchasing-form-pop-up').classList.remove('active');
-            document.body.classList.remove('pop-up-active');
         });
     });
 
@@ -1898,7 +1953,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function recalculateTotal() {
         updateItemListTotal();
     }
-
+    const itemListTableBody = document.getElementById('itemListTableBody');
     if (itemListTableBody) {
         itemListTableBody.addEventListener('click', function (e) {
             if (e.target.closest('.btn-remove-row-itemlist')) {
@@ -1962,10 +2017,11 @@ document.addEventListener("DOMContentLoaded", function () {
             const row = e.target.closest('tr');
             if (!row) return;
 
-            const name = row.querySelector('td.name input').value.trim();
-            const desc = row.querySelector('td.desc input').value.trim();
-            const qty = row.querySelector('td.qty input').value.trim();
-            const uom = row.querySelector('td.uom input').value.trim();
+            // 1. Ambil data dari baris "Request Item to Purchasing" yang di-klik
+            const name = row.querySelector('td.name input')?.value.trim();
+            const desc = row.querySelector('td.desc input')?.value.trim();
+            const qty = row.querySelector('td.qty input')?.value.trim();
+            const uom = row.querySelector('td.uom input')?.value.trim();           
 
             if (!(name || desc || qty || uom)) return;
 
@@ -1984,35 +2040,35 @@ document.addEventListener("DOMContentLoaded", function () {
             if (foundEmptyRow) {
                 targetRow = foundEmptyRow;
             } else {
-                const rowCount = itemListTbody.children.length + 1;
+                const newIndex = itemListTbody.querySelectorAll('tr').length;
                 targetRow = document.createElement('tr');
                 targetRow.innerHTML = `
-            <td class="text-center" style="font-weight: 500;"></td>
+           <td class="text-center" style="font-weight: 500;">${newIndex + 1}</td>
             <td class="name">
+                <input type="hidden" name="ItemListSectionItems[${newIndex}].ItemID" value="">
                 <div class="wrapp item-dropdown" style="width: 100%;">
                     <div class="select-btn d-flex align-items-center">
-                        <span></span>
+                        <span>${name}</span>
                         <i class='bx bx-chevron-down'></i>
                     </div>
                     <div class="content-search">
-                        <div class="search">
-                            <i class="bx bx-search-alt-2"></i>
-                            <input type="text" placeholder="Search" />
-                        </div>
+                        <div class="search"><i class="bx bx-search-alt-2"></i><input type="text" placeholder="Search"></div>
                         <ul class="option" style="margin-bottom: 10px;"></ul>
                     </div>
                 </div>
             </td>
-            <td class="desc"><input type='text' class='size form-control1'></td>
-            <td class="qty"><input type='number' class='size text-center form-control1' oninput="updateRowAmount(this)"></td>
-            <td class="uom"><input type='text' class='size form-control1'></td>
-            <td class="price"><input type='number' class='size form-control1' oninput="updateRowAmount(this)"></td>
-            <td class="notes"><input type='text' class='size form-control1'></td>
-            <td class="details"><input type='text' class='size form-control1'></td>
-            <td class="warranty"><input type='text' class='size form-control1'></td>
+            <td class="desc"><input type="text" class="size form-control1" name="ItemListSectionItems[${newIndex}].ItemDescription" value="${desc}"></td>
+            <td class="qty"><input type="number" class="size text-center form-control1" name="ItemListSectionItems[${newIndex}].Quantity" value="${qty}" oninput="updateRowAmount(this)"></td>
+            <td class="uom"><input type="text" class="size form-control1" name="ItemListSectionItems[${newIndex}].UoM" value="${uom}"></td>
+            <td class="price"><input type="number" class="size form-control1" name="ItemListSectionItems[${newIndex}].TargetUnitPrice" oninput="updateRowAmount(this)"></td>
+            <td class="notes"><input type="text" class="size form-control1" name="ItemListSectionItems[${newIndex}].Notes"></td>
+            <td class="details"><input type="text" class="size form-control1" name="ItemListSectionItems[${newIndex}].Details"></td>
+            <td class="warranty"><input type="text" class="size form-control1" name="ItemListSectionItems[${newIndex}].SalesWarranty"></td>
             <td class="amount"><span class="item-price-amount"></span></td>
-            <td class="delete"><button type="button" class="btn btn-remove-row-itemlist"><i class='bx bx-trash'></i></button></td>
+            <td class="delete"><button type="button" class="btn btn-remove-row-itemlist"><i class="bx bx-trash"></i></button></td>
         `;
+
+                // 4. Tambahkan baris baru ke tabel "Item List"
                 itemListTbody.appendChild(targetRow);
 
                 setupItemDropdown(targetRow.querySelector('.wrapp.item-dropdown'));
@@ -2023,7 +2079,6 @@ document.addEventListener("DOMContentLoaded", function () {
             targetRow.querySelector('td.desc input').value = desc;
             targetRow.querySelector('td.qty input').value = qty;
             targetRow.querySelector('td.uom input').value = uom;
-
             updateRowAmount(targetRow.querySelector('td.qty input'));
 
             const itemDropdown = targetRow.querySelector('.wrapp.item-dropdown');
@@ -2045,33 +2100,32 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 const newAddOnRow = document.createElement('tr');
                 newAddOnRow.classList.add('addon-row');
+                const newAddonIndex = itemListTbody.querySelectorAll('tr').length;
                 newAddOnRow.innerHTML = `
                     <td></td>
                     <td class="name">
+                        <input type="hidden" name="ItemListSectionItems[${newAddonIndex}].ItemID" value="">
                         <div class="wrapp item-dropdown" style="width: 100%;">
                             <div class="select-btn d-flex align-items-center">
-                                <span>${addOnName}</span>
-                                <i class='bx bx-chevron-down'></i>
+                                <span>${addOnName}</span><i class='bx bx-chevron-down'></i>
                             </div>
                             <div class="content-search">
-                                <div class="search">
-                                    <i class="bx bx-search-alt-2"></i>
-                                    <input type="text" placeholder="Search" />
-                                </div>
+                                <div class="search"><i class="bx bx-search-alt-2"></i><input type="text" placeholder="Search" /></div>
                                 <ul class="option" style="margin-bottom: 10px;"></ul>
                             </div>
                         </div>
                     </td>
-                    <td class="desc"><input type='text' class='size form-control1' value="${addOnDesc}"></td>
-                    <td class="qty"><input type='number' class='size text-center form-control1' value="${addOnQty}"></td>
-                    <td class="uom"><input type='text' class='size form-control1' value="${addOnUom}"></td>
-                    <td class="price"><input type='number' class='size form-control1'></td>
-                    <td class="notes"><input type='text' class='size form-control1'></td>
-                    <td class="details"><input type='text' class='size form-control1'></td>
-                    <td class="warranty"><input type='text' class='size form-control1'></td>
+                    <td class="desc"><input type='text' class='size form-control1' name="ItemListSectionItems[${newAddonIndex}].ItemDescription" value="${addOnDesc}"></td>
+                    <td class="qty"><input type='number' class='size text-center form-control1' name="ItemListSectionItems[${newAddonIndex}].Quantity" value="${addOnQty}"></td>
+                    <td class="uom"><input type='text' class='size form-control1' name="ItemListSectionItems[${newAddonIndex}].UoM" value="${addOnUom}"></td>
+                    <td class="price"><input type='number' class='size form-control1' name="ItemListSectionItems[${newAddonIndex}].TargetUnitPrice"></td>
+                    <td class="notes"><input type='text' class='size form-control1' name="ItemListSectionItems[${newAddonIndex}].Notes"></td>
+                    <td class="details"><input type='text' class='size form-control1' name="ItemListSectionItems[${newAddonIndex}].Details"></td>
+                    <td class="warranty"><input type='text' class='size form-control1' name="ItemListSectionItems[${newAddonIndex}].SalesWarranty"></td>
                     <td class="amount"><span class="item-price-amount"></span></td>
                     <td class="delete"><button type="button" class="btn btn-remove-row-itemlist"><i class='bx bx-trash'></i></button></td>
                 `;
+
                 if (insertAfter && insertAfter.nextSibling) {
                     itemListTbody.insertBefore(newAddOnRow, insertAfter.nextSibling);
                 } else {
@@ -2080,13 +2134,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 insertAfter = newAddOnRow;
 
                 setupItemDropdown(newAddOnRow.querySelector('.wrapp.item-dropdown'));
-
                 const addOnDropdown = newAddOnRow.querySelector('.wrapp.item-dropdown');
                 if (addOnDropdown) {
                     addOnDropdown.classList.add('disabled-by-script');
                     addOnDropdown.setAttribute('tabindex', '-1');
                 }
-
                 newAddOnRow.querySelectorAll('input').forEach(input => {
                     input.addEventListener('input', function () {
                         updateAddItemButtonState();
@@ -2111,11 +2163,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 addOnRow.parentNode.removeChild(addOnRow);
             }
 
-            row.parentNode.removeChild(row);
+  
 
+            row.parentNode.removeChild(row);
             renumberItemListTable();
             renumberReqTable();
-
             updateAddItemButtonState();
         }
     });
@@ -2531,7 +2583,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         const closeBtn = document.getElementById('configure-item-form-close-btn');
-        const configureItemForm = document.querySelector('.configure-item-form-pop-up');
+        configureItemForm = document.querySelector('.configure-item-form-pop-up');
         if (closeBtn && configureItemForm) {
             closeBtn.addEventListener('click', function () {
                 configureItemForm.classList.remove('active');
@@ -2555,23 +2607,38 @@ document.addEventListener("DOMContentLoaded", function () {
             confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
 
             newConfirmBtn.addEventListener('click', function () {
+                const configureItemForm = document.querySelector('.configure-item-form-pop-up');
+                const requestToPurchasingForm = document.querySelector('.request-to-purchasing-form');
+
+                // --- DEKLARASI VARIABEL DIPINDAHKAN KE ATAS SINI ---
+                // Ambil data dari pop-up sekali saja di sini agar bisa dipakai di semua kondisi.
                 const itemName = document.getElementById('configure-item-name-code').textContent.split(' [')[0].trim();
                 const itemDesc = document.getElementById('configure-item-description').textContent.trim();
                 const quantity = document.getElementById('configure-item-quantity').value;
                 const price = parseCurrency(document.getElementById('vendor-price').textContent);
+                // --- AKHIR BAGIAN DEKLARASI ---
 
-                const requestToPurchasingForm = document.querySelector('.request-to-purchasing-form');
                 const isRequestToPurchasing = requestToPurchasingForm && requestToPurchasingForm.style.display !== 'none';
 
                 if (isRequestToPurchasing) {
+                    // --- LOGIKA UNTUK "REQUEST TO PURCHASING" ---
                     let reason = document.getElementById('reason-for-request').value;
                     if (reason === 'Other') {
                         reason = document.getElementById('other-reason-input').value.trim();
                     }
                     const notes = document.getElementById('request-details-notes').value.trim();
 
-                    addToRequestPurchasing(itemName, itemDesc, quantity, reason, notes, '');
+                    // Panggil fungsi untuk menambahkan baris baru ke tabel purchasing
+                    addToRequestPurchasing({
+                        name: itemName,
+                        description: itemDesc,
+                        quantity: quantity,
+                        uom: 'Unit',
+                        reason: reason,
+                        notes: notes
+                    });
 
+                    // Hapus item dari tabel "Item List"
                     const itemListTableBody = document.getElementById('itemListTableBody');
                     if (itemListTableBody) {
                         const rows = Array.from(itemListTableBody.querySelectorAll('tr'));
@@ -2710,7 +2777,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     updateAddItemButtonState();
                 }
 
-                const configureItemForm = document.querySelector('.configure-item-form-pop-up');
                 if (configureItemForm) {
                     configureItemForm.classList.remove('active');
                 }
@@ -2730,7 +2796,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (itemNameElement && !itemNameElement.textContent.includes('Create "')) {
                 const itemName = itemNameElement.textContent.trim();
 
-                const configureItemForm = document.querySelector('.configure-item-form-pop-up');
+                configureItemForm = document.querySelector('.configure-item-form-pop-up');
                 if (configureItemForm) {
                     resetConfigureItemForm();
                     setDefaultVendor();
@@ -2774,7 +2840,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         option.addEventListener('click', function () {
                             const itemName = this.textContent.trim();
                             if (itemName && !itemName.includes('Create "')) {
-                                const configureItemForm = document.querySelector('.configure-item-form-pop-up');
+                                configureItemForm = document.querySelector('.configure-item-form-pop-up');
                                 if (configureItemForm) {
                                     const itemNameCodeElement = document.getElementById('configure-item-name-code');
                                     if (itemNameCodeElement) {
@@ -3327,3 +3393,37 @@ document.addEventListener("DOMContentLoaded", function () {
         discardBtn.addEventListener('click', () => window.location.href = '/RFQ/Index');
     }
 });
+
+function populateEndUserDropdown(customerId) {
+    const endUserSelect = $('#endUserDropdown'); // Menggunakan jQuery selector agar lebih mudah
+    endUserSelect.empty(); // Kosongkan pilihan lama
+    endUserSelect.prop('disabled', true); // Nonaktifkan selama proses loading
+
+    if (customerId && customerId !== "" && customerId !== "0") {
+        endUserSelect.append($('<option></option>').val('').text('Loading...'));
+
+        $.ajax({
+            url: '/RFQ/GetContactPersonsByCustomerId', // URL ke action di RFQController
+            type: 'GET',
+            data: { customerId: customerId },
+            success: function (data) {
+                endUserSelect.empty();
+                endUserSelect.append($('<option></option>').val('').text('-- Pilih End User --'));
+                if (data && data.length > 0) {
+                    $.each(data, function (index, item) {
+                        endUserSelect.append($('<option></option>').val(item.value).text(item.text));
+                    });
+                } else {
+                    endUserSelect.append($('<option></option>').val('').text('Tidak ada kontak'));
+                }
+                endUserSelect.prop('disabled', false); // Aktifkan kembali dropdown
+            },
+            error: function () {
+                endUserSelect.empty();
+                endUserSelect.append($('<option></option>').val('').text('Error memuat data'));
+            }
+        });
+    } else {
+        endUserSelect.append($('<option></option>').val('').text('-- Pilih Perusahaan --'));
+    }
+}

@@ -63,6 +63,12 @@ namespace BQuick.Controllers
             viewModel.SurveyCategoryList = new SelectList(
                 await _context.SurveyCategories.OrderBy(sc => sc.CategoryName).ToListAsync(),
                 "SurveyCategoryID", "CategoryName", viewModel.SurveySectionItems.FirstOrDefault()?.SurveyCategoryID);
+
+            var purchasingUsers = await _context.Users
+                .Where(u => u.IsActive && u.RoleID == 5)
+                .OrderBy(u => u.FullName)
+                .ToListAsync();
+            viewModel.PurchasingUserList = new SelectList(purchasingUsers, "UserID", "FullName");
         }
 
 
