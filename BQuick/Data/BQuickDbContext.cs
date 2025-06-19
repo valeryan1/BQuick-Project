@@ -301,6 +301,15 @@ namespace BQuick.Data
                 .HasForeignKey(ah => ah.ApproverUserID)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Item>(entity =>
+            {
+                // Menentukan presisi untuk properti desimal agar tidak ada data yang terpotong
+                // HasPrecision(18, 4) berarti total 18 digit, dengan 4 digit di belakang koma.
+                entity.Property(e => e.DimensionL).HasPrecision(18, 4);
+                entity.Property(e => e.DimensionW).HasPrecision(18, 4);
+                entity.Property(e => e.DimensionH).HasPrecision(18, 4);
+                entity.Property(e => e.Weight).HasPrecision(18, 4);
+            });
             // Konfigurasi untuk tabel lookup (mencegah penghapusan jika masih digunakan)
             ConfigureRestrictDeleteForLookupTables(modelBuilder);
         }
@@ -436,11 +445,11 @@ namespace BQuick.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Survey Lookups
-            modelBuilder.Entity<SurveyRequest>()
+            /*modelBuilder.Entity<SurveyRequest>()
                .HasOne(sr => sr.SurveyCategory)
                .WithMany(sc => sc.SurveyRequests)
                .HasForeignKey(sr => sr.SurveyCategoryID)
-               .OnDelete(DeleteBehavior.Restrict);
+               .OnDelete(DeleteBehavior.Restrict);*/
             modelBuilder.Entity<SurveyRequest>()
                 .HasOne(sr => sr.SurveyStatus)
                 .WithMany(ss => ss.SurveyRequests)

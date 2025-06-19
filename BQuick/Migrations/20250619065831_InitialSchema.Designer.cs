@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BQuick.Migrations
 {
     [DbContext(typeof(BQuickDbContext))]
-    [Migration("20250604070634_updateNullableRfq")]
-    partial class updateNullableRfq
+    [Migration("20250619065831_InitialSchema")]
+    partial class InitialSchema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -58,7 +58,6 @@ namespace BQuick.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ApproverRoleAtTime")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -73,20 +72,19 @@ namespace BQuick.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("MeetingReportInstanceID")
+                    b.Property<int?>("MeetingReportInstanceID")
                         .HasColumnType("int");
 
-                    b.Property<int>("QuotationID")
+                    b.Property<int?>("QuotationID")
                         .HasColumnType("int");
 
                     b.Property<string>("Remarks")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("StepOrder")
                         .HasColumnType("int");
 
-                    b.Property<int>("SurveyReportInstanceID")
+                    b.Property<int?>("SurveyReportInstanceID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Timestamp")
@@ -116,42 +114,34 @@ namespace BQuick.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomerID"));
 
                     b.Property<string>("AccountPayableCode")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("AccountReceivableCode")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("BillingAddressCity")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("BillingAddressCountry")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("BillingAddressDetail")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("BillingAddressProvince")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("BillingAddressStreet")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("BillingAddressZipCode")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
@@ -164,12 +154,10 @@ namespace BQuick.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CustomerCode")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("CustomerType")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -181,41 +169,54 @@ namespace BQuick.Migrations
                     b.Property<int?>("DefaultTermsOfPaymentID")
                         .HasColumnType("int");
 
+                    b.Property<string>("Email")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Fax")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
                     b.Property<DateTime>("LastModifiedTimestamp")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Mobile")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("NPWP")
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
                     b.Property<string>("PurchasingLevel")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("ShippingAddressCity")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ShippingAddressCountry")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ShippingAddressDetail")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("ShippingAddressProvince")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ShippingAddressStreet")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("ShippingAddressZipCode")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
@@ -242,7 +243,6 @@ namespace BQuick.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
@@ -255,12 +255,10 @@ namespace BQuick.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("PhoneNumber")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Position")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -288,10 +286,12 @@ namespace BQuick.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal?>("DimensionH")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<decimal?>("DimensionL")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<string>("DimensionUnit")
                         .IsRequired()
@@ -299,7 +299,8 @@ namespace BQuick.Migrations
                         .HasColumnType("nvarchar(10)");
 
                     b.Property<decimal?>("DimensionW")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<bool>("IsEOL")
                         .HasColumnType("bit");
@@ -377,7 +378,8 @@ namespace BQuick.Migrations
                         .HasColumnType("decimal(5, 2)");
 
                     b.Property<decimal?>("Weight")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<string>("WeightUnit")
                         .IsRequired()
@@ -490,7 +492,6 @@ namespace BQuick.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("LeadTimeUnit")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
@@ -501,7 +502,6 @@ namespace BQuick.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Notes")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
@@ -523,7 +523,6 @@ namespace BQuick.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("WarrantyUnit")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
@@ -582,7 +581,6 @@ namespace BQuick.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ReportContent")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ReportMasterID")
@@ -619,7 +617,6 @@ namespace BQuick.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("LocationDetails")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MeetingCode")
@@ -628,7 +625,6 @@ namespace BQuick.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("MeetingName")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
@@ -636,7 +632,6 @@ namespace BQuick.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("NotesInternal")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PrimaryPIC_UserID")
@@ -704,11 +699,9 @@ namespace BQuick.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NavigationURL")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NotificationType")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -719,7 +712,6 @@ namespace BQuick.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("RelatedEntityType")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -813,7 +805,6 @@ namespace BQuick.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("RequestedItemDescription")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RequestedItemName")
@@ -822,11 +813,9 @@ namespace BQuick.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("SalesAttachmentURL")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SalesNotes")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UoM")
@@ -887,7 +876,6 @@ namespace BQuick.Migrations
                         .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("DeliveryInfo")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("DirectorApproverID")
@@ -900,11 +888,9 @@ namespace BQuick.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("FooterText")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("InternalNotes")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("LastModifiedTimestamp")
@@ -937,14 +923,12 @@ namespace BQuick.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("RemarkToCustomer")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("SalesManagerApproverID")
                         .HasColumnType("int");
 
                     b.Property<string>("SentToCustomerProofURL")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("SentToCustomerTimestamp")
@@ -1009,7 +993,6 @@ namespace BQuick.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("QuotationItemID"));
 
                     b.Property<string>("DescriptionOverride")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("DisplaySequence")
@@ -1052,7 +1035,6 @@ namespace BQuick.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("SalesWarranty")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -1264,7 +1246,6 @@ namespace BQuick.Migrations
                         .HasColumnType("decimal(18, 2)");
 
                     b.Property<string>("ItemDescription")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ItemName")
@@ -1276,13 +1257,14 @@ namespace BQuick.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<decimal?>("Quantity")
+                    b.Property<decimal>("Quantity")
                         .HasColumnType("decimal(18, 2)");
 
                     b.Property<int>("RFQID")
                         .HasColumnType("int");
 
                     b.Property<string>("UoM")
+                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
@@ -1346,15 +1328,16 @@ namespace BQuick.Migrations
                     b.Property<int?>("ChosenVendorID")
                         .HasColumnType("int");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Details")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ItemID")
                         .HasColumnType("int");
 
                     b.Property<string>("Notes")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("OriginatingPurchasingRequestID")
@@ -1367,7 +1350,6 @@ namespace BQuick.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("SalesWarranty")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -1409,7 +1391,6 @@ namespace BQuick.Migrations
                         .HasColumnType("nvarchar(150)");
 
                     b.Property<string>("ReportTemplateDefinition")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ReportMasterID");
@@ -1471,7 +1452,6 @@ namespace BQuick.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SettingID"));
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
@@ -1593,7 +1573,6 @@ namespace BQuick.Migrations
                         .HasColumnType("nvarchar(150)");
 
                     b.Property<string>("FormTemplateDefinition")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
@@ -1622,11 +1601,9 @@ namespace BQuick.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("FilledFormData")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SubmissionStatus")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -1696,7 +1673,6 @@ namespace BQuick.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ReportContent")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ReportMasterID")
@@ -1746,26 +1722,23 @@ namespace BQuick.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CustomerPICName")
-                        .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
                     b.Property<string>("LocationDetails")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("RFQID")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("RequestedDateTime")
+                    b.Property<DateTime?>("RequestEndTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("RequestStartTime")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("SalesNotesInternal")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("SurveyCategoryID")
-                        .HasColumnType("int");
 
                     b.Property<string>("SurveyCode")
                         .IsRequired()
@@ -1773,7 +1746,6 @@ namespace BQuick.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("SurveyName")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
@@ -1785,8 +1757,6 @@ namespace BQuick.Migrations
                     b.HasIndex("CreatedByUserID");
 
                     b.HasIndex("RFQID");
-
-                    b.HasIndex("SurveyCategoryID");
 
                     b.HasIndex("SurveyCode")
                         .IsUnique();
@@ -1893,41 +1863,33 @@ namespace BQuick.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VendorID"));
 
                     b.Property<string>("BillingAddressCity")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("BillingAddressCountry")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("BillingAddressDetail")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("BillingAddressProvince")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("BillingAddressStreet")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("BillingAddressZipCode")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("CompanyProfileAttachmentURL")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ContactPersonName")
-                        .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
@@ -1938,7 +1900,6 @@ namespace BQuick.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("DefaultCurrency")
-                        .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
@@ -1946,7 +1907,6 @@ namespace BQuick.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
@@ -1954,57 +1914,46 @@ namespace BQuick.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("NPWP")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("OfficeType")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("PhoneNumber")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("RiskLevel")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("ShippingAddressCity")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ShippingAddressCountry")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ShippingAddressDetail")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("ShippingAddressProvince")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ShippingAddressStreet")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("ShippingAddressZipCode")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("VendorCode")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -2014,12 +1963,10 @@ namespace BQuick.Migrations
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("VendorType")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Website")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("VendorID");
@@ -2059,12 +2006,10 @@ namespace BQuick.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("BranchName")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("SwiftCode")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
@@ -2076,6 +2021,21 @@ namespace BQuick.Migrations
                     b.HasIndex("VendorID");
 
                     b.ToTable("VendorBanks");
+                });
+
+            modelBuilder.Entity("SurveyCategorySurveyRequest", b =>
+                {
+                    b.Property<int>("SurveyCategoriesSurveyCategoryID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SurveyRequestsSurveyRequestID")
+                        .HasColumnType("int");
+
+                    b.HasKey("SurveyCategoriesSurveyCategoryID", "SurveyRequestsSurveyRequestID");
+
+                    b.HasIndex("SurveyRequestsSurveyRequestID");
+
+                    b.ToTable("SurveyCategorySurveyRequest");
                 });
 
             modelBuilder.Entity("BQuick.Models.ApprovalHistory", b =>
@@ -2094,21 +2054,15 @@ namespace BQuick.Migrations
 
                     b.HasOne("BQuick.Models.MeetingReportInstance", "MeetingReportInstance")
                         .WithMany("ApprovalHistories")
-                        .HasForeignKey("MeetingReportInstanceID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("MeetingReportInstanceID");
 
                     b.HasOne("BQuick.Models.Quotation", "Quotation")
                         .WithMany("ApprovalHistories")
-                        .HasForeignKey("QuotationID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("QuotationID");
 
                     b.HasOne("BQuick.Models.SurveyReportInstance", "SurveyReportInstance")
                         .WithMany("ApprovalHistories")
-                        .HasForeignKey("SurveyReportInstanceID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("SurveyReportInstanceID");
 
                     b.Navigation("ApprovalDecisionStatus");
 
@@ -2717,12 +2671,6 @@ namespace BQuick.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BQuick.Models.SurveyCategory", "SurveyCategory")
-                        .WithMany("SurveyRequests")
-                        .HasForeignKey("SurveyCategoryID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("BQuick.Models.SurveyStatus", "SurveyStatus")
                         .WithMany("SurveyRequests")
                         .HasForeignKey("SurveyStatusID")
@@ -2732,8 +2680,6 @@ namespace BQuick.Migrations
                     b.Navigation("CreatedByUser");
 
                     b.Navigation("RFQ");
-
-                    b.Navigation("SurveyCategory");
 
                     b.Navigation("SurveyStatus");
                 });
@@ -2793,6 +2739,21 @@ namespace BQuick.Migrations
                         .IsRequired();
 
                     b.Navigation("Vendor");
+                });
+
+            modelBuilder.Entity("SurveyCategorySurveyRequest", b =>
+                {
+                    b.HasOne("BQuick.Models.SurveyCategory", null)
+                        .WithMany()
+                        .HasForeignKey("SurveyCategoriesSurveyCategoryID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BQuick.Models.SurveyRequest", null)
+                        .WithMany()
+                        .HasForeignKey("SurveyRequestsSurveyRequestID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("BQuick.Models.ApprovalDecisionStatus", b =>
@@ -2947,8 +2908,6 @@ namespace BQuick.Migrations
 
             modelBuilder.Entity("BQuick.Models.SurveyCategory", b =>
                 {
-                    b.Navigation("SurveyRequests");
-
                     b.Navigation("TechnicalCompetencies");
                 });
 

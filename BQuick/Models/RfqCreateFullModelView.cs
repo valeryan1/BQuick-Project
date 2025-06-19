@@ -77,7 +77,7 @@ namespace BQuick.Models
     // --- Sub-ViewModel untuk "Survey List" ---
     public class RfqCreateSurveyRequestItemViewModel
     {
-        public int SurveyCategoryID { get; set; }
+        public List<int> SurveyCategoryIDs { get; set; }
 
         [StringLength(255)]
         public string SurveyName { get; set; }
@@ -87,17 +87,32 @@ namespace BQuick.Models
 
         public List<int> TechnicalUserIDs { get; set; }
 
-        [DataType(DataType.DateTime)]
-        public DateTime RequestedDateTime { get; set; } = DateTime.Now.AddDays(1);
+        [Display(Name = "Waktu Mulai Survey")]
+        public DateTime? RequestStartTime { get; set; }
+
+        [Display(Name = "Waktu Selesai Survey")]
+        public DateTime? RequestEndTime { get; set; }
 
         public string LocationDetails { get; set; }
 
         public string SalesNotesInternal { get; set; }
+        public string SurveyStatus { get; set; } = "Open"; // Beri nilai default "Open"
 
         public RfqCreateSurveyRequestItemViewModel()
         {
+            SurveyCategoryIDs = new List<int>();
             TechnicalUserIDs = new List<int>();
         }
+    }
+
+    public class RfqCreateMeetingItemViewModel
+    {
+        [StringLength(255)]
+        public string MeetingName { get; set; }
+        public DateTime? RequestedDateTime { get; set; }
+        public string LocationDetails { get; set; }
+        public string NotesInternal { get; set; }
+        public List<int> AssignedPICs { get; set; } = new List<int>();
     }
 
 
@@ -152,6 +167,7 @@ namespace BQuick.Models
         public List<RfqCreateRfqItemViewModel> ItemListSectionItems { get; set; }
         public List<RfqCreatePurchasingRequestItemViewModel> PurchasingRequestSectionItems { get; set; }
         public List<RfqCreateSurveyRequestItemViewModel> SurveySectionItems { get; set; }
+        public List<RfqCreateMeetingItemViewModel> MeetingSectionItems { get; set; } = new List<RfqCreateMeetingItemViewModel>();
 
         // --- Properti untuk mengisi Dropdown Lists ---
         public SelectList? CustomerList { get; set; }
@@ -162,6 +178,7 @@ namespace BQuick.Models
         public SelectList? ItemMasterList { get; set; }
         public SelectList? SurveyCategoryList { get; set; }
         public SelectList? PurchasingUserList { get; set; }
+        public SelectList? SurveyUserList { get; set; }
 
         public RfqCreateFullViewModel()
         {

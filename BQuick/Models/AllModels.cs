@@ -2,12 +2,51 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace BQuick.Models
 {
 
+    public class ReqItem2
+    {
 
-    // --- Entitas Inti & Pengguna ---*/
+        public int Id { get; set; }
+
+        [MaxLength(100)]
+        public string Name { get; set; } = string.Empty;
+
+        [MaxLength(100)]
+        public string Description { get; set; } = string.Empty;
+
+        public int Quantity { get; set; }
+
+        [MaxLength(100)]
+        public string UoM { get; set; } = string.Empty;
+
+        [MaxLength(100)]
+        public string reasonForReq { get; set; } = string.Empty;
+
+        [MaxLength(100)]
+        public string notes { get; set; } = string.Empty;
+
+        public string ImageFileName { get; set; } = string.Empty;
+
+        public byte[]? ImageData { get; set; } // Tipe byte[] akan dipetakan ke VARBINARY(MAX)
+
+        [MaxLength(100)] // Sesuaikan panjang jika perlu
+        public string? ImageContentType { get; set; } // Untuk tipe konten gambar
+
+        [MaxLength(100)]
+        public string PIC { get; set; } = string.Empty;
+
+        [MaxLength(100)]
+        public string status { get; set; } = string.Empty;
+
+        public DateTime CreatedAt { get; set; }
+    }
+    // --- Entitas Inti & Pengguna ---
+    [Index(nameof(Username), IsUnique = true)]
+    [Index(nameof(Email), IsUnique = true)]
     public class User
     {
         [Key]
@@ -185,54 +224,73 @@ namespace BQuick.Models
         public int CustomerID { get; set; }
 
         [StringLength(50)]
-        public string CustomerCode { get; set; } // e.g., "PEB"
+        public string? CustomerCode { get; set; } // e.g., "PEB" - Made nullable for consistency
 
         [Required]
         [StringLength(200)]
         public string CompanyName { get; set; }
 
         [StringLength(50)]
-        public string CustomerType { get; set; } // "Company", "Personal"
+        public string? CustomerType { get; set; } // "Company", "Personal" - Made nullable
+
+        // New Fields
+        [StringLength(30)]
+        public string? Fax { get; set; }
+
+        [EmailAddress]
+        [StringLength(100)]
+        public string? Email { get; set; }
+
+        [Phone]
+        [StringLength(30)]
+        public string? Phone { get; set; }
+
+        [Phone]
+        [StringLength(30)]
+        public string? Mobile { get; set; }
+
+        [StringLength(25)]
+        public string? NPWP { get; set; }
 
         [StringLength(10)]
         public string DefaultCurrency { get; set; } = "IDR";
 
         public int? DefaultTermsOfPaymentID { get; set; }
         [ForeignKey("DefaultTermsOfPaymentID")]
-        public virtual PaymentTerm DefaultTermsOfPayment { get; set; }
+        public virtual PaymentTerm? DefaultTermsOfPayment { get; set; }
 
         [StringLength(255)]
-        public string BillingAddressStreet { get; set; }
+        public string? BillingAddressStreet { get; set; }
         [StringLength(255)]
-        public string BillingAddressDetail { get; set; }
+        public string? BillingAddressDetail { get; set; }
         [StringLength(100)]
-        public string BillingAddressCity { get; set; }
+        public string? BillingAddressCity { get; set; }
         [StringLength(100)]
-        public string BillingAddressProvince { get; set; }
+        public string? BillingAddressProvince { get; set; }
         [StringLength(100)]
-        public string BillingAddressCountry { get; set; }
+        public string? BillingAddressCountry { get; set; }
         [StringLength(20)]
-        public string BillingAddressZipCode { get; set; }
+        public string? BillingAddressZipCode { get; set; }
 
         [StringLength(255)]
-        public string ShippingAddressStreet { get; set; }
+        public string? ShippingAddressStreet { get; set; }
         [StringLength(255)]
-        public string ShippingAddressDetail { get; set; }
+        public string? ShippingAddressDetail { get; set; }
         [StringLength(100)]
-        public string ShippingAddressCity { get; set; }
+        public string? ShippingAddressCity { get; set; }
         [StringLength(100)]
-        public string ShippingAddressProvince { get; set; }
+        public string? ShippingAddressProvince { get; set; }
         [StringLength(100)]
-        public string ShippingAddressCountry { get; set; }
+        public string? ShippingAddressCountry { get; set; }
         [StringLength(20)]
-        public string ShippingAddressZipCode { get; set; }
+        public string? ShippingAddressZipCode { get; set; }
 
         [StringLength(50)]
-        public string AccountReceivableCode { get; set; }
+        public string? AccountReceivableCode { get; set; }
         [StringLength(50)]
-        public string AccountPayableCode { get; set; }
+        public string? AccountPayableCode { get; set; }
         [StringLength(50)]
-        public string PurchasingLevel { get; set; } // Platinum, Gold, Silver
+        public string? PurchasingLevel { get; set; } // Platinum, Gold, Silver
 
         public DateTime CreatedTimestamp { get; set; } = DateTime.UtcNow;
         public DateTime LastModifiedTimestamp { get; set; } = DateTime.UtcNow;
@@ -246,6 +304,7 @@ namespace BQuick.Models
         {
             ContactPersons = new HashSet<CustomerContactPerson>();
             RFQs = new HashSet<RFQ>();
+            // Nullable strings are null by default, no need to initialize to string.Empty unless desired
         }
     }
 
@@ -263,16 +322,17 @@ namespace BQuick.Models
         [StringLength(200)]
         public string FullName { get; set; }
         [StringLength(100)]
-        public string Position { get; set; }
+        public string? Position { get; set; } // Made nullable
         [EmailAddress]
         [StringLength(150)]
-        public string Email { get; set; }
+        public string? Email { get; set; } // Made nullable
         [StringLength(50)]
-        public string PhoneNumber { get; set; }
+        public string? PhoneNumber { get; set; } // Made nullable
         public bool IsPrimary { get; set; } = false;
     }
 
     // --- Entitas Terkait Item & Vendor ---
+    [Index(nameof(ItemCode), IsUnique = true)] // Added index for ItemCode
     public class Item
     {
         [Key]
@@ -410,6 +470,7 @@ namespace BQuick.Models
         public decimal? PriceInBundle { get; set; } // Harga komponen dalam bundel, jika relevan
     }
 
+    [Index(nameof(VendorCode), IsUnique = true)] // Added index for VendorCode
     public class Vendor
     {
         [Key]
@@ -418,62 +479,62 @@ namespace BQuick.Models
         [StringLength(200)]
         public string VendorName { get; set; }
         [StringLength(50)]
-        public string VendorCode { get; set; } // Unik, diindeks
+        public string? VendorCode { get; set; } // Made nullable
         [StringLength(150)]
-        public string ContactPersonName { get; set; }
+        public string? ContactPersonName { get; set; } // Made nullable
         [EmailAddress]
         [StringLength(150)]
-        public string Email { get; set; }
+        public string? Email { get; set; } // Made nullable
         [StringLength(50)]
-        public string PhoneNumber { get; set; }
-        public string Website { get; set; }
+        public string? PhoneNumber { get; set; } // Made nullable
+        public string? Website { get; set; } // Made nullable
         [StringLength(50)]
-        public string NPWP { get; set; }
+        public string? NPWP { get; set; } // Made nullable
 
         public int? DefaultPaymentTermID { get; set; }
         [ForeignKey("DefaultPaymentTermID")]
-        public virtual PaymentTerm DefaultPaymentTerm { get; set; }
+        public virtual PaymentTerm? DefaultPaymentTerm { get; set; } // Made nullable
 
         [StringLength(10)]
-        public string DefaultCurrency { get; set; }
+        public string? DefaultCurrency { get; set; } // Made nullable
         [StringLength(50)]
-        public string OfficeType { get; set; } // Pusat, Cabang
+        public string? OfficeType { get; set; } // Made nullable
         [StringLength(50)]
-        public string VendorType { get; set; } // Luar Negeri, Dalam Negeri
+        public string? VendorType { get; set; } // Made nullable
         [StringLength(50)]
-        public string RiskLevel { get; set; } // High, Medium, Low
-        public string CompanyProfileAttachmentURL { get; set; }
+        public string? RiskLevel { get; set; } // Made nullable
+        public string? CompanyProfileAttachmentURL { get; set; } // Made nullable
 
         [StringLength(255)]
-        public string BillingAddressStreet { get; set; }
+        public string? BillingAddressStreet { get; set; }
         [StringLength(255)]
-        public string BillingAddressDetail { get; set; }
+        public string? BillingAddressDetail { get; set; }
         [StringLength(100)]
-        public string BillingAddressCity { get; set; }
+        public string? BillingAddressCity { get; set; }
         [StringLength(100)]
-        public string BillingAddressProvince { get; set; }
+        public string? BillingAddressProvince { get; set; }
         [StringLength(100)]
-        public string BillingAddressCountry { get; set; }
+        public string? BillingAddressCountry { get; set; }
         [StringLength(20)]
-        public string BillingAddressZipCode { get; set; }
+        public string? BillingAddressZipCode { get; set; }
 
         [StringLength(255)]
-        public string ShippingAddressStreet { get; set; }
+        public string? ShippingAddressStreet { get; set; }
         [StringLength(255)]
-        public string ShippingAddressDetail { get; set; }
+        public string? ShippingAddressDetail { get; set; }
         [StringLength(100)]
-        public string ShippingAddressCity { get; set; }
+        public string? ShippingAddressCity { get; set; }
         [StringLength(100)]
-        public string ShippingAddressProvince { get; set; }
+        public string? ShippingAddressProvince { get; set; }
         [StringLength(100)]
-        public string ShippingAddressCountry { get; set; }
+        public string? ShippingAddressCountry { get; set; }
         [StringLength(20)]
-        public string ShippingAddressZipCode { get; set; }
+        public string? ShippingAddressZipCode { get; set; }
 
-        public int? CreatedByUserID { get; set; } // User yang membuat data vendor ini
+        public int? CreatedByUserID { get; set; }
         [ForeignKey("CreatedByUserID")]
         [InverseProperty("CreatedVendors")]
-        public virtual User CreatedByUser { get; set; }
+        public virtual User? CreatedByUser { get; set; } // Made nullable
 
         public DateTime CreatedTimestamp { get; set; } = DateTime.UtcNow;
         public DateTime LastModifiedTimestamp { get; set; } = DateTime.UtcNow;
@@ -503,7 +564,7 @@ namespace BQuick.Models
         [StringLength(100)]
         public string BankName { get; set; }
         [StringLength(100)]
-        public string BranchName { get; set; }
+        public string? BranchName { get; set; } // Made nullable
         [Required]
         [StringLength(150)]
         public string AccountHolderName { get; set; }
@@ -511,7 +572,7 @@ namespace BQuick.Models
         [StringLength(50)]
         public string AccountNumber { get; set; }
         [StringLength(20)]
-        public string SwiftCode { get; set; }
+        public string? SwiftCode { get; set; } // Made nullable
     }
 
     public class ItemVendorPricing
@@ -532,22 +593,23 @@ namespace BQuick.Models
         public decimal Price { get; set; }
         [StringLength(10)]
         public string Currency { get; set; }
-        public int? LeadTimeValue { get; set; } // Dipisah untuk perhitungan (mis: 4)
+        public int? LeadTimeValue { get; set; }
         [StringLength(20)]
-        public string LeadTimeUnit { get; set; } // Days, Weeks, Months
+        public string? LeadTimeUnit { get; set; } // Made nullable
         public int? WarrantyPeriod { get; set; }
         [StringLength(20)]
-        public string WarrantyUnit { get; set; } // "Months", "Years"
+        public string? WarrantyUnit { get; set; } // Made nullable
         public DateTime PriceValidityStartDate { get; set; }
         public DateTime PriceValidityEndDate { get; set; }
         public int? MinOrderQuantity { get; set; }
-        public string Notes { get; set; }
-        public int? StockAvailableAtVendor { get; set; } // Stok spesifik di vendor ini
+        public string? Notes { get; set; } // Made nullable
+        public int? StockAvailableAtVendor { get; set; }
 
         public DateTime LastUpdatedTimestamp { get; set; } = DateTime.UtcNow;
     }
 
     // --- Entitas Terkait RFQ ---
+    [Index(nameof(RFQCode), IsUnique = true)] // Added Index for RFQCode
     public class RFQ
     {
         [Key]
@@ -555,7 +617,7 @@ namespace BQuick.Models
 
         [Required]
         [StringLength(50)]
-        public string RFQCode { get; set; } // Unik, diindeks
+        public string RFQCode { get; set; }
 
         [Required]
         [StringLength(255)]
@@ -568,7 +630,7 @@ namespace BQuick.Models
 
         public int? ContactPersonID { get; set; }
         [ForeignKey("ContactPersonID")]
-        public virtual CustomerContactPerson ContactPerson { get; set; }
+        public virtual CustomerContactPerson? ContactPerson { get; set; } // Made nullable
 
         public DateTime RequestDate { get; set; }
         public DateTime DueDate { get; set; }
@@ -576,22 +638,24 @@ namespace BQuick.Models
         [Column(TypeName = "decimal(18, 2)")]
         public decimal? OverallBudget { get; set; }
         [StringLength(100)]
-        public string? OverallLeadTime { get; set; } // Misalnya "4-6 Weeks"
+        public string? OverallLeadTime { get; set; } // MODIFIED TO NULLABLE
 
         [StringLength(50)]
-        public string? Resource { get; set; } // Email, Whatsapp, Personal
-        public int? PersonalResourceEmployeeID { get; set; }
+        public string? Resource { get; set; } // MODIFIED TO NULLABLE
+
+        public int? PersonalResourceEmployeeID { get; set; } // Nullable as per DB
         [ForeignKey("PersonalResourceEmployeeID")]
         [InverseProperty("PersonalResourceRFQs")]
-        public virtual User PersonalResourceEmployee { get; set; }
+        public virtual User? PersonalResourceEmployee { get; set; } // Made nullable
 
-        public int? RFQCategoryID { get; set; }
+        public int? RFQCategoryID { get; set; } // Nullable as per DB
         [ForeignKey("RFQCategoryID")]
-        public virtual RFQCategory RFQCategory { get; set; } // Project, Middle Project, Non-Project
+        public virtual RFQCategory? RFQCategory { get; set; } // Made nullable
 
-        public int? RFQOpportunityID { get; set; }
+        public int? RFQOpportunityID { get; set; } // Nullable as per DB
         [ForeignKey("RFQOpportunityID")]
-        public virtual RFQOpportunity RFQOpportunity { get; set; } // General, Bundle Installation
+        [InverseProperty("RFQs")] // Corrected InverseProperty based on RFQOpportunity model
+        public virtual RFQOpportunity? RFQOpportunity { get; set; } // Made nullable
 
         public int RFQStatusID { get; set; }
         [ForeignKey("RFQStatusID")]
@@ -605,12 +669,12 @@ namespace BQuick.Models
         public int? AssignedToAdminSalesID { get; set; }
         [ForeignKey("AssignedToAdminSalesID")]
         [InverseProperty("AssignedRFQsAsAdmin")]
-        public virtual User AssignedToAdminSales { get; set; }
+        public virtual User? AssignedToAdminSales { get; set; } // Made nullable
 
         public int? SalesManagerAssignerID { get; set; }
         [ForeignKey("SalesManagerAssignerID")]
         [InverseProperty("AssignedBySalesManagerRFQs")]
-        public virtual User SalesManagerAssigner { get; set; }
+        public virtual User? SalesManagerAssigner { get; set; } // Made nullable
 
         public DateTime CreationTimestamp { get; set; } = DateTime.UtcNow;
         public DateTime LastUpdateTimestamp { get; set; } = DateTime.UtcNow;
@@ -683,15 +747,15 @@ namespace BQuick.Models
 
         [StringLength(255)]
         public string ItemName { get; set; }
-        public string ItemDescription { get; set; }
+        public string? ItemDescription { get; set; } // Made nullable
         [Column(TypeName = "decimal(18, 2)")]
-        public decimal? Quantity { get; set; }
+        public decimal Quantity { get; set; }
         [StringLength(20)]
-        public string? UoM { get; set; }
+        public string UoM { get; set; }
         [Column(TypeName = "decimal(18, 2)")]
         public decimal? BudgetTarget { get; set; }
         [StringLength(100)]
-        public string? LeadTimeTarget { get; set; }
+        public string? LeadTimeTarget { get; set; } // Made nullable
     }
 
     public class RFQAttachment
@@ -707,13 +771,13 @@ namespace BQuick.Models
         [StringLength(255)]
         public string FileName { get; set; }
         [Required]
-        public string FileURL { get; set; }
+        public string FileURL { get; set; } // Consider StringLength
         public DateTime UploadTimestamp { get; set; } = DateTime.UtcNow;
 
-        public int? UploadedByUserID { get; set; } // User yang mengunggah
+        public int? UploadedByUserID { get; set; }
         [ForeignKey("UploadedByUserID")]
         [InverseProperty("UploadedRFQAttachments")]
-        public virtual User UploadedByUser { get; set; }
+        public virtual User? UploadedByUser { get; set; } // Made nullable
     }
 
     public class RFQ_Item
@@ -737,20 +801,20 @@ namespace BQuick.Models
         public string UoM { get; set; }
         [Column(TypeName = "decimal(18, 2)")]
         public decimal? TargetUnitPrice { get; set; }
-        public string Notes { get; set; }
-        public string Details { get; set; }    // Detail tambahan dari sales untuk item ini di RFQ
+        public string? Notes { get; set; } // Made nullable
+        public string? Description { get; set; } // Made nullable
+        public string? Details { get; set; } // Made nullable
         [StringLength(100)]
-        public string SalesWarranty { get; set; } // Garansi yang ditawarkan sales (bisa beda dari vendor)
+        public string? SalesWarranty { get; set; } // Made nullable
 
-        public int? ChosenVendorID { get; set; }    // Vendor yang dipilih sales untuk item ini (jika ada preferensi awal)
+        public int? ChosenVendorID { get; set; }
         [ForeignKey("ChosenVendorID")]
-        public virtual Vendor ChosenVendor { get; set; }
+        public virtual Vendor? ChosenVendor { get; set; } // Made nullable
 
-        // Untuk melacak kembali ke request purchasing jika item ini berasal dari sana
         public int? OriginatingPurchasingRequestID { get; set; }
         [ForeignKey("OriginatingPurchasingRequestID")]
         [InverseProperty("ResultingRFQItems")]
-        public virtual PurchasingRequest OriginatingPurchasingRequest { get; set; }
+        public virtual PurchasingRequest? OriginatingPurchasingRequest { get; set; } // Made nullable
     }
 
     // --- Entitas Terkait Purchasing ---
@@ -763,35 +827,35 @@ namespace BQuick.Models
         [InverseProperty("PurchasingRequests")]
         public virtual RFQ RFQ { get; set; }
 
-        public int? ItemID_IfExists { get; set; }    // ItemID jika item sudah ada di database
+        public int? ItemID_IfExists { get; set; }
         [ForeignKey("ItemID_IfExists")]
-        public virtual Item ItemIfExists { get; set; }
+        public virtual Item? ItemIfExists { get; set; } // Made nullable
 
         [StringLength(255)]
-        public string RequestedItemName { get; set; }    // Nama item jika belum ada di DB
-        public string RequestedItemDescription { get; set; }    // Deskripsi item jika belum ada di DB
+        public string RequestedItemName { get; set; }
+        public string? RequestedItemDescription { get; set; } // Made nullable
         [Column(TypeName = "decimal(18, 2)")]
         public decimal Quantity { get; set; }
         [StringLength(20)]
         public string UoM { get; set; }
         [StringLength(100)]
-        public string ReasonForRequest { get; set; } // Not yet in Database, Leadtime not suitable, Out of Stock, Invalid Price, etc.
-        public string SalesNotes { get; set; } // Catatan dari Sales untuk Purchasing
-        public string SalesAttachmentURL { get; set; } // Lampiran dari Sales untuk Purchasing
+        public string ReasonForRequest { get; set; }
+        public string? SalesNotes { get; set; } // Made nullable
+        public string? SalesAttachmentURL { get; set; } // Made nullable
 
-        public int? AssignedToPurchasingUserID { get; set; }    // User Purchasing yang menangani
+        public int? AssignedToPurchasingUserID { get; set; }
         [ForeignKey("AssignedToPurchasingUserID")]
         [InverseProperty("HandledPurchasingRequests")]
-        public virtual User AssignedToPurchasingUser { get; set; }
+        public virtual User? AssignedToPurchasingUser { get; set; } // Made nullable
 
         public DateTime RequestDate { get; set; } = DateTime.UtcNow;
-        public DateTime? DueDate { get; set; } // Batas waktu untuk Purchasing mendapatkan harga
+        public DateTime? DueDate { get; set; }
 
         public int PurchasingStatusID { get; set; }
         [ForeignKey("PurchasingStatusID")]
-        public virtual PurchasingStatus PurchasingStatus { get; set; } // Status proses di Purchasing
+        public virtual PurchasingStatus PurchasingStatus { get; set; }
 
-        public int RequestedByUserID { get; set; }    // User Sales yang membuat request ini
+        public int RequestedByUserID { get; set; }
         [ForeignKey("RequestedByUserID")]
         [InverseProperty("CreatedPurchasingRequests")]
         public virtual User RequestedByUser { get; set; }
@@ -818,10 +882,14 @@ namespace BQuick.Models
         [Required]
         [StringLength(150)]
         public string CategoryName { get; set; } // e.g., Security Access, Network Cabling, CCTV System
-        [InverseProperty("SurveyCategory")]
+
+        [InverseProperty("SurveyCategories")]
         public virtual ICollection<SurveyRequest> SurveyRequests { get; set; }
+
+        // Atribut untuk TechnicalCompetencies sudah benar, biarkan saja
         [InverseProperty("SurveyCategory")]
         public virtual ICollection<TechnicalCompetency> TechnicalCompetencies { get; set; }
+
 
         public SurveyCategory()
         {
@@ -830,17 +898,15 @@ namespace BQuick.Models
         }
     }
 
-    // Tabel Join untuk User (Teknisi) dan SurveyCategory (Kompetensi)
     public class TechnicalCompetency
     {
-        [Key] // EF Core akan mengatur composite key
-        public int UserID { get; set; } // PK, FK
+        // Composite Key configured in DbContext OnModelCreating
+        public int UserID { get; set; }
         [ForeignKey("UserID")]
         [InverseProperty("TechnicalCompetencies")]
         public virtual User User { get; set; }
 
-        [Key] // EF Core akan mengatur composite key
-        public int SurveyCategoryID { get; set; } // PK, FK
+        public int SurveyCategoryID { get; set; }
         [ForeignKey("SurveyCategoryID")]
         [InverseProperty("TechnicalCompetencies")]
         public virtual SurveyCategory SurveyCategory { get; set; }
@@ -857,26 +923,23 @@ namespace BQuick.Models
 
         [Required]
         [StringLength(50)]
-        public string SurveyCode { get; set; } // Unik, diindeks
+        public string SurveyCode { get; set; }
         [StringLength(255)]
-        public string SurveyName { get; set; }
+        public string? SurveyName { get; set; } // Made nullable
 
-        public int SurveyCategoryID { get; set; }
-        [ForeignKey("SurveyCategoryID")]
-        [InverseProperty("SurveyRequests")]
-        public virtual SurveyCategory SurveyCategory { get; set; }
 
         [StringLength(150)]
-        public string CustomerPICName { get; set; } // Nama PIC Customer di lokasi survei
-        public DateTime RequestedDateTime { get; set; } // Tanggal & Waktu survei yang diminta
-        public string LocationDetails { get; set; } // Detail lokasi survei
-        public string SalesNotesInternal { get; set; } // Catatan internal dari Sales untuk tim teknis
+        public string? CustomerPICName { get; set; } // Made nullable
+        public DateTime? RequestStartTime { get; set; }
+        public DateTime? RequestEndTime { get; set; }
+        public string? LocationDetails { get; set; } // Made nullable
+        public string? SalesNotesInternal { get; set; } // Made nullable
 
         public int SurveyStatusID { get; set; }
         [ForeignKey("SurveyStatusID")]
         public virtual SurveyStatus SurveyStatus { get; set; }
 
-        public int CreatedByUserID { get; set; }    // User Sales yang membuat request survei
+        public int CreatedByUserID { get; set; }
         [ForeignKey("CreatedByUserID")]
         [InverseProperty("CreatedSurveyRequests")]
         public virtual User CreatedByUser { get; set; }
@@ -884,14 +947,19 @@ namespace BQuick.Models
         public DateTime CreationTimestamp { get; set; } = DateTime.UtcNow;
 
         [InverseProperty("SurveyRequest")]
-        public virtual ICollection<SurveyPIC> AssignedPICs { get; set; } // Tim teknis yang ditugaskan
+        public virtual ICollection<SurveyPIC> AssignedPICs { get; set; }
         [InverseProperty("SurveyRequest")]
-        public virtual ICollection<SurveyInstance> SurveyInstances { get; set; } // Hasil pelaksanaan survei
+        public virtual ICollection<SurveyInstance> SurveyInstances { get; set; }
+
+        [InverseProperty("SurveyRequests")]
+        public virtual ICollection<SurveyCategory> SurveyCategories { get; set; }
+      
 
         public SurveyRequest()
         {
             AssignedPICs = new HashSet<SurveyPIC>();
             SurveyInstances = new HashSet<SurveyInstance>();
+            SurveyCategories = new HashSet<SurveyCategory>();
         }
     }
 
@@ -900,12 +968,12 @@ namespace BQuick.Models
         [Key]
         public int SurveyStatusID { get; set; }
         [Required, StringLength(100)]
-        public string Name { get; set; } // Not Yet, Waiting Tech Manager Approval, Waiting PIC Approval, Approved, On Progress, Report Submitted, etc.
+        public string Name { get; set; }
         [InverseProperty("SurveyStatus")]
         public virtual ICollection<SurveyRequest> SurveyRequests { get; set; } = new HashSet<SurveyRequest>();
     }
 
-    public class SurveyPIC // Teknisi yang ditugaskan untuk survei
+    public class SurveyPIC
     {
         [Key]
         public int SurveyPIC_ID { get; set; }
@@ -914,36 +982,36 @@ namespace BQuick.Models
         [InverseProperty("AssignedPICs")]
         public virtual SurveyRequest SurveyRequest { get; set; }
 
-        public int TechnicalUserID { get; set; }    // User teknisi
+        public int TechnicalUserID { get; set; }
         [ForeignKey("TechnicalUserID")]
         [InverseProperty("SurveyAssignments")]
         public virtual User TechnicalUser { get; set; }
 
-        public int PICApprovalStatusID { get; set; } // Status persetujuan dari teknisi
+        public int PICApprovalStatusID { get; set; }
         [ForeignKey("PICApprovalStatusID")]
         public virtual PICApprovalStatus PICApprovalStatus { get; set; }
     }
 
-    public class PICApprovalStatus // Tabel Lookup untuk status persetujuan PIC (Teknisi/Sales Meeting)
+    public class PICApprovalStatus
     {
         [Key]
         public int PICApprovalStatusID { get; set; }
         [Required, StringLength(50)]
-        public string Name { get; set; } // Pending, Accepted, Rejected
+        public string Name { get; set; }
         [InverseProperty("PICApprovalStatus")]
         public virtual ICollection<SurveyPIC> SurveyPICs { get; set; } = new HashSet<SurveyPIC>();
         [InverseProperty("PICApprovalStatus")]
         public virtual ICollection<MeetingPIC> MeetingPICs { get; set; } = new HashSet<MeetingPIC>();
     }
 
-    public class SurveyFormMaster // Master template untuk form survei
+    public class SurveyFormMaster
     {
         [Key]
         public int SurveyFormID { get; set; }
         [Required]
         [StringLength(150)]
-        public string FormName { get; set; } // e.g., Access Control Form, Network Assessment Form
-        public string FormTemplateDefinition { get; set; } // JSON/XML struktur form atau path ke template
+        public string FormName { get; set; }
+        public string? FormTemplateDefinition { get; set; } // Made nullable
         public bool IsActive { get; set; } = true;
         [InverseProperty("SurveyForm")]
         public virtual ICollection<SurveyInstance> SurveyInstances { get; set; }
@@ -953,7 +1021,7 @@ namespace BQuick.Models
         }
     }
 
-    public class SurveyInstance // Instance spesifik dari pelaksanaan survei
+    public class SurveyInstance
     {
         [Key]
         public int SurveyInstanceID { get; set; }
@@ -962,28 +1030,28 @@ namespace BQuick.Models
         [InverseProperty("SurveyInstances")]
         public virtual SurveyRequest SurveyRequest { get; set; }
 
-        public int SurveyFormID { get; set; }    // Form yang digunakan
+        public int SurveyFormID { get; set; }
         [ForeignKey("SurveyFormID")]
         [InverseProperty("SurveyInstances")]
         public virtual SurveyFormMaster SurveyForm { get; set; }
 
         public DateTime? ActualSurveyStartTime { get; set; }
         public DateTime? ActualSurveyEndTime { get; set; }
-        public string FilledFormData { get; set; } // Data hasil isian form (JSON/XML)
+        public string? FilledFormData { get; set; } // Made nullable
 
-        public int SubmittedByUserID { get; set; }    // Teknisi yang submit hasil survei
+        public int SubmittedByUserID { get; set; }
         [ForeignKey("SubmittedByUserID")]
         [InverseProperty("SubmittedSurveyInstances")]
         public virtual User SubmittedByUser { get; set; }
 
         [StringLength(50)]
-        public string SubmissionStatus { get; set; } // e.g., Draft, Submitted
+        public string? SubmissionStatus { get; set; } // Made nullable
         public DateTime SubmissionTimestamp { get; set; } = DateTime.UtcNow;
 
         [InverseProperty("SurveyInstance")]
-        public virtual ICollection<SurveyDocumentation> Documentations { get; set; } // Foto, denah, dll.
+        public virtual ICollection<SurveyDocumentation> Documentations { get; set; }
         [InverseProperty("SurveyInstance")]
-        public virtual ICollection<SurveyReportInstance> Reports { get; set; } // Laporan yang dihasilkan
+        public virtual ICollection<SurveyReportInstance> Reports { get; set; }
         public SurveyInstance()
         {
             Documentations = new HashSet<SurveyDocumentation>();
@@ -991,7 +1059,7 @@ namespace BQuick.Models
         }
     }
 
-    public class SurveyDocumentation // Dokumentasi pendukung survei
+    public class SurveyDocumentation
     {
         [Key]
         public int SurveyDocumentationID { get; set; }
@@ -1002,7 +1070,7 @@ namespace BQuick.Models
         [Required, StringLength(255)]
         public string FileName { get; set; }
         [Required]
-        public string FileURL { get; set; }
+        public string FileURL { get; set; } // Consider StringLength
         public int UploadedByUserID { get; set; }
         [ForeignKey("UploadedByUserID")]
         [InverseProperty("UploadedSurveyDocumentations")]
@@ -1010,14 +1078,14 @@ namespace BQuick.Models
         public DateTime UploadTimestamp { get; set; } = DateTime.UtcNow;
     }
 
-    public class ReportMaster // Master template untuk berbagai jenis laporan
+    public class ReportMaster
     {
         [Key]
         public int ReportMasterID { get; set; }
         [Required]
         [StringLength(150)]
-        public string ReportName { get; set; } // e.g., MLA (Material List Approval), BoQ, MoM (Minute of Meeting)
-        public string ReportTemplateDefinition { get; set; } // Struktur atau path ke template laporan
+        public string ReportName { get; set; }
+        public string? ReportTemplateDefinition { get; set; } // Made nullable
         public bool IsActive { get; set; } = true;
         [InverseProperty("ReportMaster")]
         public virtual ICollection<SurveyReportInstance> SurveyReportInstances { get; set; }
@@ -1031,7 +1099,7 @@ namespace BQuick.Models
         }
     }
 
-    public class SurveyReportInstance // Instance laporan hasil survei
+    public class SurveyReportInstance
     {
         [Key]
         public int SurveyReportInstanceID { get; set; }
@@ -1040,43 +1108,42 @@ namespace BQuick.Models
         [InverseProperty("Reports")]
         public virtual SurveyInstance SurveyInstance { get; set; }
 
-        public int ReportMasterID { get; set; }    // Jenis laporan yang digunakan
+        public int ReportMasterID { get; set; }
         [ForeignKey("ReportMasterID")]
         [InverseProperty("SurveyReportInstances")]
         public virtual ReportMaster ReportMaster { get; set; }
 
-        public string ReportContent { get; set; } // Konten laporan (JSON/XML/HTML atau path)
-        public int GeneratedByUserID { get; set; }    // User yang generate laporan
+        public string? ReportContent { get; set; } // Made nullable
+        public int GeneratedByUserID { get; set; }
         [ForeignKey("GeneratedByUserID")]
         [InverseProperty("GeneratedSurveyReports")]
         public virtual User GeneratedByUser { get; set; }
         public DateTime GeneratedTimestamp { get; set; } = DateTime.UtcNow;
 
-        public int ReportStatusID { get; set; } // Status laporan survei
+        public int ReportStatusID { get; set; }
         [ForeignKey("ReportStatusID")]
         public virtual ReportStatus ReportStatus { get; set; }
 
-        // Reviewer akhir dapat disimpan di sini untuk akses cepat, ApprovalHistory untuk audit lengkap
         public int? TechManagerReviewerID { get; set; }
         [ForeignKey("TechManagerReviewerID")]
         [InverseProperty("TechReviewedSurveyReports")]
-        public virtual User TechManagerReviewer { get; set; }
+        public virtual User? TechManagerReviewer { get; set; } // Made nullable
 
         public int? SalesManagerReviewerID { get; set; }
         [ForeignKey("SalesManagerReviewerID")]
         [InverseProperty("SalesReviewedSurveyReports")]
-        public virtual User SalesManagerReviewer { get; set; }
+        public virtual User? SalesManagerReviewer { get; set; } // Made nullable
 
         [InverseProperty("SurveyReportInstance")]
         public virtual ICollection<ApprovalHistory> ApprovalHistories { get; set; } = new HashSet<ApprovalHistory>();
     }
 
-    public class ReportStatus // Tabel Lookup untuk status laporan (Survey & Meeting)
+    public class ReportStatus
     {
         [Key]
         public int ReportStatusID { get; set; }
         [Required, StringLength(100)]
-        public string Name { get; set; } // Draft, SubmittedForReview, Approved, Rejected
+        public string Name { get; set; }
         [InverseProperty("ReportStatus")]
         public virtual ICollection<SurveyReportInstance> SurveyReportInstances { get; set; } = new HashSet<SurveyReportInstance>();
         [InverseProperty("ReportStatus")]
@@ -1084,6 +1151,7 @@ namespace BQuick.Models
     }
 
     // --- Entitas Terkait Meeting ---
+    [Index(nameof(MeetingCode), IsUnique = true)] // Added index
     public class MeetingRequest
     {
         [Key]
@@ -1094,31 +1162,32 @@ namespace BQuick.Models
         public virtual RFQ RFQ { get; set; }
         [Required]
         [StringLength(50)]
-        public string MeetingCode { get; set; } // Unik, diindeks
+        public string MeetingCode { get; set; }
         [StringLength(255)]
-        public string MeetingName { get; set; }
-        public int PrimaryPIC_UserID { get; set; }    // PIC Utama dari tim Sales
+        public string? MeetingName { get; set; } // Made nullable
+        public int PrimaryPIC_UserID { get; set; }
         [ForeignKey("PrimaryPIC_UserID")]
         [InverseProperty("LedMeetingRequests")]
         public virtual User PrimaryPIC_User { get; set; }
-        public DateTime RequestedDateTime { get; set; }
-        public string LocationDetails { get; set; } // Offline (Alamat) / Online (Link Meeting)
-        public string NotesInternal { get; set; } // Catatan internal
+        public DateTime? MeetingStartTime { get; set; }
+        public DateTime? MeetingEndTime { get; set; }
+        public string? LocationDetails { get; set; } // Made nullable
+        public string? NotesInternal { get; set; } // Made nullable
 
         public int MeetingStatusID { get; set; }
         [ForeignKey("MeetingStatusID")]
         public virtual MeetingStatus MeetingStatus { get; set; }
 
-        public int CreatedByUserID { get; set; }    // User yang membuat request meeting
+        public int CreatedByUserID { get; set; }
         [ForeignKey("CreatedByUserID")]
         [InverseProperty("CreatedMeetingRequests")]
         public virtual User CreatedByUser { get; set; }
         public DateTime CreationTimestamp { get; set; } = DateTime.UtcNow;
 
         [InverseProperty("MeetingRequest")]
-        public virtual ICollection<MeetingPIC> AssignedPICs { get; set; } // Peserta meeting dari internal
+        public virtual ICollection<MeetingPIC> AssignedPICs { get; set; }
         [InverseProperty("MeetingRequest")]
-        public virtual ICollection<MeetingReportInstance> Reports { get; set; }    // Laporan hasil meeting (MoM)
+        public virtual ICollection<MeetingReportInstance> Reports { get; set; }
 
         public MeetingRequest()
         {
@@ -1132,12 +1201,12 @@ namespace BQuick.Models
         [Key]
         public int MeetingStatusID { get; set; }
         [Required, StringLength(100)]
-        public string Name { get; set; } // Scheduled, Waiting PIC Approval, On Progress, Completed, Cancelled
+        public string Name { get; set; }
         [InverseProperty("MeetingStatus")]
         public virtual ICollection<MeetingRequest> MeetingRequests { get; set; } = new HashSet<MeetingRequest>();
     }
 
-    public class MeetingPIC // Peserta internal meeting
+    public class MeetingPIC
     {
         [Key]
         public int MeetingPIC_ID { get; set; }
@@ -1145,18 +1214,18 @@ namespace BQuick.Models
         [ForeignKey("MeetingRequestID")]
         [InverseProperty("AssignedPICs")]
         public virtual MeetingRequest MeetingRequest { get; set; }
-        public int UserID { get; set; }    // User peserta
+        public int UserID { get; set; }
         [ForeignKey("UserID")]
         [InverseProperty("MeetingAssignments")]
         public virtual User User { get; set; }
 
-        public int PICApprovalStatusID { get; set; } // Status konfirmasi kehadiran dari peserta
+        public int PICApprovalStatusID { get; set; }
         [ForeignKey("PICApprovalStatusID")]
         [InverseProperty("MeetingPICs")]
         public virtual PICApprovalStatus PICApprovalStatus { get; set; }
     }
 
-    public class MeetingReportInstance // MoM (Minute of Meeting)
+    public class MeetingReportInstance
     {
         [Key]
         public int MeetingReportInstanceID { get; set; }
@@ -1164,18 +1233,18 @@ namespace BQuick.Models
         [ForeignKey("MeetingRequestID")]
         [InverseProperty("Reports")]
         public virtual MeetingRequest MeetingRequest { get; set; }
-        public int ReportMasterID { get; set; } // Jenis laporan (MoM dari ReportMaster)
+        public int ReportMasterID { get; set; }
         [ForeignKey("ReportMasterID")]
         [InverseProperty("MeetingReportInstances")]
         public virtual ReportMaster ReportMaster { get; set; }
-        public string ReportContent { get; set; } // Konten MoM
-        public int GeneratedByUserID { get; set; }    // User yang membuat MoM
+        public string? ReportContent { get; set; } // Made nullable
+        public int GeneratedByUserID { get; set; }
         [ForeignKey("GeneratedByUserID")]
         [InverseProperty("GeneratedMeetingReports")]
         public virtual User GeneratedByUser { get; set; }
         public DateTime GeneratedTimestamp { get; set; } = DateTime.UtcNow;
 
-        public int ReportStatusID { get; set; } // Status MoM
+        public int ReportStatusID { get; set; }
         [ForeignKey("ReportStatusID")]
         [InverseProperty("MeetingReportInstances")]
         public virtual ReportStatus ReportStatus { get; set; }
@@ -1185,6 +1254,7 @@ namespace BQuick.Models
     }
 
     // --- Entitas Terkait Quotation ---
+    [Index(nameof(QuotationCode), IsUnique = true)] // Added index
     public class Quotation
     {
         [Key]
@@ -1192,7 +1262,7 @@ namespace BQuick.Models
 
         [Required]
         [StringLength(50)]
-        public string QuotationCode { get; set; } // Unik, diindeks
+        public string QuotationCode { get; set; }
 
         public int RFQID { get; set; }
         [ForeignKey("RFQID")]
@@ -1201,11 +1271,11 @@ namespace BQuick.Models
 
         public DateTime CreationDate { get; set; } = DateTime.UtcNow;
         public DateTime? ExpiryDate { get; set; }
-        public string DeliveryInfo { get; set; }
+        public string? DeliveryInfo { get; set; } // Made nullable
         [StringLength(10)]
         public string Currency { get; set; } = "IDR";
         [Column(TypeName = "decimal(18, 4)")]
-        public decimal? ExchangeRate { get; set; } // Kurs jika mata uang bukan IDR
+        public decimal? ExchangeRate { get; set; }
 
         public int PaymentTermID { get; set; }
         [ForeignKey("PaymentTermID")]
@@ -1220,7 +1290,6 @@ namespace BQuick.Models
         [InverseProperty("PreparedQuotations")]
         public virtual User PreparedByUser { get; set; }
 
-        // Kolom biaya detail
         [Column(TypeName = "decimal(18, 2)")]
         public decimal TotalUnitCost_Internal { get; set; }
         [Column(TypeName = "decimal(18, 2)")]
@@ -1238,38 +1307,39 @@ namespace BQuick.Models
         [Column(TypeName = "decimal(18, 4)")]
         public decimal OverallMarginPercentage_Internal { get; set; }
 
-        public string RemarkToCustomer { get; set; }
-        public string InternalNotes { get; set; }
-        public string FooterText { get; set; }
+        public string? RemarkToCustomer { get; set; } // Made nullable
+        public string? InternalNotes { get; set; } // Made nullable
+        public string? FooterText { get; set; } // Made nullable
 
         public int QuotationStatusID { get; set; }
         [ForeignKey("QuotationStatusID")]
         public virtual QuotationStatus QuotationStatus { get; set; }
 
-        public int? SplitParentQuotationID { get; set; }    // Jika quotation ini adalah hasil split
+        public int? SplitParentQuotationID { get; set; }
         [ForeignKey("SplitParentQuotationID")]
         [InverseProperty("SplitChildQuotations")]
-        public virtual Quotation SplitParentQuotation { get; set; }
+        public virtual Quotation? SplitParentQuotation { get; set; } // Made nullable
 
         [InverseProperty("SplitParentQuotation")]
         public virtual ICollection<Quotation> SplitChildQuotations { get; set; }
 
-        // FK Approver spesifik (untuk approver final atau akses cepat)
         public int? SalesManagerApproverID { get; set; }
         [ForeignKey("SalesManagerApproverID")]
         [InverseProperty("SMApprovedQuotations")]
-        public virtual User SalesManagerApprover { get; set; }
+        public virtual User? SalesManagerApprover { get; set; } // Made nullable
+
         public int? TechnicalManagerApproverID { get; set; }
         [ForeignKey("TechnicalManagerApproverID")]
         [InverseProperty("TMApprovedQuotations")]
-        public virtual User TechnicalManagerApprover { get; set; }
+        public virtual User? TechnicalManagerApprover { get; set; } // Made nullable
+
         public int? DirectorApproverID { get; set; }
         [ForeignKey("DirectorApproverID")]
         [InverseProperty("DirectorApprovedQuotations")]
-        public virtual User DirectorApprover { get; set; }
+        public virtual User? DirectorApprover { get; set; } // Made nullable
 
         public DateTime? SentToCustomerTimestamp { get; set; }
-        public string SentToCustomerProofURL { get; set; } // URL bukti pengiriman
+        public string? SentToCustomerProofURL { get; set; } // Made nullable
 
         public DateTime LastModifiedTimestamp { get; set; } = DateTime.UtcNow;
 
@@ -1291,7 +1361,7 @@ namespace BQuick.Models
         [Key]
         public int PaymentTermID { get; set; }
         [Required, StringLength(100)]
-        public string Name { get; set; } // 30 days, Cash In Advance, etc.
+        public string Name { get; set; }
         public bool IsActive { get; set; } = true;
         [InverseProperty("DefaultTermsOfPayment")]
         public virtual ICollection<Customer> CustomersAsDefault { get; set; } = new HashSet<Customer>();
@@ -1306,7 +1376,7 @@ namespace BQuick.Models
         [Key]
         public int ShipmentTermID { get; set; }
         [Required, StringLength(100)]
-        public string Name { get; set; } // DDP PEB, FOB Batam, etc.
+        public string Name { get; set; }
         public bool IsActive { get; set; } = true;
         [InverseProperty("ShipmentTerm")]
         public virtual ICollection<Quotation> Quotations { get; set; } = new HashSet<Quotation>();
@@ -1317,7 +1387,7 @@ namespace BQuick.Models
         [Key]
         public int QuotationStatusID { get; set; }
         [Required, StringLength(100)]
-        public string Name { get; set; } // Draft, Waiting SM Approval, Approved by Director, Sent to Customer
+        public string Name { get; set; }
         [InverseProperty("QuotationStatus")]
         public virtual ICollection<Quotation> Quotations { get; set; } = new HashSet<Quotation>();
     }
@@ -1336,11 +1406,11 @@ namespace BQuick.Models
         [InverseProperty("QuotationItems")]
         public virtual Item Item { get; set; }
 
-        public int? RFQ_ItemID { get; set; }    // Link ke item RFQ asal
+        public int? RFQ_ItemID { get; set; }
         [ForeignKey("RFQ_ItemID")]
-        public virtual RFQ_Item RFQ_Item { get; set; }
+        public virtual RFQ_Item? RFQ_Item { get; set; } // Made nullable
 
-        public string DescriptionOverride { get; set; } // Jika deskripsi di quotation beda dari master item
+        public string? DescriptionOverride { get; set; } // Made nullable
         [Column(TypeName = "decimal(18, 2)")]
         public decimal Quantity { get; set; }
         [StringLength(20)]
@@ -1349,46 +1419,45 @@ namespace BQuick.Models
         [Column(TypeName = "decimal(18, 2)")]
         public decimal UnitCost_Internal { get; set; }
 
-        // PPN bisa berupa persentase dari UnitCost atau nilai tetap
-        [Column(TypeName = "decimal(5, 4)")] // Untuk persentase (misal 0.11 untuk 11%)
+        [Column(TypeName = "decimal(5, 4)")]
         public decimal? PPN_Percentage { get; set; }
         [Column(TypeName = "decimal(18, 2)")]
-        public decimal? PPN_FixedAmount { get; set; } // Jika PPN adalah nilai tetap per unit
+        public decimal? PPN_FixedAmount { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
-        public decimal? Endorsement_Amount { get; set; } // Biaya endorsement per unit
+        public decimal? Endorsement_Amount { get; set; }
         [Column(TypeName = "decimal(18, 2)")]
-        public decimal? Freight_AmountPerUnit { get; set; } // Biaya pengiriman per unit
+        public decimal? Freight_AmountPerUnit { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
-        public decimal TotalCostPerUnit_Internal { get; set; } // Kalkulasi: UnitCost + PPN_calc + Endorsement + Freight
+        public decimal TotalCostPerUnit_Internal { get; set; }
         [Column(TypeName = "decimal(18, 2)")]
-        public decimal QuotePricePerUnit_Customer { get; set; } // Harga jual ke customer per unit
+        public decimal QuotePricePerUnit_Customer { get; set; }
         [Column(TypeName = "decimal(18, 2)")]
-        public decimal TotalQuotePrice_Customer { get; set; } // Kalkulasi: QuotePricePerUnit * Quantity
+        public decimal TotalQuotePrice_Customer { get; set; }
         [Column(TypeName = "decimal(18, 2)")]
-        public decimal MarginAmount_Internal { get; set; } // Kalkulasi: QuotePricePerUnit_Customer - TotalCostPerUnit_Internal
+        public decimal MarginAmount_Internal { get; set; }
         [Column(TypeName = "decimal(18, 4)")]
-        public decimal MarginPercentage_Internal { get; set; } // Kalkulasi
+        public decimal MarginPercentage_Internal { get; set; }
 
         [StringLength(100)]
-        public string SalesWarranty { get; set; } // Garansi yang ditawarkan di quotation
-        public bool DisplayWithDetailInternal { get; set; } // Apakah detail internal (cost, margin) ditampilkan di versi internal
-        public int DisplaySequence { get; set; } // Urutan tampilan item di quotation
+        public string? SalesWarranty { get; set; } // Made nullable
+        public bool DisplayWithDetailInternal { get; set; }
+        public int DisplaySequence { get; set; }
     }
 
     // --- Entitas Generik untuk Persetujuan & Notifikasi ---
-    public class ApprovalHistory // Mencatat semua histori approval
+    public class ApprovalHistory
     {
         [Key]
         public int ApprovalHistoryID { get; set; }
 
         [Required]
         [StringLength(100)]
-        public string EntityType { get; set; } // "Quotation", "SurveyReportInstance", "MeetingReportInstance", "Customer" etc.
+        public string EntityType { get; set; }
 
         [Required]
-        public int EntityID { get; set; } // FK ke entitas terkait (QuotationID, SurveyReportInstanceID, dll.)
+        public int EntityID { get; set; }
 
         public int ApproverUserID { get; set; }
         [ForeignKey("ApproverUserID")]
@@ -1396,32 +1465,30 @@ namespace BQuick.Models
         public virtual User ApproverUser { get; set; }
 
         [StringLength(100)]
-        public string ApproverRoleAtTime { get; set; } // Peran approver saat itu
+        public string? ApproverRoleAtTime { get; set; } // Made nullable
 
-        public int ApprovalDecisionStatusID { get; set; } // Keputusan approval
+        public int ApprovalDecisionStatusID { get; set; }
         [ForeignKey("ApprovalDecisionStatusID")]
         public virtual ApprovalDecisionStatus ApprovalDecisionStatus { get; set; }
 
-        public string Remarks { get; set; } // Catatan dari approver
+        public string? Remarks { get; set; } // Made nullable
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
-        public int StepOrder { get; set; } // Urutan langkah approval jika multi-langkah
+        public int StepOrder { get; set; }
 
-        // Navigasi balik ke entitas spesifik (opsional, tergantung kebutuhan query)
         [InverseProperty("ApprovalHistories")]
-        public virtual Quotation Quotation { get; set; }
+        public virtual Quotation? Quotation { get; set; } // Made nullable
         [InverseProperty("ApprovalHistories")]
-        public virtual SurveyReportInstance SurveyReportInstance { get; set; }
+        public virtual SurveyReportInstance? SurveyReportInstance { get; set; } // Made nullable
         [InverseProperty("ApprovalHistories")]
-        public virtual MeetingReportInstance MeetingReportInstance { get; set; }
-        // Tambahkan entitas lain yang memerlukan approval jika perlu
+        public virtual MeetingReportInstance? MeetingReportInstance { get; set; } // Made nullable
     }
 
-    public class ApprovalDecisionStatus // Tabel Lookup untuk keputusan approval
+    public class ApprovalDecisionStatus
     {
         [Key]
         public int ApprovalDecisionStatusID { get; set; }
         [Required, StringLength(50)]
-        public string Name { get; set; } // Approved, Rejected, Requested Revision, Pending, etc.
+        public string Name { get; set; }
         [InverseProperty("ApprovalDecisionStatus")]
         public virtual ICollection<ApprovalHistory> ApprovalHistories { get; set; } = new HashSet<ApprovalHistory>();
     }
@@ -1437,25 +1504,85 @@ namespace BQuick.Models
         [Required]
         public string Message { get; set; }
         [StringLength(100)]
-        public string NotificationType { get; set; } // NewTask, ApprovalRequest, Information, Reminder
+        public string? NotificationType { get; set; } // Made nullable
         [StringLength(100)]
-        public string RelatedEntityType { get; set; } // RFQ, Quotation, SurveyRequest, etc.
-        public int? RelatedEntityID { get; set; } // ID dari entitas terkait
-        public string NavigationURL { get; set; } // URL untuk navigasi langsung ke item terkait
+        public string? RelatedEntityType { get; set; } // Made nullable
+        public int? RelatedEntityID { get; set; }
+        public string? NavigationURL { get; set; } // Made nullable
         public bool IsRead { get; set; } = false;
         public DateTime CreationTimestamp { get; set; } = DateTime.UtcNow;
     }
 
-    public class Setting // Untuk konfigurasi aplikasi
+    public class Setting
     {
         [Key]
         public int SettingID { get; set; }
         [Required, StringLength(100)]
-        public string SettingGroup { get; set; } // e.g., RFQOptions, EmailConfig, ApprovalFlow
+        public string SettingGroup { get; set; }
         [Required, StringLength(100)]
-        public string SettingKey { get; set; } // e.g., DefaultDueDateDays, SMTPHost
+        public string SettingKey { get; set; }
         public string SettingValue { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; } // Made nullable
         public bool IsActive { get; set; } = true;
+    }
+
+    public class LoginViewModel
+    {
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Invalid Email Address.")]
+        public string Email { get; set; }
+
+        [Required(ErrorMessage = "Password is required.")]
+        [DataType(DataType.Password)]
+        public string Password { get; set; }
+        [Display(Name = "Remember Me")]
+        public bool RememberMe { get; set; }
+    }
+
+    public class RegisterViewModel
+    {
+        [Required(ErrorMessage = "Username is required.")]
+        [Display(Name = "Username")]
+        public string Username { get; set; }
+
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Invalid Email Address.")]
+        [Display(Name = "Email")]
+        public string Email { get; set; }
+
+        [Required(ErrorMessage = "Full Name is required.")]
+        [Display(Name = "Full Name")]
+        public string FullName { get; set; }
+
+        [Required(ErrorMessage = "Password is required.")]
+        [DataType(DataType.Password)]
+        [MinLength(6, ErrorMessage = "Password must be at least 6 characters.")]
+        [Display(Name = "Password")]
+        public string Password { get; set; }
+
+        [Required(ErrorMessage = "Confirm Password is required.")]
+        [DataType(DataType.Password)]
+        [Compare("Password", ErrorMessage = "Passwords do not match.")]
+        [Display(Name = "Confirm Password")]
+        public string ConfirmPassword { get; set; }
+    }
+
+    public class ChangePasswordViewModel
+    {
+        [Required]
+        [DataType(DataType.Password)]
+        [Display(Name = "Current password")]
+        public string OldPassword { get; set; }
+
+        [Required]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [DataType(DataType.Password)]
+        [Display(Name = "New password")]
+        public string NewPassword { get; set; }
+
+        [DataType(DataType.Password)]
+        [Display(Name = "Confirm new password")]
+        [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
+        public string ConfirmPassword { get; set; }
     }
 }

@@ -1895,36 +1895,39 @@ document.addEventListener("DOMContentLoaded", function () {
     if (addRowBtnItem) {
         addRowBtnItem.addEventListener('click', function () {
             const tbody = document.getElementById('itemListTableBody');
-            const rowCount = tbody.querySelectorAll('tr').length + 1;
+            // Dapatkan indeks untuk baris baru SEBELUM baris ditambahkan
+            const newIndex = tbody.querySelectorAll('tr').length;
             const newRow = document.createElement('tr');
 
+
             newRow.innerHTML = `
-                <td class="text-center" style="font-weight: 500;">${rowCount}</td>
-                <td class="name">
-                    <div class="wrapp item-dropdown" style="width: 100%;">
-                        <div class="select-btn d-flex align-items-center">
-                            <span></span>
-                            <i class='bx bx-chevron-down'></i>
-                        </div>
-                        <div class="content-search">
-                            <div class="search">
-                                <i class="bx bx-search-alt-2"></i>
-                                <input type="text" placeholder="Search" />
-                            </div>
-                            <ul class="option" style="margin-bottom: 10px;"></ul>
-                        </div>
+            <td class="text-center" style="font-weight: 500;">${newIndex + 1}</td>
+            <td class="name">
+                <input type="hidden" name="ItemListSectionItems[${newIndex}].ItemID" value="">
+                <div class="wrapp item-dropdown" style="width: 100%;">
+                    <div class="select-btn d-flex align-items-center">
+                        <span></span>
+                        <i class='bx bx-chevron-down'></i>
                     </div>
-                </td>
-                <td class="desc"><input type='text' class='size form-control1'></td>
-                <td class="qty"><input type='number' class='size text-center form-control1' oninput="updateRowAmount(this)"></td>
-                <td class="uom"><input type='text' class='size form-control1'></td>
-                <td class="price"><input type='number' class='size form-control1' oninput="updateRowAmount(this)"></td>
-                <td class="notes"><input type='text' class='size form-control1'></td>
-                <td class="details"><input type='text' class='size form-control1'></td>
-                <td class="warranty"><input type='text' class='size form-control1'></td>
-                <td class="amount"><span class="item-price-amount"></span></td>
-                <td class="delete"><button type="button" class="btn btn-remove-row-itemlist"><i class='bx bx-trash'></i></button></td>
-            `;
+                    <div class="content-search">
+                        <div class="search">
+                            <i class="bx bx-search-alt-2"></i>
+                            <input type="text" placeholder="Search" />
+                        </div>
+                        <ul class="option" style="margin-bottom: 10px;"></ul>
+                    </div>
+                </div>
+            </td>
+            <td class="desc"><input type='text' class='size form-control1' name="ItemListSectionItems[${newIndex}].ItemDescription"></td>
+            <td class="qty"><input type='number' class='size text-center form-control1' name="ItemListSectionItems[${newIndex}].Quantity" oninput="updateRowAmount(this)"></td>
+            <td class="uom"><input type='text' class='size form-control1' name="ItemListSectionItems[${newIndex}].UoM"></td>
+            <td class="price"><input type='number' class='size form-control1' name="ItemListSectionItems[${newIndex}].TargetUnitPrice" oninput="updateRowAmount(this)"></td>
+            <td class="notes"><input type='text' class='size form-control1' name="ItemListSectionItems[${newIndex}].Notes"></td>
+            <td class="details"><input type='text' class='size form-control1' name="ItemListSectionItems[${newIndex}].Details"></td>
+            <td class="warranty"><input type='text' class='size form-control1' name="ItemListSectionItems[${newIndex}].SalesWarranty"></td>
+            <td class="amount"><span class="item-price-amount"></span></td>
+            <td class="delete"><button type="button" class="btn btn-remove-row-itemlist"><i class='bx bx-trash'></i></button></td>
+        `;
 
             tbody.appendChild(newRow);
             renumberItemListTable();
@@ -2097,6 +2100,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 const addOnDesc = addOnRow.querySelector('td.desc input').value.trim();
                 const addOnQty = addOnRow.querySelector('td.qty input').value.trim();
                 const addOnUom = addOnRow.querySelector('td.uom input').value.trim();
+                const addOnPrice = addOnRow.querySelector('td.price input')?.value.trim() || 0;
+
 
                 const newAddOnRow = document.createElement('tr');
                 newAddOnRow.classList.add('addon-row');
@@ -2655,15 +2660,29 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
 
                     const addOnCheckboxes = document.querySelectorAll('#add-ons-table-body .add-on-checkbox:checked');
+
                     addOnCheckboxes.forEach(checkbox => {
                         const row = checkbox.closest('tr');
                         if (!row) return;
+
+                        // Ambil data add-on seperti biasa
                         const addOnName = row.cells[2].textContent.trim();
                         const addOnDesc = row.cells[3].textContent.trim();
-                        const addOnQty = quantity;
+                        const addOnQty = quantity; // Tetap menggunakan kuantitas dari item utama
                         const addOnUom = row.cells[5].textContent.trim();
-                        const addOnPrice = parseCurrency(row.cells[6].textContent);
-                        addToRequestPurchasing(addOnName, addOnDesc, addOnQty, reason, notes, addOnUom, true);
+
+                        // 1. Kumpulkan semua data add-on ke dalam SATU OBJEK
+                        const addOnItemData = {
+                            name: addOnName,
+                            description: addOnDesc,
+                            quantity: addOnQty,
+                            uom: addOnUom,
+                            reason: reason, // 'reason' dari item utama
+                            notes: notes    // 'notes' dari item utama
+                        };
+
+                        // 2. Panggil fungsi dengan SATU OBJEK tersebut
+                        addToRequestPurchasing(addOnItemData);
                     });
 
                     renumberReqTable();
@@ -2710,30 +2729,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         const newRow = document.createElement('tr');
                         newRow.classList.add('addon-row');
+                        const newAddonIndex = itemListTableBody.querySelectorAll('tr').length;
                         newRow.innerHTML = `
                             <td></td>
                             <td class="name">
+                                <input type="hidden" name="ItemListSectionItems[${newAddonIndex}].ItemID" value="">
                                 <div class="wrapp item-dropdown" style="width: 100%;">
-                                    <div class="select-btn d-flex align-items-center">
-                                        <span>${addOnName}</span>
-                                        <i class='bx bx-chevron-down'></i>
-                                    </div>
+                                    <div class="select-btn d-flex align-items-center"><span>${addOnName}</span><i class='bx bx-chevron-down'></i></div>
                                     <div class="content-search">
-                                        <div class="search">
-                                            <i class="bx bx-search-alt-2"></i>
-                                            <input type="text" placeholder="Search" />
-                                        </div>
+                                        <div class="search"><i class="bx bx-search-alt-2"></i><input type="text" placeholder="Search" /></div>
                                         <ul class="option" style="margin-bottom: 10px;"></ul>
                                     </div>
                                 </div>
                             </td>
-                            <td class="desc"><input type='text' class='size form-control1' value="${addOnDesc}"></td>
-                            <td class="qty"><input type='number' class='size text-center form-control1' value="${addOnQty}"></td>
-                            <td class="uom"><input type='text' class='size form-control1' value="${addOnUom}"></td>
-                            <td class="price"><input type='number' class='size form-control1' value="${addOnPrice}"></td>
-                            <td class="notes"><input type='text' class='size form-control1'></td>
-                            <td class="details"><input type='text' class='size form-control1'></td>
-                            <td class="warranty"><input type='text' class='size form-control1'></td>
+                            <td class="desc"><input type='text' class='size form-control1' name="ItemListSectionItems[${newAddonIndex}].ItemDescription" value="${addOnDesc}"></td>
+                            <td class="qty"><input type='number' class='size text-center form-control1' name="ItemListSectionItems[${newAddonIndex}].Quantity" value="${addOnQty}"></td>
+                            <td class="uom"><input type='text' class='size form-control1' name="ItemListSectionItems[${newAddonIndex}].UoM" value="${addOnUom}"></td>
+                            <td class="price"><input type='number' class='size form-control1' name="ItemListSectionItems[${newAddonIndex}].TargetUnitPrice" value="${addOnPrice}"></td>
+                            <td class="notes"><input type='text' class='size form-control1' name="ItemListSectionItems[${newAddonIndex}].Notes"></td>
+                            <td class="details"><input type='text' class='size form-control1' name="ItemListSectionItems[${newAddonIndex}].Details"></td>
+                            <td class="warranty"><input type='text' class='size form-control1' name="ItemListSectionItems[${newAddonIndex}].SalesWarranty"></td>
                             <td class="amount"><span class="item-price-amount"></span></td>
                             <td class="delete"><button type="button" class="btn btn-remove-row-itemlist"><i class='bx bx-trash'></i></button></td>
                         `;
@@ -2876,16 +2891,17 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll('.survey-pic-dropdown').forEach(setupMultiSelectDropdown);
     document.querySelectorAll('.meeting-pic-dropdown').forEach(setupMultiSelectDropdown);
 
-    const surveyTableBody = document.getElementById("surveyTableBody");
+/*    const surveyTableBody = document.getElementById("surveyTableBody");
     const addRowBtnSurvey = document.getElementById("addRowBtnSurvey");
 
     if (addRowBtnSurvey) {
         addRowBtnSurvey.addEventListener("click", function () {
             const tbody = document.getElementById("surveyTableBody");
             const rows = tbody.querySelectorAll("tr");
+            const newIndex = tbody.querySelectorAll("tr").length;
             const lastRow = rows[rows.length - 1];
 
-            const categoryChecked = lastRow.querySelectorAll('.survey-category-dropdown .survey-list-checkboxes:checked').length > 0;
+            *//*const categoryChecked = lastRow.querySelectorAll('.survey-category-dropdown .survey-list-checkboxes:checked').length > 0;
             const surveyName = lastRow.querySelector('.survey-name input')?.value.trim();
             const picChecked = lastRow.querySelectorAll('.survey-pic-dropdown .survey-list-checkboxes:checked').length > 0;
             const customerPic = lastRow.querySelector('.survey-customer-pic input')?.value.trim();
@@ -2903,106 +2919,86 @@ document.addEventListener("DOMContentLoaded", function () {
                 !notes
             ) {
                 return;
+            }*//*
+
+            // --- MEMBUAT OPSI UNTUK DROPDOWN CATEGORY ---
+            let categoryOptionsHtml = '';
+            if (typeof surveyCategoriesFromServer !== 'undefined') {
+                surveyCategoriesFromServer.forEach(cat => {
+                    categoryOptionsHtml += `
+                    <li>
+                        <input type="checkbox" class="survey-list-checkboxes me-2" name="SurveySectionItems[${newIndex}].SurveyCategoryIDs" value="${cat.value}">
+                        <span>${cat.text}</span>
+                    </li>`;
+                });
+            }
+
+            // --- MEMBUAT OPSI UNTUK DROPDOWN PIC ---
+            let picOptionsHtml = '';
+            // Gunakan 'surveyUsersFromServer' yang baru, bukan 'usersFromServer'
+            if (typeof surveyUsersFromServer !== 'undefined') {
+                surveyUsersFromServer.forEach(user => {
+                    picOptionsHtml += `
+                    <li>
+                        <input type="checkbox" class="survey-list-checkboxes me-2" name="SurveySectionItems[${newIndex}].TechnicalUserIDs" value="${user.value}">
+                        <span>${user.text}</span>
+                    </li>`;
+                });
             }
 
             const rowCount = surveyTableBody.querySelectorAll("tr").length;
             const newRow = document.createElement("tr");
             newRow.innerHTML = `
-            <td class="text-center" style="font-weight: 500;">${rowCount + 1}</td>
+            <td class="text-center" style="font-weight: 500;">${newIndex + 1}</td>
             <td class="survey-code">None</td>
             <td class="survey-category">
                 <div class="wrapp survey-category-dropdown">
                     <div class="select-btn py-0">
-                        <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" />
+                        <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" placeholder="Pilih Kategori"/>
                         <i class='bx bx-chevron-down'></i>
                     </div>
-                    <div class="content-search">
-                        <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
-                            <li>
-                                <input type="checkbox" class="survey-list-checkboxes me-2" value="Network Security">
-                                <span>Network Security</span>
-                            </li>
-                            <li>
-                                <input type="checkbox" class="survey-list-checkboxes me-2" value="Mechanical & Electrical">
-                                <span>Mechanical & Electrical</span>
-                            </li>
-                            <li>
-                                <input type="checkbox" class="survey-list-checkboxes me-2" value="Security Access">
-                                <span>Security Access</span>
-                            </li>
-                            <li>
-                                <input type="checkbox" class="survey-list-checkboxes me-2" value="Endpoint">
-                                <span>Endpoint</span>
-                            </li>
-                            <li>
-                                <input type="checkbox" class="survey-list-checkboxes me-2" value="Data Center">
-                                <span>Data Center</span>
-                            </li>
-                        </ul>
-                    </div>
+                    <div class="content-search"><ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">${categoryOptionsHtml}</ul></div>
                 </div>
             </td>
-            <td class="survey-name"><input type="text" class="size form-control1"></td>
+            <td class="survey-name"><input type="text" class="size form-control1" name="SurveySectionItems[${newIndex}].SurveyName"></td>
             <td class="survey-pic">
                 <div class="wrapp survey-pic-dropdown">
                     <div class="select-btn py-0">
-                        <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" />
+                        <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" placeholder="Pilih PIC"/>
                         <i class='bx bx-chevron-down'></i>
                     </div>
-                    <div class="content-search">
-                        <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
-                            <li>
-                                <input type="checkbox" class="survey-list-checkboxes me-2" value="Ance">
-                                <span>Ance</span>
-                            </li>
-                            <li>
-                                <input type="checkbox" class="survey-list-checkboxes me-2" value="Feggy">
-                                <span>Feggy</span>
-                            </li>
-                            <li>
-                                <input type="checkbox" class="survey-list-checkboxes me-2" value="Geo">
-                                <span>Geo</span>
-                            </li>
-                            <li>
-                                <input type="checkbox" class="survey-list-checkboxes me-2" value="Nuriel">
-                                <span>Nuriel</span>
-                            </li>
-                            <li>
-                                <input type="checkbox" class="survey-list-checkboxes me-2" value="Robby">
-                                <span>Robby</span>
-                            </li>
-                        </ul>
-                    </div>
+                    <div class="content-search"><ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">${picOptionsHtml}</ul></div>
                 </div>
             </td>
-            <td class="survey-customer-pic"><input type="text" class="size form-control1"></td>
+            <td class="survey-customer-pic"><input type="text" class="size form-control1" name="SurveySectionItems[${newIndex}].CustomerPICName"></td>
             <td class="survey-req-date-time">
+                <input type="hidden" asp-for="SurveySectionItems[${newIndex}].RequestedDateTime" />
                 <div class="d-flex flex-column gap-1">
-                    <input type="date" class="form-control form-control-sm survey-date">
+                    <input type="date" class="form-control form-control-sm survey-date" 
+                           value="@Model.SurveySectionItems[${newIndex}].RequestedDateTime.ToString("yyyy-MM-dd")">
                     <div class="d-flex gap-1 align-items-center">
-                        <input type="time" class="form-control form-control-sm survey-time-start">
+                        <input type="time" class="form-control form-control-sm survey-time-start" 
+                               value="@Model.SurveySectionItems[${newIndex}].RequestedDateTime.ToString("HH:mm")">
                         <span>-</span>
                         <input type="time" class="form-control form-control-sm survey-time-end">
                     </div>
-                    <input type="text" class="form-control form-control-sm survey-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;">
                 </div>
             </td>
-            <td class="survey-detail-location"><input type="text" class="size form-control1"></td>
-            <td class="survey-notes"><input type="text" class="size form-control1"></td>
-            <td class="survey-status">
-                <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                    <span id="not-yet" class="rounded-pill status">Not Yet</span>
-                </div>
-            </td>
+            <td class="survey-detail-location"><input type="text" class="size form-control1" name="SurveySectionItems[${newIndex}].LocationDetails"></td>
+            <td class="survey-notes"><input type="text" class="size form-control1" name="SurveySectionItems[${newIndex}].SalesNotesInternal"></td>
+            <td class="survey-status"><div class="d-flex justify-content-center align-items-center flex-column gap-1"><span class="rounded-pill status">Open</span></div></td>
             <td class="survey-actions">
                 <div class="d-flex justify-content-center">
-                    <button type="button" class="btn"><i class='bx bx-file'></i> </button>
+                    <button type="button" class="btn"><i class='bx bx-file'></i></button>
                     <button type="button" class="btn btn-remove-row-survey"><i class='bx bx-trash'></i></button>
                 </div>
             </td>
         `;
             tbody.appendChild(newRow);
             renumberTableRows("surveyTableBody");
+
+            setupMultiSelectDropdown(newRow.querySelector('.survey-category-dropdown'));
+            setupMultiSelectDropdown(newRow.querySelector('.survey-pic-dropdown'));
 
             const newCategoryDropdown = newRow.querySelector('.survey-category-dropdown');
             if (newCategoryDropdown) setupMultiSelectDropdown(newCategoryDropdown);
@@ -3112,7 +3108,205 @@ document.addEventListener("DOMContentLoaded", function () {
                 display.value = '';
             }
         }
+    });*/
+
+    // Di dalam file wwwroot/js/site.js, di dalam DOMContentLoaded
+
+    // Hapus fungsi setupMultiSelectDropdown yang lama dan semua event listener
+    // yang berhubungan dengan surveyTableBody. Ganti dengan kode di bawah ini.
+
+    // =======================================================================
+    // BLOK KODE BARU UNTUK MENGELOLA SEMUA INTERAKSI TABEL SURVEY
+    // =======================================================================
+
+    const surveyTableBody = document.getElementById("surveyTableBody");
+
+    // Fungsi ini HANYA untuk memperbarui teks di display dropdown
+    function updateMultiSelectDisplay(wrapp) {
+        const displayInput = wrapp.querySelector('.select-btn input[type="text"]');
+        const checkboxes = wrapp.querySelectorAll('.option .survey-list-checkboxes:checked');
+
+        const selectedTexts = Array.from(checkboxes).map(cb => {
+            return cb.nextElementSibling?.textContent.trim();
+        });
+
+        if (displayInput) {
+            displayInput.value = selectedTexts.join(', ');
+        }
+    }
+
+    // Fungsi ini HANYA untuk menangani klik buka/tutup dropdown
+    function handleDropdownToggle(e) {
+        const selectBtn = e.target.closest('.select-btn');
+        if (!selectBtn) return;
+
+        const wrapp = selectBtn.closest('.wrapp');
+        if (!wrapp) return;
+
+        e.stopPropagation();
+        const isActive = wrapp.classList.contains('active');
+        closeAllDropdowns(); // Gunakan fungsi global Anda
+        if (!isActive) {
+            wrapp.classList.add('active');
+        }
+    }
+
+    // SATU EVENT LISTENER UTAMA untuk seluruh tabel survey
+    if (surveyTableBody) {
+        surveyTableBody.addEventListener('click', function (e) {
+            // Menangani buka/tutup dropdown
+            handleDropdownToggle(e);
+
+            // Menangani klik pada checkbox untuk update display
+            if (e.target.classList.contains('survey-list-checkboxes')) {
+                const wrapp = e.target.closest('.wrapp');
+                updateMultiSelectDisplay(wrapp);
+            }
+
+            // Menangani tombol hapus baris
+            if (e.target.closest('.btn-remove-row-survey')) {
+                e.target.closest('tr').remove();
+                renumberTableRows('surveyTableBody');
+            }
+        });
+
+        // Menangani perubahan pada input tanggal & waktu
+        surveyTableBody.addEventListener('change', function (e) {
+            if (e.target.matches('.survey-date, .survey-time-start, .survey-time-end')) {
+                const row = e.target.closest('tr');
+                if (!row) return;
+
+                // Ambil semua elemen input yang relevan dari baris tersebut
+                const dateInput = row.querySelector('.survey-date');
+                const startTimeInput = row.querySelector('.survey-time-start');
+                const endTimeInput = row.querySelector('.survey-time-end');
+                const displayInput = row.querySelector('.survey-date-display');
+
+                // Dapatkan kedua input tersembunyi berdasarkan atribut 'name' mereka
+                const hiddenStartInput = row.querySelector('input[name*="RequestStartTime"]');
+                const hiddenEndInput = row.querySelector('input[name*="RequestEndTime"]');
+
+                let isValid = true;
+                // 1. Selalu cari dan hapus pesan error yang mungkin sudah ada di baris ini
+                const existingError = row.querySelector('.invalid-feedback');
+                if (existingError) {
+                    existingError.remove();
+                }
+                endTimeInput.classList.remove('is-invalid');
+
+                // 2. Lakukan perbandingan jika kedua input waktu sudah diisi
+                if (startTimeInput.value && endTimeInput.value) {
+                    if (endTimeInput.value < startTimeInput.value) {
+                        // Beri tanda visual pada input yang salah
+                        endTimeInput.classList.add('is-invalid');
+
+                        // Buat elemen div untuk pesan error
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'invalid-feedback d-block';
+                        errorDiv.innerText = '*Waktu selesai tidak boleh lebih awal dari waktu mulai.';
+
+                        // 3. Tempatkan pesan error TEPAT DI BAWAH input display tanggal
+                        if (displayInput) {
+                            displayInput.after(errorDiv);
+                        }
+
+                        isValid = false; // Tandai sebagai tidak valid
+                    }
+                }
+
+                // Hanya update nilai jika valid
+                if (isValid) {
+                    // Update hidden input untuk Waktu Mulai
+                    if (dateInput?.value && startTimeInput?.value && hiddenStartInput) {
+                        hiddenStartInput.value = `${dateInput.value}T${startTimeInput.value}`;
+                    }
+
+                    // Update hidden input untuk Waktu Selesai
+                    if (dateInput?.value && endTimeInput?.value && hiddenEndInput) {
+                        hiddenEndInput.value = `${dateInput.value}T${endTimeInput.value}`;
+                    }
+
+                    // Update teks display jika semua input valid dan terisi
+                    if (displayInput && dateInput.value && startTimeInput.value && endTimeInput.value) {
+                        displayInput.value = formatSurveyDateTime(dateInput.value, startTimeInput.value, endTimeInput.value);
+                    } else if (displayInput) {
+                        displayInput.value = '';
+                    }
+                } else {
+                    // Jika tidak valid, kosongkan nilai yang salah dan display
+                    if (displayInput) displayInput.value = '';
+                    if (hiddenEndInput) hiddenEndInput.value = '';
+                }
+            }
+        });
+    }
+
+
+    // Logika untuk tombol "Add Survey"
+    const addRowBtnSurvey = document.getElementById("addRowBtnSurvey");
+    if (addRowBtnSurvey) {
+        addRowBtnSurvey.addEventListener("click", function () {
+            const tbody = document.getElementById("surveyTableBody");
+            const newIndex = tbody.querySelectorAll("tr").length;
+            const newRow = document.createElement("tr");
+
+            let categoryOptionsHtml = (surveyCategoriesFromServer || []).map(cat => `
+            <li>
+                <label class="posisi-sejajar">
+                    <input type="checkbox" class="survey-list-checkboxes me-2" name="SurveySectionItems[${newIndex}].SurveyCategoryIDs" value="${cat.value}">
+                    <span>${cat.text}</span>
+                </label>
+            </li>`).join('');
+
+            // --- REVISI DI SINI: Tambahkan <label> ---
+            let picOptionsHtml = (surveyUsersFromServer || []).map(user => `
+            <li>
+                <label class="posisi-sejajar">
+                    <input type="checkbox" class="survey-list-checkboxes me-2" name="SurveySectionItems[${newIndex}].TechnicalUserIDs" value="${user.value}">
+                    <span>${user.text}</span>
+                </label>
+            </li>`).join('');
+
+            newRow.innerHTML = `
+            <td class="text-center" style="font-weight: 500;">${newIndex + 1}</td>
+            <td class="survey-code">None</td>
+            <td class="survey-category">
+                <div class="wrapp survey-category-dropdown"><div class="select-btn py-0"><input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" placeholder="Pilih Kategori"/><i class='bx bx-chevron-down'></i></div><div class="content-search"><ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">${categoryOptionsHtml}</ul></div></div>
+            </td>
+            <td class="survey-name"><input type="text" class="size form-control1" name="SurveySectionItems[${newIndex}].SurveyName"></td>
+            <td class="survey-pic">
+                <div class="wrapp survey-pic-dropdown"><div class="select-btn py-0"><input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" placeholder="Pilih PIC"/><i class='bx bx-chevron-down'></i></div><div class="content-search"><ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">${picOptionsHtml}</ul></div></div>
+            </td>
+            <td class="survey-customer-pic"><input type="text" class="size form-control1" name="SurveySectionItems[${newIndex}].CustomerPICName"></td>
+            <td class="survey-req-date-time">
+                <input type="hidden" name="SurveySectionItems[${newIndex}].RequestStartTime" />
+                <input type="hidden" name="SurveySectionItems[${newIndex}].RequestEndTime" />
+                <div class="d-flex flex-column gap-1">
+                    <input type="date" class="form-control form-control-sm survey-date">
+                    <div class="d-flex gap-1 align-items-center">
+                        <input type="time" class="form-control form-control-sm survey-time-start">
+                        <span>-</span>
+                        <input type="time" class="form-control form-control-sm survey-time-end">
+                    </div>
+                        <input type="text" class="form-control form-control-sm survey-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;">
+                </div>
+            </td>
+            <td class="survey-detail-location"><input type="text" class="size form-control1" name="SurveySectionItems[${newIndex}].LocationDetails"></td>
+            <td class="survey-notes"><input type="text" class="size form-control1" name="SurveySectionItems[${newIndex}].SalesNotesInternal"></td>
+            <td class="survey-status"><div class="d-flex justify-content-center align-items-center flex-column gap-1"><span id="open" class="rounded-pill status">Open</span></div></td>
+            <td class="survey-actions"><div class="d-flex justify-content-center"><button type="button" class="btn"><i class="bx bx-file"></i></button><button type="button" class="btn btn-remove-row-survey"><i class="bx bx-trash"></i></button></div></td>
+        `;
+
+            tbody.appendChild(newRow);
+        });
+    }
+
+    // Inisialisasi untuk baris yang sudah ada saat halaman dimuat
+    document.querySelectorAll('.survey-category-dropdown, .survey-pic-dropdown').forEach(wrapp => {
+        updateMultiSelectDisplay(wrapp);
     });
+    // =======================================================================
+
 
     document.getElementById('meetingTableBody').addEventListener('input', function (e) {
         const row = e.target.closest('tr');

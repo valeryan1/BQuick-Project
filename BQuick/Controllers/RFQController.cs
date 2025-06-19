@@ -60,15 +60,25 @@ namespace BQuick.Controllers
                 await _context.Items.OrderBy(i => i.ItemName).ToListAsync(),
                 "ItemID", "ItemName"); // ItemID (int) dari model Item Anda
 
-            viewModel.SurveyCategoryList = new SelectList(
+           viewModel.SurveyCategoryList = new SelectList(
                 await _context.SurveyCategories.OrderBy(sc => sc.CategoryName).ToListAsync(),
-                "SurveyCategoryID", "CategoryName", viewModel.SurveySectionItems.FirstOrDefault()?.SurveyCategoryID);
+                "SurveyCategoryID", 
+                "CategoryName" 
+            );
 
             var purchasingUsers = await _context.Users
                 .Where(u => u.IsActive && u.RoleID == 5)
                 .OrderBy(u => u.FullName)
                 .ToListAsync();
             viewModel.PurchasingUserList = new SelectList(purchasingUsers, "UserID", "FullName");
+
+
+            var surveyRoleIds = new List<int> { 1, 2, 3, 4 };
+            var surveyUsers = await _context.Users
+                .Where(u => u.IsActive && surveyRoleIds.Contains(u.RoleID))
+                .OrderBy(u => u.FullName)
+                .ToListAsync();
+            viewModel.SurveyUserList = new SelectList(surveyUsers, "UserID", "FullName");
         }
 
 
@@ -345,6 +355,49 @@ namespace BQuick.Controllers
                                     };
                                     _context.RFQAttachments.Add(rfqAttachmentEntity);
                                 }
+                            }
+                        }
+
+                        if (viewModel.SurveySectionItems != null && viewModel.SurveySectionItems.Any())
+                        {
+                            foreach (var surveyVm in viewModel.SurveySectionItems)
+                            {
+                                // Buat entitas SurveyRequest baru dari database model Anda
+                                var surveyEntity = new SurveyRequest
+                                {
+                                    RFQID = rfqEntity.RFQID, // Tautkan ke RFQ yang baru dibuat
+                                    SurveyName = surveyVm.SurveyName,
+                                    CustomerPICName = surveyVm.CustomerPICName,
+                                    LocationDetails = surveyVm.LocationDetails,
+                                    SalesNotesInternal = surveyVm.SalesNotesInternal,
+                                    RequestStartTime = surveyVm.RequestStartTime,
+                                    RequestEndTime = surveyVm.RequestEndTime,
+                                    SurveyStatusID = 1,
+                                    // TODO: Logika untuk menyimpan relasi many-to-many (kategori dan PIC)
+                                };
+                                if (surveyVm.SurveyCategoryIDs != null && surveyVm.SurveyCategoryIDs.Any())
+                                {
+                                    var selectedCategories = await _context.SurveyCategories
+                                        .Where(c => surveyVm.SurveyCategoryIDs.Contains(c.SurveyCategoryID))
+                                        .ToListAsync();
+                                    surveyEntity.SurveyCategories = selectedCategories;
+                                }
+
+                                // 2. Menangani Assigned PICs (menggunakan tabel join SurveyPIC)
+                                if (surveyVm.TechnicalUserIDs != null && surveyVm.TechnicalUserIDs.Any())
+                                {
+                                    foreach (var userId in surveyVm.TechnicalUserIDs)
+                                    {
+                                        var surveyPic = new SurveyPIC
+                                        {
+                                            SurveyRequest = surveyEntity, // Tautkan ke entitas survey
+                                            TechnicalUserID = userId              // Tautkan ke ID user
+                                        };
+                                        _context.SurveyPICs.Add(surveyPic);
+                                    }
+                                }
+
+                                _context.SurveyRequests.Add(surveyEntity);
                             }
                         }
 

@@ -1306,668 +1306,118 @@
                             </tr>
                         </thead>
                         <tbody id="surveyTableBody">
-                            <tr>
-                                <td class="text-center" style="font-weight: 500;">1</td>
-                                <td class="survey-code">SVY240001</td>
-                                <td class="survey-category">
-                                    <div class="wrapp survey-category-dropdown">
-                                        <div class="select-btn py-0">
-                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Mechanical & Electrical, Security Access" />
-                                            <i class='bx bx-chevron-down'></i>
+                            @for (int i = 0; i < Model.SurveySectionItems.Count; i++)
+                            {
+                                <tr>
+                                    <td class="text-center" style="font-weight: 500;">@(i + 1)</td>
+                                    <td class="survey-code">None</td>
+
+                                    <td class="survey-category">
+                                        <div class="wrapp survey-category-dropdown">
+                                            <div class="select-btn py-0">
+                                                <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" placeholder="Pilih Kategori" />
+                                                <i class='bx bx-chevron-down'></i>
+                                            </div>
+                                            <div class="content-search">
+                                                <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
+                                                    @foreach (var category in Model.SurveyCategoryList)
+                                                    {
+                                                        <li>
+                                                            <label>
+                                                                <input type="checkbox" class="survey-list-checkboxes me-2"
+                                                                       name="SurveySectionItems[@i].SurveyCategoryIDs"
+                                                                       value="@category.Value"
+                                                                       @(Model.SurveySectionItems[i].SurveyCategoryIDs.Contains(int.Parse(category.Value)) ? "checked" : "")>
+                                                                <span>@category.Text</span>
+                                                            </label>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            </div>
                                         </div>
-                                        <div class="content-search">
-                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Network Security">
-                                                    <span>Network Security</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Mechanical & Electrical">
-                                                    <span>Mechanical & Electrical</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Security Access">
-                                                    <span>Security Access</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Endpoint">
-                                                    <span>Endpoint</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Data Center">
-                                                    <span>Data Center</span>
-                                                </li>
-                                            </ul>
+                                    </td>
+
+                                    <td class="survey-name"><input asp-for="SurveySectionItems[i].SurveyName" class="size form-control1"></td>
+
+                                    <td class="survey-pic">
+                                        <div class="wrapp survey-pic-dropdown">
+                                            <div class="select-btn py-0">
+                                                <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" placeholder="Pilih PIC" />
+                                                <i class='bx bx-chevron-down'></i>
+                                            </div>
+                                            <div class="content-search">
+                                                <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
+                                                    @foreach (var user in Model.SurveyUserList)
+                                                    {
+                                                        <li>
+                                                            <label>
+                                                                <input type="checkbox" class="survey-list-checkboxes me-2"
+                                                                       name="SurveySectionItems[@i].TechnicalUserIDs"
+                                                                       value="@user.Value"
+                                                                       @(Model.SurveySectionItems[i].TechnicalUserIDs.Contains(int.Parse(user.Value)) ? "checked" : "")>
+                                                                <span>@user.Text</span>
+                                                            </label>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td class="survey-name"><input type="text" class="size form-control1" value="Installation CCTV"></td>
-                                <td class="survey-pic">
-                                    <div class="wrapp survey-pic-dropdown">
-                                        <div class="select-btn py-0">
-                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Ance, Feggy" />
-                                            <i class='bx bx-chevron-down'></i>
+                                    </td>
+
+                                    <td class="survey-customer-pic"><input asp-for="SurveySectionItems[i].CustomerPICName" class="size form-control1"></td>
+
+                                    <td class="survey-req-date-time">
+                                        <input type="hidden" asp-for="SurveySectionItems[i].RequestStartTime" />
+                                        <input type="hidden" asp-for="SurveySectionItems[i].RequestEndTime" />
+                                        <div class="d-flex flex-column gap-1">
+                                            <input type="date" class="form-control form-control-sm survey-date"
+                                                   value="@(Model.SurveySectionItems[i].RequestStartTime?.ToString("yyyy-MM-dd"))">
+                                            <div class="d-flex gap-1 align-items-center">
+                                                <input type="time" class="form-control form-control-sm survey-time-start"
+                                                       value="@(Model.SurveySectionItems[i].RequestStartTime?.ToString("HH:mm"))">
+                                                <span>-</span>
+                                                <input type="time" class="form-control form-control-sm survey-time-end"
+                                                       value="@(Model.SurveySectionItems[i].RequestEndTime?.ToString("HH:mm"))">
+                                            </div>
+                                            <input type="text" class="form-control form-control-sm survey-date-display" readonly
+                                                   style="background: #f8f9fa; border: none; font-weight: 500;">
                                         </div>
-                                        <div class="content-search">
-                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Ance">
-                                                    <span>Ance</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Feggy">
-                                                    <span>Feggy</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Geo">
-                                                    <span>Geo</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Nuriel">
-                                                    <span>Nuriel</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Robby">
-                                                    <span>Robby</span>
-                                                </li>
-                                            </ul>
+                                    </td>
+
+                                    <td class="survey-detail-location"><input asp-for="SurveySectionItems[i].LocationDetails" class="size form-control1"></td>
+                                    <td class="survey-notes"><input asp-for="SurveySectionItems[i].SalesNotesInternal" class="size form-control1"></td>
+
+                                    <td class="survey-status">
+                                        <div class="d-flex justify-content-center align-items-center flex-column gap-1">
+                                            <span id="@(Model.SurveySectionItems[i].SurveyStatus?.ToLower())" class="rounded-pill status">
+                                                @Model.SurveySectionItems[i].SurveyStatus
+                                            </span>
                                         </div>
-                                    </div>
-                                </td>
-                                <td class="survey-customer-pic"><input type="text" class="size form-control1" value="Pak John"></td>
-                                <td class="survey-req-date-time">
-                                    <div class="d-flex flex-column gap-1">
-                                        <input type="date" class="form-control form-control-sm survey-date" value="2024-08-13">
-                                        <div class="d-flex gap-1 align-items-center">
-                                            <input type="time" class="form-control form-control-sm survey-time-start" value="13:30">
-                                            <span>-</span>
-                                            <input type="time" class="form-control form-control-sm survey-time-end" value="15:45">
+                                    </td>
+
+                                    <td class="survey-actions">
+                                        <div class="d-flex justify-content-center">
+                                            <button type="button" class="btn"><i class='bx bx-file'></i></button>
+                                            <button type="button" class="btn btn-remove-row-survey"><i class='bx bx-trash'></i></button>
                                         </div>
-                                        <input type="text" class="form-control form-control-sm survey-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;" value="Tuesday, 13 August 2024 01:30 PM - 03:45 PM">
-                                    </div>
-                                </td>
-                                <td class="survey-detail-location"><input type="text" class="size form-control1" value="Epson lot 1"></td>
-                                <td class="survey-notes"><input type="text" class="size form-control1" value="Memakai APD Lengkap"></td>
-                                <td class="survey-status">
-                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                                        <span id="open" class="rounded-pill status">Open</span>
-                                    </div>
-                                </td>
-                                <td class="survey-actions">
-                                    <div class="d-flex justify-content-center">
-                                        <button type="button" class="btn"><i class='bx bx-file'></i> </button>
-                                        <button type="button" class="btn btn-remove-row-survey"><i class='bx bx-trash'></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center" style="font-weight: 500;">2</td>
-                                <td class="survey-code">SVY240002</td>
-                                <td class="survey-category">
-                                    <div class="wrapp survey-category-dropdown">
-                                        <div class="select-btn py-0">
-                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Mechanical & Electrical, Security Access" />
-                                            <i class='bx bx-chevron-down'></i>
-                                        </div>
-                                        <div class="content-search">
-                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Network Security">
-                                                    <span>Network Security</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Mechanical & Electrical">
-                                                    <span>Mechanical & Electrical</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Security Access">
-                                                    <span>Security Access</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Endpoint">
-                                                    <span>Endpoint</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Data Center">
-                                                    <span>Data Center</span>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="survey-name"><input type="text" class="size form-control1" value="Installation CCTV"></td>
-                                <td class="survey-pic">
-                                    <div class="wrapp survey-pic-dropdown">
-                                        <div class="select-btn py-0">
-                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Ance, Feggy" />
-                                            <i class='bx bx-chevron-down'></i>
-                                        </div>
-                                        <div class="content-search">
-                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Ance">
-                                                    <span>Ance</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Feggy">
-                                                    <span>Feggy</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Geo">
-                                                    <span>Geo</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Nuriel">
-                                                    <span>Nuriel</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Robby">
-                                                    <span>Robby</span>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="survey-customer-pic"><input type="text" class="size form-control1" value="Pak John"></td>
-                                <td class="survey-req-date-time">
-                                    <div class="d-flex flex-column gap-1">
-                                        <input type="date" class="form-control form-control-sm survey-date" value="2024-08-13">
-                                        <div class="d-flex gap-1 align-items-center">
-                                            <input type="time" class="form-control form-control-sm survey-time-start" value="13:30">
-                                            <span>-</span>
-                                            <input type="time" class="form-control form-control-sm survey-time-end" value="15:45">
-                                        </div>
-                                        <input type="text" class="form-control form-control-sm survey-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;" value="Tuesday, 13 August 2024 01:30 PM - 03:45 PM">
-                                    </div>
-                                </td>
-                                <td class="survey-detail-location"><input type="text" class="size form-control1" value="Epson lot 1"></td>
-                                <td class="survey-notes"><input type="text" class="size form-control1" value="Memakai APD Lengkap"></td>
-                                <td class="survey-status">
-                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                                        <span id="waiting-approval" class="rounded-pill status">Waiting Approval</span>
-                                    </div>
-                                </td>
-                                <td class="survey-actions">
-                                    <div class="d-flex justify-content-center">
-                                        <button type="button" class="btn"><i class='bx bx-file'></i> </button>
-                                        <button type="button" class="btn btn-remove-row-survey"><i class='bx bx-trash'></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center" style="font-weight: 500;">3</td>
-                                <td class="survey-code">SVY240003</td>
-                                <td class="survey-category">
-                                    <div class="wrapp survey-category-dropdown">
-                                        <div class="select-btn py-0">
-                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Mechanical & Electrical, Security Access" />
-                                            <i class='bx bx-chevron-down'></i>
-                                        </div>
-                                        <div class="content-search">
-                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Network Security">
-                                                    <span>Network Security</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Mechanical & Electrical">
-                                                    <span>Mechanical & Electrical</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Security Access">
-                                                    <span>Security Access</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Endpoint">
-                                                    <span>Endpoint</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Data Center">
-                                                    <span>Data Center</span>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="survey-name"><input type="text" class="size form-control1" value="Installation CCTV"></td>
-                                <td class="survey-pic">
-                                    <div class="wrapp survey-pic-dropdown">
-                                        <div class="select-btn py-0">
-                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Ance, Feggy" />
-                                            <i class='bx bx-chevron-down'></i>
-                                        </div>
-                                        <div class="content-search">
-                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Ance">
-                                                    <span>Ance</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Feggy">
-                                                    <span>Feggy</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Geo">
-                                                    <span>Geo</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Nuriel">
-                                                    <span>Nuriel</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Robby">
-                                                    <span>Robby</span>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="survey-customer-pic"><input type="text" class="size form-control1" value="Pak John"></td>
-                                <td class="survey-req-date-time">
-                                    <div class="d-flex flex-column gap-1">
-                                        <input type="date" class="form-control form-control-sm survey-date" value="2024-08-13">
-                                        <div class="d-flex gap-1 align-items-center">
-                                            <input type="time" class="form-control form-control-sm survey-time-start" value="13:30">
-                                            <span>-</span>
-                                            <input type="time" class="form-control form-control-sm survey-time-end" value="15:45">
-                                        </div>
-                                        <input type="text" class="form-control form-control-sm survey-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;" value="Tuesday, 13 August 2024 01:30 PM - 03:45 PM">
-                                    </div>
-                                </td>
-                                <td class="survey-detail-location"><input type="text" class="size form-control1" value="Epson lot 1"></td>
-                                <td class="survey-notes"><input type="text" class="size form-control1" value="Memakai APD Lengkap"></td>
-                                <td class="survey-status">
-                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                                        <span id="hold" class="rounded-pill status">Hold</span>
-                                    </div>
-                                </td>
-                                <td class="survey-actions">
-                                    <div class="d-flex justify-content-center">
-                                        <button type="button" class="btn"><i class='bx bx-file'></i> </button>
-                                        <button type="button" class="btn btn-remove-row-survey"><i class='bx bx-trash'></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center" style="font-weight: 500;">4</td>
-                                <td class="survey-code">SVY240004</td>
-                                <td class="survey-category">
-                                    <div class="wrapp survey-category-dropdown">
-                                        <div class="select-btn py-0">
-                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Mechanical & Electrical, Security Access" />
-                                            <i class='bx bx-chevron-down'></i>
-                                        </div>
-                                        <div class="content-search">
-                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Network Security">
-                                                    <span>Network Security</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Mechanical & Electrical">
-                                                    <span>Mechanical & Electrical</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Security Access">
-                                                    <span>Security Access</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Endpoint">
-                                                    <span>Endpoint</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Data Center">
-                                                    <span>Data Center</span>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="survey-name"><input type="text" class="size form-control1" value="Installation CCTV"></td>
-                                <td class="survey-pic">
-                                    <div class="wrapp survey-pic-dropdown">
-                                        <div class="select-btn py-0">
-                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Ance, Feggy" />
-                                            <i class='bx bx-chevron-down'></i>
-                                        </div>
-                                        <div class="content-search">
-                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Ance">
-                                                    <span>Ance</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Feggy">
-                                                    <span>Feggy</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Geo">
-                                                    <span>Geo</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Nuriel">
-                                                    <span>Nuriel</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Robby">
-                                                    <span>Robby</span>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="survey-customer-pic"><input type="text" class="size form-control1" value="Pak John"></td>
-                                <td class="survey-req-date-time">
-                                    <div class="d-flex flex-column gap-1">
-                                        <input type="date" class="form-control form-control-sm survey-date" value="2024-08-13">
-                                        <div class="d-flex gap-1 align-items-center">
-                                            <input type="time" class="form-control form-control-sm survey-time-start" value="13:30">
-                                            <span>-</span>
-                                            <input type="time" class="form-control form-control-sm survey-time-end" value="15:45">
-                                        </div>
-                                        <input type="text" class="form-control form-control-sm survey-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;" value="Tuesday, 13 August 2024 01:30 PM - 03:45 PM">
-                                    </div>
-                                </td>
-                                <td class="survey-detail-location"><input type="text" class="size form-control1" value="Epson lot 1"></td>
-                                <td class="survey-notes"><input type="text" class="size form-control1" value="Memakai APD Lengkap"></td>
-                                <td class="survey-status">
-                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                                        <span id="rescheduled" class="rounded-pill status">Rescheduled</span>
-                                    </div>
-                                </td>
-                                <td class="survey-actions">
-                                    <div class="d-flex justify-content-center">
-                                        <button type="button" class="btn"><i class='bx bx-file'></i> </button>
-                                        <button type="button" class="btn btn-remove-row-survey"><i class='bx bx-trash'></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center" style="font-weight: 500;">5</td>
-                                <td class="survey-code">SVY240005</td>
-                                <td class="survey-category">
-                                    <div class="wrapp survey-category-dropdown">
-                                        <div class="select-btn py-0">
-                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Mechanical & Electrical, Security Access" />
-                                            <i class='bx bx-chevron-down'></i>
-                                        </div>
-                                        <div class="content-search">
-                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Network Security">
-                                                    <span>Network Security</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Mechanical & Electrical">
-                                                    <span>Mechanical & Electrical</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Security Access">
-                                                    <span>Security Access</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Endpoint">
-                                                    <span>Endpoint</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Data Center">
-                                                    <span>Data Center</span>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="survey-name"><input type="text" class="size form-control1" value="Installation CCTV"></td>
-                                <td class="survey-pic">
-                                    <div class="wrapp survey-pic-dropdown">
-                                        <div class="select-btn py-0">
-                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Ance, Feggy" />
-                                            <i class='bx bx-chevron-down'></i>
-                                        </div>
-                                        <div class="content-search">
-                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Ance">
-                                                    <span>Ance</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Feggy">
-                                                    <span>Feggy</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Geo">
-                                                    <span>Geo</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Nuriel">
-                                                    <span>Nuriel</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Robby">
-                                                    <span>Robby</span>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="survey-customer-pic"><input type="text" class="size form-control1" value="Pak John"></td>
-                                <td class="survey-req-date-time">
-                                    <div class="d-flex flex-column gap-1">
-                                        <input type="date" class="form-control form-control-sm survey-date" value="2024-08-13">
-                                        <div class="d-flex gap-1 align-items-center">
-                                            <input type="time" class="form-control form-control-sm survey-time-start" value="13:30">
-                                            <span>-</span>
-                                            <input type="time" class="form-control form-control-sm survey-time-end" value="15:45">
-                                        </div>
-                                        <input type="text" class="form-control form-control-sm survey-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;" value="Tuesday, 13 August 2024 01:30 PM - 03:45 PM">
-                                    </div>
-                                </td>
-                                <td class="survey-detail-location"><input type="text" class="size form-control1" value="Epson lot 1"></td>
-                                <td class="survey-notes"><input type="text" class="size form-control1" value="Memakai APD Lengkap"></td>
-                                <td class="survey-status">
-                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                                        <span id="on-progress" class="rounded-pill status">On Progress</span>
-                                    </div>
-                                </td>
-                                <td class="survey-actions">
-                                    <div class="d-flex justify-content-center">
-                                        <button type="button" class="btn"><i class='bx bx-file'></i> </button>
-                                        <button type="button" class="btn btn-remove-row-survey"><i class='bx bx-trash'></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center" style="font-weight: 500;">6</td>
-                                <td class="survey-code">SVY240006</td>
-                                <td class="survey-category">
-                                    <div class="wrapp survey-category-dropdown">
-                                        <div class="select-btn py-0">
-                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Mechanical & Electrical, Security Access" />
-                                            <i class='bx bx-chevron-down'></i>
-                                        </div>
-                                        <div class="content-search">
-                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Network Security">
-                                                    <span>Network Security</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Mechanical & Electrical">
-                                                    <span>Mechanical & Electrical</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Security Access">
-                                                    <span>Security Access</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Endpoint">
-                                                    <span>Endpoint</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Data Center">
-                                                    <span>Data Center</span>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="survey-name"><input type="text" class="size form-control1" value="Installation CCTV"></td>
-                                <td class="survey-pic">
-                                    <div class="wrapp survey-pic-dropdown">
-                                        <div class="select-btn py-0">
-                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Ance, Feggy" />
-                                            <i class='bx bx-chevron-down'></i>
-                                        </div>
-                                        <div class="content-search">
-                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Ance">
-                                                    <span>Ance</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Feggy">
-                                                    <span>Feggy</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Geo">
-                                                    <span>Geo</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Nuriel">
-                                                    <span>Nuriel</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Robby">
-                                                    <span>Robby</span>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="survey-customer-pic"><input type="text" class="size form-control1" value="Pak John"></td>
-                                <td class="survey-req-date-time">
-                                    <div class="d-flex flex-column gap-1">
-                                        <input type="date" class="form-control form-control-sm survey-date" value="2024-08-13">
-                                        <div class="d-flex gap-1 align-items-center">
-                                            <input type="time" class="form-control form-control-sm survey-time-start" value="13:30">
-                                            <span>-</span>
-                                            <input type="time" class="form-control form-control-sm survey-time-end" value="15:45">
-                                        </div>
-                                        <input type="text" class="form-control form-control-sm survey-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;" value="Tuesday, 13 August 2024 01:30 PM - 03:45 PM">
-                                    </div>
-                                </td>
-                                <td class="survey-detail-location"><input type="text" class="size form-control1" value="Epson lot 1"></td>
-                                <td class="survey-notes"><input type="text" class="size form-control1" value="Memakai APD Lengkap"></td>
-                                <td class="survey-status">
-                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                                        <span id="completed" class="rounded-pill status">Completed</span>
-                                    </div>
-                                </td>
-                                <td class="survey-actions">
-                                    <div class="d-flex justify-content-center">
-                                        <button type="button" class="btn"><i class='bx bx-file'></i> </button>
-                                        <button type="button" class="btn btn-remove-row-survey"><i class='bx bx-trash'></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center" style="font-weight: 500;">7</td>
-                                <td class="survey-code">SVY240007</td>
-                                <td class="survey-category">
-                                    <div class="wrapp survey-category-dropdown">
-                                        <div class="select-btn py-0">
-                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Network Security, Security Access, Endpoint, Data Center" />
-                                            <i class='bx bx-chevron-down'></i>
-                                        </div>
-                                        <div class="content-search">
-                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Network Security">
-                                                    <span>Network Security</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Mechanical & Electrical">
-                                                    <span>Mechanical & Electrical</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Security Access">
-                                                    <span>Security Access</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Endpoint">
-                                                    <span>Endpoint</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Data Center">
-                                                    <span>Data Center</span>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="survey-name"><input type="text" class="size form-control1" value="Control Room"></td>
-                                <td class="survey-pic">
-                                    <div class="wrapp survey-pic-dropdown">
-                                        <div class="select-btn py-0">
-                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Ance, Feggy" />
-                                            <i class='bx bx-chevron-down'></i>
-                                        </div>
-                                        <div class="content-search">
-                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Ance">
-                                                    <span>Ance</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Feggy">
-                                                    <span>Feggy</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Geo">
-                                                    <span>Geo</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Nuriel">
-                                                    <span>Nuriel</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Robby">
-                                                    <span>Robby</span>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="survey-customer-pic"><input type="text" class="size form-control1" value="Pak John"></td>
-                                <td class="survey-req-date-time">
-                                    <div class="d-flex flex-column gap-1">
-                                        <input type="date" class="form-control form-control-sm survey-date" value="2024-08-13">
-                                        <div class="d-flex gap-1 align-items-center">
-                                            <input type="time" class="form-control form-control-sm survey-time-start" value="13:30">
-                                            <span>-</span>
-                                            <input type="time" class="form-control form-control-sm survey-time-end" value="15:45">
-                                        </div>
-                                        <input type="text" class="form-control form-control-sm survey-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;" value="Tuesday, 13 August 2024 01:30 PM - 03:45 PM">
-                                    </div>
-                                </td>
-                                <td class="survey-detail-location"><input type="text" class="size form-control1" value="Epson Lot 151"></td>
-                                <td class="survey-notes"><input type="text" class="size form-control1" value="Memakai APD Lengkap"></td>
-                                <td class="survey-status">
-                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                                        <span id="not-yet" class="rounded-pill status">Not Yet</span>
-                                    </div>
-                                </td>
-                                <td class="survey-actions">
-                                    <div class="d-flex justify-content-center">
-                                        <button type="button" class="btn"><i class='bx bx-file'></i> </button>
-                                        <button type="button" class="btn btn-remove-row-survey"><i class='bx bx-trash'></i></button>
-                                    </div>
-                                </td>
-                            </tr>
+                                    </td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
                     <button type="button" id="addRowBtnSurvey" class="btn btn-dark btn-uniform">Add Survey</button>
                 </div>
+
+
+
+
+
+
+
+
+@* ========================
+======================== *@
+
 
                 <div class="tabel meeting-list col-12 mb-5">
                     <h5 class="item-list-title underline">Meeting List</h5>
@@ -2380,5 +1830,8 @@
 
          var itemMasterDataFromServer = @Html.Raw(Json.Serialize(Model.ItemMasterList.Select(item => new { value = item.Value, text = item.Text })));
          var purchasingUsersFromServer = @Html.Raw(Json.Serialize(Model.PurchasingUserList.Select(item => new { value = item.Value, text = item.Text })));
+         var surveyCategoriesFromServer = @Html.Raw(Json.Serialize(Model.SurveyCategoryList.Select(item => new { value = item.Value, text = item.Text })));
+         var usersFromServer = @Html.Raw(Json.Serialize(Model.UserList.Select(item => new { value = item.Value, text = item.Text })));
+         var surveyUsersFromServer = @Html.Raw(Json.Serialize(Model.SurveyUserList.Select(item => new { value = item.Value, text = item.Text })));
     </script>
 }

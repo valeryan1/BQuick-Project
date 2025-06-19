@@ -432,6 +432,7 @@ function setupMultiSelectDropdown(wrapp) {
         li.addEventListener('click', function (e) {
             e.stopPropagation();
             const cb = li.querySelector('.survey-list-checkboxes');
+
             if (cb) {
                 cb.checked = !cb.checked;
                 cb.dispatchEvent(new Event('change'));
