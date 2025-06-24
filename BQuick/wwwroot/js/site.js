@@ -542,6 +542,28 @@ function formatSurveyDateTime(dateStr, timeStart, timeEnd) {
     return `${dayName}, ${day} ${month} ${year} ${formatTime(timeStart)} - ${formatTime(timeEnd)}`;
 }
 
+function formatMeetingDateTime(dateStr, timeStart, timeEnd) {
+    if (!dateStr || !timeStart || !timeEnd) return '';
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const date = new Date(dateStr + 'T' + timeStart);
+    const dayName = days[date.getDay()];
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = months[date.getMonth()];
+    const year = date.getFullYear();
+
+    function formatTime(t) {
+        const [h, m] = t.split(':');
+        let hour = parseInt(h, 10);
+        const min = m;
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        hour = hour % 12;
+        if (hour === 0) hour = 12;
+        return `${String(hour).padStart(2, '0')}:${min} ${ampm}`;
+    }
+
+    return `${dayName}, ${day} ${month} ${year} ${formatTime(timeStart)} - ${formatTime(timeEnd)}`;
+}
 function formatFileName(name, maxLength = 20) {
     const dotIndex = name.lastIndexOf('.');
     if (name.length <= maxLength) return name;
@@ -1629,56 +1651,48 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const resourceWrapper = document.querySelector('.wrapp.resource-dropdown');
     if (resourceWrapper) {
-        const resourceSelectBtn = resourceWrapper.querySelector('.select-btn');
-        const resourceOptions = resourceWrapper.querySelectorAll('.option > li:not(.has-sub)');
-        const personalOption = document.getElementById('resource-personal-option');
-        const personalSubDropdown = document.getElementById('resource-personal-sub-dropdown');
+        const resourceSelectBtnText = resourceWrapper.querySelector('.select-btn span');
+        const resourceHiddenInput = document.querySelector('input[name="Resource"]');
+        const personalResourceHiddenInput = document.querySelector('input[name="PersonalResourceEmployeeID"]');
 
-        if (resourceSelectBtn) {
-            resourceSelectBtn.addEventListener("click", function (e) {
-                e.stopPropagation();
-                const isActive = resourceWrapper.classList.contains("active");
-                closeAllDropdowns();
-                if (!isActive) resourceWrapper.classList.add("active");
-            });
-        }
+        // Menggunakan satu event listener utama pada wrapper
+        resourceWrapper.addEventListener('click', function (e) {
+            const clickedLi = e.target.closest('li');
+            if (!clickedLi || !this.classList.contains('active')) return;
 
-        resourceOptions.forEach(option => {
-            option.addEventListener('click', function (e) {
-                e.stopPropagation();
-                resourceSelectBtn.firstElementChild.innerText = this.innerText;
-                resourceWrapper.classList.remove("active");
-                document.querySelectorAll('.option .has-sub').forEach(el => el.classList.remove('active'));
-            });
+            // Cek jika yang diklik adalah header sub-menu (seperti "Email", "Phone")
+            if (clickedLi.classList.contains('has-sub')) {
+                e.stopPropagation(); // Mencegah dropdown utama tertutup
+                clickedLi.classList.toggle('active'); // Buka/tutup sub-menu
+                return; // Hentikan eksekusi, jangan pilih nilai apapun
+            }
+
+            // Jika kita sampai di sini, artinya sebuah nilai akhir telah diklik
+            const selectedText = clickedLi.innerText.trim();
+            let finalValue = selectedText;
+
+            // Reset ID personal resource
+            if (personalResourceHiddenInput) personalResourceHiddenInput.value = '';
+
+            // Cek apakah yang diklik ada di dalam sub-menu "Personal"
+            const personalParent = clickedLi.closest('#resource-personal-sub-dropdown');
+            if (personalParent) {
+                const subType = clickedLi.closest('.has-sub').firstChild.textContent.trim(); // Mendapatkan "Email", "Phone", dll.
+                finalValue = `Personal ${subType} (${selectedText})`;
+
+                // Simpan ID user ke hidden input khusus Personal Resource
+                if (personalResourceHiddenInput) {
+                    personalResourceHiddenInput.value = clickedLi.getAttribute('data-value');
+                }
+            }
+
+            // Update tampilan teks dan nilai di hidden input utama
+            if (resourceSelectBtnText) resourceSelectBtnText.innerText = finalValue;
+            if (resourceHiddenInput) resourceHiddenInput.value = finalValue;
+
+            // Tutup semua dropdown
+            closeAllDropdowns();
         });
-
-        if (personalOption) {
-            personalOption.addEventListener('click', function (e) {
-                e.stopPropagation();
-                document.querySelectorAll('.option > .has-sub').forEach(li => {
-                    if (li !== personalOption) li.classList.remove('active');
-                });
-                personalOption.classList.toggle('active');
-            });
-        }
-
-        document.querySelectorAll('#resource-personal-sub-dropdown > .has-sub').forEach(parent => {
-            parent.addEventListener('click', function (e) {
-                e.stopPropagation();
-                document.querySelectorAll('#resource-personal-sub-dropdown > .has-sub').forEach(li => {
-                    if (li !== this) li.classList.remove('active');
-                });
-                this.classList.toggle('active');
-            });
-        });
-
-        window.updateResourcePersonalUser = function (selectedLi) {
-            const parentType = selectedLi.parentElement.parentElement.firstChild.textContent.trim();
-            const user = selectedLi.textContent.trim();
-            resourceSelectBtn.firstElementChild.innerText = `Personal ${parentType} (${user})`;
-            resourceWrapper.classList.remove("active");
-            document.querySelectorAll('.option .has-sub').forEach(el => el.classList.remove('active'));
-        };
     }
 
     (function patchCompanyDropdown() {
@@ -2015,37 +2029,39 @@ document.addEventListener("DOMContentLoaded", function () {
         if (qtyInput) updateRowAmount(qtyInput);
     });
 
-    document.getElementById('reqTableBody').addEventListener('click', function (e) {
-        if (e.target.closest('.bx-plus')) {
-            const row = e.target.closest('tr');
-            if (!row) return;
+    const reqTableBody = document.getElementById('reqTableBody');
+    if (reqTableBody) {
+        reqTableBody.addEventListener('click', function (e) {
+            if (e.target.closest('.bx-plus')) {
+                const row = e.target.closest('tr');
+                if (!row) return;
 
-            // 1. Ambil data dari baris "Request Item to Purchasing" yang di-klik
-            const name = row.querySelector('td.name input')?.value.trim();
-            const desc = row.querySelector('td.desc input')?.value.trim();
-            const qty = row.querySelector('td.qty input')?.value.trim();
-            const uom = row.querySelector('td.uom input')?.value.trim();           
+                // 1. Ambil data dari baris "Request Item to Purchasing" yang di-klik
+                const name = row.querySelector('td.name input')?.value.trim();
+                const desc = row.querySelector('td.desc input')?.value.trim();
+                const qty = row.querySelector('td.qty input')?.value.trim();
+                const uom = row.querySelector('td.uom input')?.value.trim();
 
-            if (!(name || desc || qty || uom)) return;
+                if (!(name || desc || qty || uom)) return;
 
-            const itemListTbody = document.getElementById('itemListTableBody');
-            let foundEmptyRow = null;
-            for (const tr of itemListTbody.children) {
-                const inputs = tr.querySelectorAll('input');
-                const allEmpty = Array.from(inputs).every(input => input.value.trim() === '');
-                if (allEmpty) {
-                    foundEmptyRow = tr;
-                    break;
+                const itemListTbody = document.getElementById('itemListTableBody');
+                let foundEmptyRow = null;
+                for (const tr of itemListTbody.children) {
+                    const inputs = tr.querySelectorAll('input');
+                    const allEmpty = Array.from(inputs).every(input => input.value.trim() === '');
+                    if (allEmpty) {
+                        foundEmptyRow = tr;
+                        break;
+                    }
                 }
-            }
 
-            let targetRow;
-            if (foundEmptyRow) {
-                targetRow = foundEmptyRow;
-            } else {
-                const newIndex = itemListTbody.querySelectorAll('tr').length;
-                targetRow = document.createElement('tr');
-                targetRow.innerHTML = `
+                let targetRow;
+                if (foundEmptyRow) {
+                    targetRow = foundEmptyRow;
+                } else {
+                    const newIndex = itemListTbody.querySelectorAll('tr').length;
+                    targetRow = document.createElement('tr');
+                    targetRow.innerHTML = `
            <td class="text-center" style="font-weight: 500;">${newIndex + 1}</td>
             <td class="name">
                 <input type="hidden" name="ItemListSectionItems[${newIndex}].ItemID" value="">
@@ -2071,42 +2087,42 @@ document.addEventListener("DOMContentLoaded", function () {
             <td class="delete"><button type="button" class="btn btn-remove-row-itemlist"><i class="bx bx-trash"></i></button></td>
         `;
 
-                // 4. Tambahkan baris baru ke tabel "Item List"
-                itemListTbody.appendChild(targetRow);
+                    // 4. Tambahkan baris baru ke tabel "Item List"
+                    itemListTbody.appendChild(targetRow);
 
-                setupItemDropdown(targetRow.querySelector('.wrapp.item-dropdown'));
-            }
+                    setupItemDropdown(targetRow.querySelector('.wrapp.item-dropdown'));
+                }
 
-            const nameDropdown = targetRow.querySelector('.name .select-btn span');
-            if (nameDropdown) nameDropdown.textContent = name;
-            targetRow.querySelector('td.desc input').value = desc;
-            targetRow.querySelector('td.qty input').value = qty;
-            targetRow.querySelector('td.uom input').value = uom;
-            updateRowAmount(targetRow.querySelector('td.qty input'));
+                const nameDropdown = targetRow.querySelector('.name .select-btn span');
+                if (nameDropdown) nameDropdown.textContent = name;
+                targetRow.querySelector('td.desc input').value = desc;
+                targetRow.querySelector('td.qty input').value = qty;
+                targetRow.querySelector('td.uom input').value = uom;
+                updateRowAmount(targetRow.querySelector('td.qty input'));
 
-            const itemDropdown = targetRow.querySelector('.wrapp.item-dropdown');
-            if (itemDropdown) {
-                itemDropdown.classList.add('disabled-by-script');
-                itemDropdown.setAttribute('tabindex', '-1');
-            }
+                const itemDropdown = targetRow.querySelector('.wrapp.item-dropdown');
+                if (itemDropdown) {
+                    itemDropdown.classList.add('disabled-by-script');
+                    itemDropdown.setAttribute('tabindex', '-1');
+                }
 
-            let next = row.nextElementSibling;
-            let insertAfter = targetRow;
-            while (next && next.classList.contains('addon-row')) {
-                const addOnRow = next;
-                next = next.nextElementSibling;
+                let next = row.nextElementSibling;
+                let insertAfter = targetRow;
+                while (next && next.classList.contains('addon-row')) {
+                    const addOnRow = next;
+                    next = next.nextElementSibling;
 
-                const addOnName = addOnRow.querySelector('td.name input').value.trim();
-                const addOnDesc = addOnRow.querySelector('td.desc input').value.trim();
-                const addOnQty = addOnRow.querySelector('td.qty input').value.trim();
-                const addOnUom = addOnRow.querySelector('td.uom input').value.trim();
-                const addOnPrice = addOnRow.querySelector('td.price input')?.value.trim() || 0;
+                    const addOnName = addOnRow.querySelector('td.name input').value.trim();
+                    const addOnDesc = addOnRow.querySelector('td.desc input').value.trim();
+                    const addOnQty = addOnRow.querySelector('td.qty input').value.trim();
+                    const addOnUom = addOnRow.querySelector('td.uom input').value.trim();
+                    const addOnPrice = addOnRow.querySelector('td.price input')?.value.trim() || 0;
 
 
-                const newAddOnRow = document.createElement('tr');
-                newAddOnRow.classList.add('addon-row');
-                const newAddonIndex = itemListTbody.querySelectorAll('tr').length;
-                newAddOnRow.innerHTML = `
+                    const newAddOnRow = document.createElement('tr');
+                    newAddOnRow.classList.add('addon-row');
+                    const newAddonIndex = itemListTbody.querySelectorAll('tr').length;
+                    newAddOnRow.innerHTML = `
                     <td></td>
                     <td class="name">
                         <input type="hidden" name="ItemListSectionItems[${newAddonIndex}].ItemID" value="">
@@ -2131,52 +2147,52 @@ document.addEventListener("DOMContentLoaded", function () {
                     <td class="delete"><button type="button" class="btn btn-remove-row-itemlist"><i class='bx bx-trash'></i></button></td>
                 `;
 
-                if (insertAfter && insertAfter.nextSibling) {
-                    itemListTbody.insertBefore(newAddOnRow, insertAfter.nextSibling);
-                } else {
-                    itemListTbody.appendChild(newAddOnRow);
-                }
-                insertAfter = newAddOnRow;
+                    if (insertAfter && insertAfter.nextSibling) {
+                        itemListTbody.insertBefore(newAddOnRow, insertAfter.nextSibling);
+                    } else {
+                        itemListTbody.appendChild(newAddOnRow);
+                    }
+                    insertAfter = newAddOnRow;
 
-                setupItemDropdown(newAddOnRow.querySelector('.wrapp.item-dropdown'));
-                const addOnDropdown = newAddOnRow.querySelector('.wrapp.item-dropdown');
-                if (addOnDropdown) {
-                    addOnDropdown.classList.add('disabled-by-script');
-                    addOnDropdown.setAttribute('tabindex', '-1');
-                }
-                newAddOnRow.querySelectorAll('input').forEach(input => {
-                    input.addEventListener('input', function () {
+                    setupItemDropdown(newAddOnRow.querySelector('.wrapp.item-dropdown'));
+                    const addOnDropdown = newAddOnRow.querySelector('.wrapp.item-dropdown');
+                    if (addOnDropdown) {
+                        addOnDropdown.classList.add('disabled-by-script');
+                        addOnDropdown.setAttribute('tabindex', '-1');
+                    }
+                    newAddOnRow.querySelectorAll('input').forEach(input => {
+                        input.addEventListener('input', function () {
+                            updateAddItemButtonState();
+                        });
+                    });
+                    const selectBtn = newAddOnRow.querySelector('.select-btn');
+                    if (selectBtn) {
+                        selectBtn.addEventListener('click', function () {
+                            setTimeout(updateAddItemButtonState, 100);
+                        });
+                    }
+                    const deleteBtn = newAddOnRow.querySelector('.btn-remove-row-itemlist');
+                    deleteBtn.addEventListener('click', function () {
+                        newAddOnRow.remove();
+                        renumberItemListTable();
+                        updateItemListTotal();
                         updateAddItemButtonState();
                     });
-                });
-                const selectBtn = newAddOnRow.querySelector('.select-btn');
-                if (selectBtn) {
-                    selectBtn.addEventListener('click', function () {
-                        setTimeout(updateAddItemButtonState, 100);
-                    });
+
+                    updateRowAmount(newAddOnRow.querySelector('.qty input'));
+
+                    addOnRow.parentNode.removeChild(addOnRow);
                 }
-                const deleteBtn = newAddOnRow.querySelector('.btn-remove-row-itemlist');
-                deleteBtn.addEventListener('click', function () {
-                    newAddOnRow.remove();
-                    renumberItemListTable();
-                    updateItemListTotal();
-                    updateAddItemButtonState();
-                });
 
-                updateRowAmount(newAddOnRow.querySelector('.qty input'));
 
-                addOnRow.parentNode.removeChild(addOnRow);
+
+                row.parentNode.removeChild(row);
+                renumberItemListTable();
+                renumberReqTable();
+                updateAddItemButtonState();
             }
-
-  
-
-            row.parentNode.removeChild(row);
-            renumberItemListTable();
-            renumberReqTable();
-            updateAddItemButtonState();
-        }
-    });
-
+        });
+    }
     function initFileUpload(wrapper) {
         if (!wrapper.uploadedFiles) wrapper.uploadedFiles = [];
 
@@ -3308,135 +3324,114 @@ document.addEventListener("DOMContentLoaded", function () {
     // =======================================================================
 
 
-    document.getElementById('meetingTableBody').addEventListener('input', function (e) {
-        const row = e.target.closest('tr');
-        if (!row) return;
-        const date = row.querySelector('.meeting-date')?.value;
-        const timeStart = row.querySelector('.meeting-time-start')?.value;
-        const timeEnd = row.querySelector('.meeting-time-end')?.value;
-        const display = row.querySelector('.meeting-date-display');
+    function initializeMeetingTable() {
+        const meetingTableBody = document.getElementById("meetingTableBody");
+        if (!meetingTableBody) return;
 
-        if (timeStart && timeEnd) {
-            if (timeEnd < timeStart) {
-                row.querySelector('.meeting-time-end').value = '';
-                row.querySelector('.meeting-time-end').classList.add('is-invalid');
-                if (!row.querySelector('.meeting-time-end').nextElementSibling || !row.querySelector('.meeting-time-end').nextElementSibling.classList.contains('invalid-feedback')) {
-                    const feedback = document.createElement('div');
-                    feedback.className = 'invalid-feedback';
-                    feedback.textContent = 'End time must be after start time';
-                    row.querySelector('.meeting-time-end').after(feedback);
+        // Fungsi untuk memperbarui display awal
+        const updateAllRowsDisplay = () => {
+            meetingTableBody.querySelectorAll('tr').forEach(row => {
+                const dateInput = row.querySelector('.meeting-date');
+                const startTimeInput = row.querySelector('.meeting-time-start');
+                const endTimeInput = row.querySelector('.meeting-time-end');
+                const displayInput = row.querySelector('.meeting-date-display');
+                if (displayInput && dateInput.value && startTimeInput.value && endTimeInput.value) {
+                    displayInput.value = formatMeetingDateTime(dateInput.value, startTimeInput.value, endTimeInput.value);
                 }
-            } else {
-                row.querySelector('.meeting-time-end').classList.remove('is-invalid');
-                const feedback = row.querySelector('.meeting-time-end').nextElementSibling;
-                if (feedback && feedback.classList.contains('invalid-feedback')) {
-                    feedback.remove();
+            });
+        };
+
+        updateAllRowsDisplay();
+        meetingTableBody.querySelectorAll('.meeting-pic-dropdown').forEach(updateMultiSelectDisplay);
+
+        // Event listener utama untuk semua klik
+        meetingTableBody.addEventListener('click', function (e) { /* ... (kode ini sama seperti sebelumnya) ... */ });
+
+        // Event listener untuk perubahan input tanggal & waktu dengan validasi
+        meetingTableBody.addEventListener('change', function (e) {
+            if (e.target.matches('.meeting-date, .meeting-time-start, .meeting-time-end')) {
+                const row = e.target.closest('tr');
+                if (!row) return;
+
+                const dateTimeCell = e.target.closest('.meeting-req-date-time');
+                const dateInput = row.querySelector('.meeting-date');
+                const startTimeInput = row.querySelector('.meeting-time-start');
+                const endTimeInput = row.querySelector('.meeting-time-end');
+                const displayInput = row.querySelector('.meeting-date-display');
+                const hiddenStartInput = row.querySelector('input[name*="MeetingStartTime"]');
+                const hiddenEndInput = row.querySelector('input[name*="MeetingEndTime"]');
+                let isValid = true;
+
+                const existingError = dateTimeCell.querySelector('.invalid-feedback');
+                if (existingError) { existingError.remove(); }
+                endTimeInput.classList.remove('is-invalid');
+
+                if (startTimeInput.value && endTimeInput.value) {
+                    if (endTimeInput.value < startTimeInput.value) {
+                        endTimeInput.classList.add('is-invalid');
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'invalid-feedback d-block';
+                        errorDiv.innerText = 'Waktu selesai tidak boleh lebih awal dari waktu mulai.';
+                        if (displayInput) { displayInput.after(errorDiv); }
+                        isValid = false;
+                    }
+                }
+
+                if (isValid) {
+                    if (dateInput?.value && startTimeInput?.value) { hiddenStartInput.value = `${dateInput.value}T${startTimeInput.value}`; }
+                    if (dateInput?.value && endTimeInput?.value) { hiddenEndInput.value = `${dateInput.value}T${endTimeInput.value}`; }
+                    if (displayInput && dateInput.value && startTimeInput.value && endTimeInput.value) {
+                        displayInput.value = formatMeetingDateTime(dateInput.value, startTimeInput.value, endTimeInput.value);
+                    } else if (displayInput) {
+                        displayInput.value = '';
+                    }
+                } else {
+                    if (displayInput) displayInput.value = '';
+                    if (hiddenEndInput) hiddenEndInput.value = '';
                 }
             }
-        } else {
-            row.querySelector('.meeting-time-end')?.classList.remove('is-invalid');
-            const feedback = row.querySelector('.meeting-time-end')?.nextElementSibling;
-            if (feedback && feedback.classList.contains('invalid-feedback')) {
-                feedback.remove();
-            }
-        }
+        });
 
-        if (display) {
-            if (timeStart && timeEnd && timeEnd >= timeStart) {
-                display.value = formatSurveyDateTime(date, timeStart, timeEnd);
-            } else {
-                display.value = '';
-            }
-        }
-    });
+        // Logika untuk tombol "Add Meeting"
+        const addMeetingBtn = document.getElementById("addMeetingBtn");
+        if (addMeetingBtn) {
+            addMeetingBtn.addEventListener("click", function () {
+                const newIndex = meetingTableBody.querySelectorAll("tr").length;
+                const newRow = document.createElement("tr");
 
-    document.getElementById('addMeetingBtn').addEventListener('click', function () {
-        const tbody = document.getElementById('meetingTableBody');
-        const rows = tbody.querySelectorAll('tr');
-        if (rows.length > 0) {
-            const lastRow = rows[rows.length - 1];
-            if (isMeetingRowEmpty(lastRow)) {
-                return;
-            }
-        }
-        const rowCount = tbody.rows.length + 1;
-        const newRow = document.createElement('tr');
-        newRow.innerHTML = `
-        <td class="text-center" style="font-weight: 500;">${rowCount}</td>
-        <td class="meeting-code">None</td>
-        <td class="meeting-name"><input type="text" class="size form-control1"></td>
-        <td class="meeting-pic">
-            <div class="wrapp meeting-pic-dropdown">
-                <div class="select-btn py-0">
-                    <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" />
-                    <i class='bx bx-chevron-down'></i>
-                </div>
-                <div class="content-search">
-                    <ul class="option" style="margin-bottom: 10px; padding-left: 0rem; height: 135px;">
-                        <li>
-                            <input type="checkbox" class="survey-list-checkboxes me-2" value="Ance">
-                            <span>Ance</span>
-                        </li>
-                        <li>
-                            <input type="checkbox" class="survey-list-checkboxes me-2" value="Feggy">
-                            <span>Feggy</span>
-                        </li>
-                        <li>
-                            <input type="checkbox" class="survey-list-checkboxes me-2" value="Geo">
-                            <span>Geo</span>
-                        </li>
-                        <li>
-                            <input type="checkbox" class="survey-list-checkboxes me-2" value="Nuriel">
-                            <span>Nuriel</span>
-                        </li>
-                        <li>
-                            <input type="checkbox" class="survey-list-checkboxes me-2" value="Robby">
-                            <span>Robby</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </td>
-        <td class="meeting-req-date-time">
-            <div class="d-flex flex-column gap-1">
-                <input type="date" class="form-control form-control-sm meeting-date">
-                <div class="d-flex gap-1 align-items-center">
-                    <input type="time" class="form-control form-control-sm meeting-time-start">
-                    <span>-</span>
-                    <input type="time" class="form-control form-control-sm meeting-time-end">
-                </div>
-                <input type="text" class="form-control form-control-sm meeting-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;">
-            </div>
-        </td>
-        <td class="meeting-detail-location">
-            <input type="text" class="form-control1">
-        </td>
-        <td class="meeting-notes">
-            <input type="text" class="form-control1">
-        </td>
-        <td class="meeting-status">
-            <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                <span id="not-yet" class="rounded-pill status">Not Yet</span>
-            </div>
-        </td>
-        <td class="meeting-actions">
-            <div class="d-flex justify-content-center">
-                <button type="button" class="btn"><i class='bx bx-file'></i> </button>
-                <button type="button" class="btn btn-remove-row-meeting"><i class='bx bx-trash'></i></button>
-            </div>
-        </td>
-    `;
-        tbody.appendChild(newRow);
+                let picOptionsHtml = (usersFromServer || []).map(user => `<li><label><input type="checkbox" class="survey-list-checkboxes me-2" name="MeetingSectionItems[${newIndex}].AssignedPICs" value="${user.value}"><span>${user.text}</span></label></li>`).join('');
 
-        const newPicDropdown = newRow.querySelector('.meeting-pic-dropdown');
-        if (newPicDropdown) setupMultiSelectDropdown(newPicDropdown);
-    });
-
-    document.addEventListener('click', function (e) {
-        if (e.target.closest('.btn-remove-row-meeting')) {
-            e.target.closest('tr').remove();
+                newRow.innerHTML = `
+                <td class="text-center" style="font-weight: 500;">${newIndex + 1}</td>
+                <td class="meeting-code">None</td>
+                <td class="meeting-name"><input type="text" class="size form-control1" name="MeetingSectionItems[${newIndex}].MeetingName"></td>
+                <td class="meeting-pic"><div class="wrapp meeting-pic-dropdown"><div class="select-btn py-0"><input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" placeholder="Pilih PIC"/><i class="bx bx-chevron-down"></i></div><div class="content-search"><ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">${picOptionsHtml}</ul></div></div></td>
+                <td class="meeting-req-date-time">
+                    <input type="hidden" name="MeetingSectionItems[${newIndex}].MeetingStartTime" />
+                    <input type="hidden" name="MeetingSectionItems[${newIndex}].MeetingEndTime" />
+                    <div class="d-flex flex-column gap-1">
+                        <input type="date" class="form-control form-control-sm meeting-date">
+                        <div class="d-flex gap-1 align-items-center">
+                            <input type="time" class="form-control form-control-sm meeting-time-start">
+                            <span>-</span>
+                            <input type="time" class="form-control form-control-sm meeting-time-end">
+                        </div>
+                        <input type="text" class="form-control form-control-sm meeting-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;">
+                    </div>
+                </td>
+                <td class="meeting-detail-location"><input type="text" class="size form-control1" name="MeetingSectionItems[${newIndex}].LocationDetails"></td>
+                <td class="meeting-notes"><input type="text" class="size form-control1" name="MeetingSectionItems[${newIndex}].NotesInternal"></td>
+                <td class="meeting-status"><div class="d-flex justify-content-center align-items-center flex-column gap-1"><span class="rounded-pill status">Open</span></div></td>
+                <td class="meeting-actions"><div class="d-flex justify-content-center"><button type="button" class="btn"><i class='bx bx-file'></i></button><button type="button" class="btn btn-remove-row-meeting"><i class='bx bx-trash'></i></button></div></td>
+            `;
+                meetingTableBody.appendChild(newRow);
+            });
         }
-    });
+    }
+
+    // Panggil fungsi inisialisasi utama untuk tabel meeting
+    initializeMeetingTable();
+
 
     const buttonGroup = document.getElementById('buttonGroup');
     const saveBtn = document.getElementById('save-rfq-btn');
@@ -3488,25 +3483,29 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function isSurveyListRowEmpty(row) {
-        const categoryChecked = row.querySelectorAll('.survey-category-dropdown .survey-list-checkboxes:checked').length > 0;
-        const surveyName = row.querySelector('.survey-name input')?.value.trim();
-        const picChecked = row.querySelectorAll('.survey-pic-dropdown .survey-list-checkboxes:checked').length > 0;
-        const customerPic = row.querySelector('.survey-customer-pic input')?.value.trim();
-        const reqDateTime = row.querySelector('.survey-req-date-time input')?.value.trim();
-        const detailLocation = row.querySelector('.survey-detail-location input')?.value.trim();
-        const notes = row.querySelector('.survey-notes input')?.value.trim();
-        return !categoryChecked && !surveyName && !picChecked && !customerPic && !reqDateTime && !detailLocation && !notes;
+        // Ambil semua input yang bisa diisi pengguna (teks, tanggal, waktu, angka)
+        const inputs = row.querySelectorAll('input[type="text"], input[type="date"], input[type="time"], input[type="number"]');
+
+        // Cek apakah semua input tersebut benar-benar kosong
+        const allInputsEmpty = Array.from(inputs).every(input => !input.value.trim());
+
+        // Cek apakah ada satu saja checkbox yang tercentang
+        const anyCheckboxChecked = row.querySelector('input[type="checkbox"]:checked');
+
+        // Baris dianggap kosong HANYA JIKA semua input teks/tanggal/dll kosong DAN tidak ada satupun checkbox yang tercentang.
+        return allInputsEmpty && !anyCheckboxChecked;
     }
 
     function onSaveClick(e) {
+        // 1. Hentikan pengiriman otomatis untuk memberi waktu pada script
         e.preventDefault();
 
+        // 2. Jalankan pembersihan untuk setiap tabel
         const notesTableBody = document.getElementById('itemTableBody');
         if (notesTableBody) {
             Array.from(notesTableBody.querySelectorAll('tr')).forEach(row => {
                 if (isNotesRowEmpty(row)) row.remove();
             });
-            renumberTableRows('itemTableBody');
         }
 
         const itemListTableBody = document.getElementById('itemListTableBody');
@@ -3514,8 +3513,6 @@ document.addEventListener("DOMContentLoaded", function () {
             Array.from(itemListTableBody.querySelectorAll('tr')).forEach(row => {
                 if (isItemListRowEmpty(row)) row.remove();
             });
-            renumberItemListTable();
-            updateItemListTotal();
         }
 
         const surveyTableBody = document.getElementById('surveyTableBody');
@@ -3523,7 +3520,6 @@ document.addEventListener("DOMContentLoaded", function () {
             Array.from(surveyTableBody.querySelectorAll('tr')).forEach(row => {
                 if (isSurveyListRowEmpty(row)) row.remove();
             });
-            renumberTableRows('surveyTableBody');
         }
 
         const meetingTableBody = document.getElementById('meetingTableBody');
@@ -3531,60 +3527,55 @@ document.addEventListener("DOMContentLoaded", function () {
             Array.from(meetingTableBody.querySelectorAll('tr')).forEach(row => {
                 if (isMeetingRowEmpty(row)) row.remove();
             });
-            renumberTableRows('meetingTableBody');
-
-            meetingTableBody.querySelectorAll('tr').forEach(row => {
-                const statusSpan = row.querySelector('.meeting-status span');
-                if (statusSpan && statusSpan.textContent.trim() === 'Not Yet') {
-                    statusSpan.textContent = 'Open';
-                    statusSpan.id = 'open';
-                    statusSpan.classList.remove('status');
-                    statusSpan.classList.add('status', 'open-status');
-                }
-            });
         }
 
-
-        const reqTableBody = document.getElementById('reqTableBody');
-        if (reqTableBody) {
-            reqTableBody.querySelectorAll('tr').forEach(row => {
-                const statusSpan = row.querySelector('.reqStatus span');
-                if (statusSpan && statusSpan.textContent.trim() === 'Not Yet') {
-                    statusSpan.textContent = 'Open';
-                    statusSpan.id = 'open';
-                    statusSpan.classList.remove('status');
-                    statusSpan.classList.add('status', 'open-status');
-                }
-            });
+        // Penomoran ulang dan kalkulasi setelah semua potensi penghapusan selesai
+        if (notesTableBody) renumberTableRows('itemTableBody');
+        if (itemListTableBody) {
+            renumberItemListTable();
+            updateItemListTotal();
         }
+        if (surveyTableBody) renumberTableRows('surveyTableBody');
+        if (meetingTableBody) renumberTableRows('meetingTableBody');
 
-        if (surveyTableBody) {
-            surveyTableBody.querySelectorAll('tr').forEach(row => {
-                const statusSpan = row.querySelector('.survey-status span');
-                if (statusSpan && statusSpan.textContent.trim() === 'Not Yet') {
-                    statusSpan.textContent = 'Open';
-                    statusSpan.id = 'open';
-                    statusSpan.classList.remove('status');
-                    statusSpan.classList.add('status', 'open-status');
-                }
-            });
+
+        // 3. Submit form SETELAH jeda singkat untuk memastikan DOM sudah terupdate
+        const form = document.getElementById('create-rfq-form');
+        if (form) {
+            setTimeout(function () {
+                form.submit();
+            }, 1000); // Jeda 100 milidetik
         }
-
-        disableAllFormFields();
-        renderSendEditDiscard();
-        updateCompanyStatusLabel('waiting-assign');
     }
+
 
     function onEditClick() {
         enableAllFormFields();
         renderSaveDiscard();
     }
 
-    if (saveBtn && buttonGroup) {
-        saveBtn.addEventListener('click', onSaveClick);
+    
+    if (buttonGroup) {
+        const saveBtn = buttonGroup.querySelector('#save-rfq-btn');
+        const discardBtn = buttonGroup.querySelector('#discard-btn');
+
+        if (saveBtn) {
+            saveBtn.addEventListener('click', onSaveClick);
+        }
+        if (discardBtn) {
+            // Asumsi discard hanya kembali ke halaman index
+            discardBtn.addEventListener('click', () => {
+                window.location.href = '/RFQ/Index';
+            });
+        }
     }
-    if (discardBtn) {
-        discardBtn.addEventListener('click', () => window.location.href = '/RFQ/Index');
+
+    const rfqIdInput = document.querySelector('input[name="RFQID_FromEdit"]');
+    if (rfqIdInput && rfqIdInput.value) {
+        // Jika halaman dimuat dengan ID RFQ (artinya sudah tersimpan),
+        // maka nonaktifkan semua field dan ubah tombolnya.
+        disableAllFormFields();
+        renderSendEditDiscard();
     }
 });
 

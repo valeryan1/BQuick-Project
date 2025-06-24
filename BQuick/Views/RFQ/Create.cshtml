@@ -542,7 +542,7 @@
                         </div>
 
                         <div class="d-flex justify-content-center gap-2">
-                            <button type="submit" class="btn btn-success add-customer-form-save-btn btn-uniform">
+                            <button type="submit "  id="save-rfq-btn" form="create-rfq-form" class="btn btn-success add-customer-form-save-btn btn-uniform">
                                 Save
                             </button>
 
@@ -934,7 +934,14 @@
             </form>
         </div>
 
-        <form asp-action="Create" method="post" enctype="multipart/form-data">
+        <form id="create-rfq-form" asp-action="CreateFull" method="post" enctype="multipart/form-data">
+
+            @Html.AntiForgeryToken()
+            @if (Model.RFQID_FromEdit.HasValue)
+            {
+                <input type="hidden" asp-for="RFQID_FromEdit" />
+            }
+
             <div class="row justify-content-center">
                 <div class="col-12">
                     <div class="d-flex align-items-center justify-content-between my-4">
@@ -1019,37 +1026,41 @@
                                         </div>
                                         <div class="content-search">
                                             <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
-                                                <li onclick="updateResource(this)">Email</li>
-                                                <li onclick="updateResource(this)">Whatsapp</li>
-                                                <li onclick="updateResource(this)">Telephone</li>
+                                                @* Opsi utama (tanpa onclick) *@
+                                                <li>Email</li>
+                                                <li>Whatsapp</li>
+                                                <li>Telephone</li>
+
+                                                @* Opsi "Personal" dengan sub-menu *@
                                                 <li class="has-sub" id="resource-personal-option">
                                                     Personal
                                                     <ul class="sub-option" id="resource-personal-sub-dropdown">
                                                         <li class="has-sub" id="resource-personal-email">
                                                             Email
                                                             <ul class="sub-option second-level">
-                                                                <li onclick="updateResourcePersonalUser(this)">Seheni</li>
-                                                                <li onclick="updateResourcePersonalUser(this)">Nadya</li>
-                                                                <li onclick="updateResourcePersonalUser(this)">Meli</li>
-                                                                <li onclick="updateResourcePersonalUser(this)">Elpera</li>
+                                                                @* Menggunakan loop untuk menampilkan semua user dari model *@
+                                                                @foreach (var user in Model.UserList)
+                                                                {
+                                                                    <li data-value="@user.Value">@user.Text</li>
+                                                                }
                                                             </ul>
                                                         </li>
                                                         <li class="has-sub" id="resource-personal-phone">
                                                             Phone
                                                             <ul class="sub-option second-level">
-                                                                <li onclick="updateResourcePersonalUser(this)">Seheni</li>
-                                                                <li onclick="updateResourcePersonalUser(this)">Nadya</li>
-                                                                <li onclick="updateResourcePersonalUser(this)">Meli</li>
-                                                                <li onclick="updateResourcePersonalUser(this)">Elpera</li>
+                                                                @foreach (var user in Model.UserList)
+                                                                {
+                                                                    <li data-value="@user.Value">@user.Text</li>
+                                                                }
                                                             </ul>
                                                         </li>
                                                         <li class="has-sub" id="resource-personal-direct">
                                                             Direct
                                                             <ul class="sub-option second-level">
-                                                                <li onclick="updateResourcePersonalUser(this)">Seheni</li>
-                                                                <li onclick="updateResourcePersonalUser(this)">Nadya</li>
-                                                                <li onclick="updateResourcePersonalUser(this)">Meli</li>
-                                                                <li onclick="updateResourcePersonalUser(this)">Elpera</li>
+                                                                @foreach (var user in Model.UserList)
+                                                                {
+                                                                    <li data-value="@user.Value">@user.Text</li>
+                                                                }
                                                             </ul>
                                                         </li>
                                                     </ul>
@@ -1436,331 +1447,59 @@
                             </tr>
                         </thead>
                         <tbody id="meetingTableBody">
-                            <tr>
-                                <td class="text-center" style="font-weight: 500;">1</td>
-                                <td class="meeting-code">M240001</td>
-                                <td class="meeting-name"><input type="text" class="size form-control1" value="Replacement and Maintenance"></td>
-                                <td class="meeting-pic">
-                                    <div class="wrapp meeting-pic-dropdown">
-                                        <div class="select-btn py-0">
-                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Feggy, Geo" />
-                                            <i class='bx bx-chevron-down'></i>
+                            @for (int i = 0; i < Model.MeetingSectionItems.Count; i++)
+                            {
+                                <tr>
+                                    <td class="text-center" style="font-weight: 500;">@(i + 1)</td>
+                                    <td class="meeting-code">None</td>
+                                    <td class="meeting-name"><input asp-for="MeetingSectionItems[i].MeetingName" class="size form-control1"></td>
+                                    <td class="meeting-pic">
+                                        <div class="wrapp meeting-pic-dropdown">
+                                            <div class="select-btn py-0">
+                                                <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" placeholder="Pilih PIC" />
+                                                <i class='bx bx-chevron-down'></i>
+                                            </div>
+                                            <div class="content-search">
+                                                <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
+                                                    @foreach (var user in Model.UserList)
+                                                    {
+                                                        <li>
+                                                            <label>
+                                                                <input type="checkbox" class="survey-list-checkboxes me-2"
+                                                                       name="MeetingSectionItems[@i].AssignedPICs"
+                                                                       value="@user.Value"
+                                                                       @(Model.MeetingSectionItems[i].AssignedPICs.Contains(int.Parse(user.Value)) ? "checked" : "")>
+                                                                <span>@user.Text</span>
+                                                            </label>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            </div>
                                         </div>
-                                        <div class="content-search">
-                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem; height: 135px;">
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Ance">
-                                                    <span>Ance</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Feggy">
-                                                    <span>Feggy</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Geo">
-                                                    <span>Geo</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Nuriel">
-                                                    <span>Nuriel</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Robby">
-                                                    <span>Robby</span>
-                                                </li>
-                                            </ul>
+                                    </td>
+                                    <td class="meeting-req-date-time">
+                                        <input type="hidden" asp-for="MeetingSectionItems[i].MeetingStartTime" />
+                                        <input type="hidden" asp-for="MeetingSectionItems[i].MeetingEndTime" />
+                                        <div class="d-flex flex-column gap-1">
+                                            <input type="date" class="form-control form-control-sm meeting-date" value="@(Model.MeetingSectionItems[i].MeetingStartTime?.ToString("yyyy-MM-dd"))">
+                                            <div class="d-flex gap-1 align-items-center">
+                                                <input type="time" class="form-control form-control-sm meeting-time-start" value="@(Model.MeetingSectionItems[i].MeetingStartTime?.ToString("HH:mm"))">
+                                                <span>-</span>
+                                                <input type="time" class="form-control form-control-sm meeting-time-end" value="@(Model.MeetingSectionItems[i].MeetingEndTime?.ToString("HH:mm"))">
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td class="meeting-req-date-time">
-                                    <div class="d-flex flex-column gap-1">
-                                        <input type="date" class="form-control form-control-sm meeting-date" value="2024-08-13">
-                                        <div class="d-flex gap-1 align-items-center">
-                                            <input type="time" class="form-control form-control-sm meeting-time-start" value="13:30">
-                                            <span>-</span>
-                                            <input type="time" class="form-control form-control-sm meeting-time-end" value="15:45">
+                                    </td>
+                                    <td class="meeting-detail-location"><input asp-for="MeetingSectionItems[i].LocationDetails" class="size form-control1"></td>
+                                    <td class="meeting-notes"><input asp-for="MeetingSectionItems[i].NotesInternal" class="size form-control1"></td>
+                                    <td class="meeting-status"><div class="d-flex justify-content-center align-items-center flex-column gap-1"><span class="rounded-pill status">Open</span></div></td>
+                                    <td class="meeting-actions">
+                                        <div class="d-flex justify-content-center">
+                                            <button type="button" class="btn"><i class='bx bx-file'></i></button>
+                                            <button type="button" class="btn btn-remove-row-meeting"><i class='bx bx-trash'></i></button>
                                         </div>
-                                        <input type="text" class="form-control form-control-sm meeting-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;" value="Tuesday, 13 August 2024 01:30 PM - 03:45 PM">
-                                    </div>
-                                </td>
-                                <td class="meeting-detail-location">
-                                    <input type="text" class="form-control1" value="Online Link Zoom: https://www.zoom.com/">
-                                </td>
-                                <td class="meeting-notes">
-                                    <input type="text" class="form-control1">
-                                </td>
-                                <td class="meeting-status">
-                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                                        <span id="open" class="rounded-pill status">Open</span>
-                                    </div>
-                                </td>
-                                <td class="meeting-actions">
-                                    <div class="d-flex justify-content-center">
-                                        <button type="button" class="btn"><i class='bx bx-file'></i> </button>
-                                        <button type="button" class="btn btn-remove-row-meeting"><i class='bx bx-trash'></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center" style="font-weight: 500;">2</td>
-                                <td class="meeting-code">M240002</td>
-                                <td class="meeting-name"><input type="text" class="size form-control1" value="Replacement and Maintenance"></td>
-                                <td class="meeting-pic">
-                                    <div class="wrapp meeting-pic-dropdown">
-                                        <div class="select-btn py-0">
-                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Feggy, Geo" />
-                                            <i class='bx bx-chevron-down'></i>
-                                        </div>
-                                        <div class="content-search">
-                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem; height: 135px;">
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Ance">
-                                                    <span>Ance</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Feggy">
-                                                    <span>Feggy</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Geo">
-                                                    <span>Geo</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Nuriel">
-                                                    <span>Nuriel</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Robby">
-                                                    <span>Robby</span>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="meeting-req-date-time">
-                                    <div class="d-flex flex-column gap-1">
-                                        <input type="date" class="form-control form-control-sm meeting-date" value="2024-08-13">
-                                        <div class="d-flex gap-1 align-items-center">
-                                            <input type="time" class="form-control form-control-sm meeting-time-start" value="13:30">
-                                            <span>-</span>
-                                            <input type="time" class="form-control form-control-sm meeting-time-end" value="15:45">
-                                        </div>
-                                        <input type="text" class="form-control form-control-sm meeting-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;" value="Tuesday, 13 August 2024 01:30 PM - 03:45 PM">
-                                    </div>
-                                </td>
-                                <td class="meeting-detail-location">
-                                    <input type="text" class="form-control1" value="Online Link Zoom: https://www.zoom.com/">
-                                </td>
-                                <td class="meeting-notes">
-                                    <input type="text" class="form-control1">
-                                </td>
-                                <td class="meeting-status">
-                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                                        <span id="waiting-approval" class="rounded-pill status">Waiting Approval</span>
-                                    </div>
-                                </td>
-                                <td class="meeting-actions">
-                                    <div class="d-flex justify-content-center">
-                                        <button type="button" class="btn"><i class='bx bx-file'></i> </button>
-                                        <button type="button" class="btn btn-remove-row-meeting"><i class='bx bx-trash'></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center" style="font-weight: 500;">3</td>
-                                <td class="meeting-code">M240003</td>
-                                <td class="meeting-name"><input type="text" class="size form-control1" value="Replacement and Maintenance"></td>
-                                <td class="meeting-pic">
-                                    <div class="wrapp meeting-pic-dropdown">
-                                        <div class="select-btn py-0">
-                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Feggy, Geo" />
-                                            <i class='bx bx-chevron-down'></i>
-                                        </div>
-                                        <div class="content-search">
-                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem; height: 135px;">
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Ance">
-                                                    <span>Ance</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Feggy">
-                                                    <span>Feggy</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Geo">
-                                                    <span>Geo</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Nuriel">
-                                                    <span>Nuriel</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Robby">
-                                                    <span>Robby</span>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="meeting-req-date-time">
-                                    <div class="d-flex flex-column gap-1">
-                                        <input type="date" class="form-control form-control-sm meeting-date" value="2024-08-13">
-                                        <div class="d-flex gap-1 align-items-center">
-                                            <input type="time" class="form-control form-control-sm meeting-time-start" value="13:30">
-                                            <span>-</span>
-                                            <input type="time" class="form-control form-control-sm meeting-time-end" value="15:45">
-                                        </div>
-                                        <input type="text" class="form-control form-control-sm meeting-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;" value="Tuesday, 13 August 2024 01:30 PM - 03:45 PM">
-                                    </div>
-                                </td>
-                                <td class="meeting-detail-location">
-                                    <input type="text" class="form-control1" value="Online Link Zoom: https://www.zoom.com/">
-                                </td>
-                                <td class="meeting-notes">
-                                    <input type="text" class="form-control1">
-                                </td>
-                                <td class="meeting-status">
-                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                                        <span id="on-progress" class="rounded-pill status">On Progress</span>
-                                    </div>
-                                </td>
-                                <td class="meeting-actions">
-                                    <div class="d-flex justify-content-center">
-                                        <button type="button" class="btn"><i class='bx bx-file'></i> </button>
-                                        <button type="button" class="btn btn-remove-row-meeting"><i class='bx bx-trash'></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center" style="font-weight: 500;">4</td>
-                                <td class="meeting-code">M240004</td>
-                                <td class="meeting-name"><input type="text" class="size form-control1" value="Replacement and Maintenance"></td>
-                                <td class="meeting-pic">
-                                    <div class="wrapp meeting-pic-dropdown">
-                                        <div class="select-btn py-0">
-                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Feggy, Geo" />
-                                            <i class='bx bx-chevron-down'></i>
-                                        </div>
-                                        <div class="content-search">
-                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem; height: 135px;">
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Ance">
-                                                    <span>Ance</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Feggy">
-                                                    <span>Feggy</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Geo">
-                                                    <span>Geo</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Nuriel">
-                                                    <span>Nuriel</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Robby">
-                                                    <span>Robby</span>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="meeting-req-date-time">
-                                    <div class="d-flex flex-column gap-1">
-                                        <input type="date" class="form-control form-control-sm meeting-date" value="2024-08-13">
-                                        <div class="d-flex gap-1 align-items-center">
-                                            <input type="time" class="form-control form-control-sm meeting-time-start" value="13:30">
-                                            <span>-</span>
-                                            <input type="time" class="form-control form-control-sm meeting-time-end" value="15:45">
-                                        </div>
-                                        <input type="text" class="form-control form-control-sm meeting-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;" value="Tuesday, 13 August 2024 01:30 PM - 03:45 PM">
-                                    </div>
-                                </td>
-                                <td class="meeting-detail-location">
-                                    <input type="text" class="form-control1" value="Online Link Zoom: https://www.zoom.com/">
-                                </td>
-                                <td class="meeting-notes">
-                                    <input type="text" class="form-control1">
-                                </td>
-                                <td class="meeting-status">
-                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                                        <span id="completed" class="rounded-pill status">Completed</span>
-                                    </div>
-                                </td>
-                                <td class="meeting-actions">
-                                    <div class="d-flex justify-content-center">
-                                        <button type="button" class="btn"><i class='bx bx-file'></i> </button>
-                                        <button type="button" class="btn btn-remove-row-meeting"><i class='bx bx-trash'></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center" style="font-weight: 500;">5</td>
-                                <td class="meeting-code">M240005</td>
-                                <td class="meeting-name"><input type="text" class="size form-control1" value="Replacement and Maintenance"></td>
-                                <td class="meeting-pic">
-                                    <div class="wrapp meeting-pic-dropdown">
-                                        <div class="select-btn py-0">
-                                            <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" value="Feggy, Geo" />
-                                            <i class='bx bx-chevron-down'></i>
-                                        </div>
-                                        <div class="content-search">
-                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem; height: 135px;">
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Ance">
-                                                    <span>Ance</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Feggy">
-                                                    <span>Feggy</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Geo">
-                                                    <span>Geo</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Nuriel">
-                                                    <span>Nuriel</span>
-                                                </li>
-                                                <li>
-                                                    <input type="checkbox" class="survey-list-checkboxes me-2" value="Robby">
-                                                    <span>Robby</span>
-                                                </li>req
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="meeting-req-date-time">
-                                    <div class="d-flex flex-column gap-1">
-                                        <input type="date" class="form-control form-control-sm meeting-date" value="2024-08-13">
-                                        <div class="d-flex gap-1 align-items-center">
-                                            <input type="time" class="form-control form-control-sm meeting-time-start" value="13:30">
-                                            <span>-</span>
-                                            <input type="time" class="form-control form-control-sm meeting-time-end" value="15:45">
-                                        </div>
-                                        <input type="text" class="form-control form-control-sm meeting-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;" value="Tuesday, 13 August 2024 01:30 PM - 03:45 PM">
-                                    </div>
-                                </td>
-                                <td class="meeting-detail-location">
-                                    <input type="text" class="form-control1" value="Online Link Zoom: https://www.zoom.com/">
-                                </td>
-                                <td class="meeting-notes">
-                                    <input type="text" class="form-control1">
-                                </td>
-                                <td class="meeting-status">
-                                    <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                                        <span id="not-yet" class="rounded-pill status">Not Yet</span>
-                                    </div>
-                                </td>
-                                <td class="meeting-actions">
-                                    <div class="d-flex justify-content-center">
-                                        <button type="button" class="btn"><i class='bx bx-file'></i> </button>
-                                        <button type="button" class="btn btn-remove-row-meeting"><i class='bx bx-trash'></i></button>
-                                    </div>
-                                </td>
-                            </tr>
+                                    </td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
                     <button type="button" id="addMeetingBtn" class="btn btn-dark mt-1 btn-uniform">Add Meeting</button>

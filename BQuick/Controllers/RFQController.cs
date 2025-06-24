@@ -145,273 +145,188 @@ namespace BQuick.Controllers
         // POST: RFQ/CreateFull
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(RfqCreateFullViewModel viewModel)
+        public async Task<IActionResult> CreateFull(RfqCreateFullViewModel viewModel)
         {
-            // Asumsi untuk Tahap 1: ini adalah pembuatan RFQ baru
-            // Nantinya Anda akan menambahkan logika untuk membedakan user role.
-            // Untuk sekarang, kita fokus pada logika penyimpanan Tahap 1.
-            bool isCreatingNewRfqByAdminSales = !viewModel.RFQID_FromEdit.HasValue;
+        
+            const int LoggedInUserId = 1;
 
-            if (isCreatingNewRfqByAdminSales)
-            {
-                // Validasi dasar untuk Tahap 1
-                if (string.IsNullOrWhiteSpace(viewModel.RFQName))
-                    ModelState.AddModelError(nameof(viewModel.RFQName), "RFQ Name harus diisi.");
-                if (viewModel.CustomerID == 0) // CustomerID dari hidden input, diisi setelah pilih/create customer
-                    ModelState.AddModelError(nameof(viewModel.CustomerID), "Company Name harus dipilih atau dibuat.");
-                if (!viewModel.EndUserContactPersonID.HasValue || viewModel.EndUserContactPersonID == 0)
-                    ModelState.AddModelError(nameof(viewModel.EndUserContactPersonID), "End User harus dipilih atau dibuat.");
 
-                // Validasi untuk NotesSectionItems
-                if (viewModel.NotesSectionItems != null)
-                {
-                    // DEBUG: Lihat isi NotesSectionItems yang diterima dari form SEBELUM RemoveAll
-                    System.Diagnostics.Debug.WriteLine($"Jumlah NotesSectionItems diterima: {viewModel.NotesSectionItems.Count}");
-                    for (int k = 0; k < viewModel.NotesSectionItems.Count; k++)
-                    {
-                        var item = viewModel.NotesSectionItems[k];
-                        System.Diagnostics.Debug.WriteLine($"SEBELUM Remove - Note Item [{k}]: Name='{item.ItemName}', Desc='{item.ItemDescription}'");
-                    }
-
-                    // LANGKAH 1: Hapus dulu baris yang sepenuhnya kosong 
-                    // (di mana kedua field wajibnya, ItemName DAN ItemDescription, kosong)
-                    viewModel.NotesSectionItems.RemoveAll(n =>
-                        string.IsNullOrWhiteSpace(n.ItemName) &&
-                        string.IsNullOrWhiteSpace(n.ItemDescription)
-                    );
-
-                    // DEBUG: Lihat isi NotesSectionItems SETELAH RemoveAll
-                    System.Diagnostics.Debug.WriteLine($"Jumlah NotesSectionItems SETELAH RemoveAll: {viewModel.NotesSectionItems.Count}");
-                    for (int k = 0; k < viewModel.NotesSectionItems.Count; k++)
-                    {
-                        var item = viewModel.NotesSectionItems[k];
-                        System.Diagnostics.Debug.WriteLine($"SETELAH Remove - Note Item [{k}]: Name='{item.ItemName}', Desc='{item.ItemDescription}'");
-                    }
-
-                    // LANGKAH 2: Kemudian, validasi setiap baris yang TERSISA 
-                    // (yang dianggap "digunakan" karena setidaknya salah satu dari ItemName atau ItemDescription sudah diisi)
-                    for (int i = 0; i < viewModel.NotesSectionItems.Count; i++)
-                    {
-                        var note = viewModel.NotesSectionItems[i];
-
-                        // Karena baris yang sepenuhnya kosong sudah dihapus,
-                        // setiap 'note' di sini pasti memiliki ItemName atau ItemDescription (atau keduanya) yang terisi.
-                        // Jadi, kita sekarang hanya perlu memastikan bahwa jika satu diisi, yang lain juga diisi.
-                        if (string.IsNullOrWhiteSpace(note.ItemName))
-                        {
-                            // Ini akan terpicu jika ItemDescription diisi, tapi ItemName tidak.
-                            ModelState.AddModelError($"NotesSectionItems[{i}].ItemName", "Item Name di Notes wajib diisi jika baris digunakan (Item Description terisi).");
-                        }
-                        if (string.IsNullOrWhiteSpace(note.ItemDescription))
-                        {
-                            // Ini akan terpicu jika ItemName diisi, tapi ItemDescription tidak.
-                            ModelState.AddModelError($"NotesSectionItems[{i}].ItemDescription", "Item Description di Notes wajib diisi jika baris digunakan (Item Name terisi).");
-                        }
-
-                        if (string.IsNullOrWhiteSpace(note.LeadTimeTarget))
-                        {
-                            ModelState.Remove($"NotesSectionItems[{i}].LeadTimeTarget");
-                        }
-                    }
-                }
-
-                // Validasi agar ItemListSectionItems dan PurchasingRequestSectionItems harus kosong
-                //if (viewModel.ItemListSectionItems != null && viewModel.ItemListSectionItems.Count > 0)
-                //{
-                //    ModelState.AddModelError(nameof(viewModel.ItemListSectionItems), "Daftar Item harus kosong pada tahap ini.");
-                //}
-                //if (viewModel.PurchasingRequestSectionItems != null && viewModel.PurchasingRequestSectionItems.Count > 0)
-                //{
-                //    ModelState.AddModelError(nameof(viewModel.PurchasingRequestSectionItems), "Daftar Purchasing Request harus kosong pada tahap ini.");
-                //}
-
-                if (viewModel.ItemListSectionItems != null && viewModel.ItemListSectionItems.Count == 1)
-                {
-                    // Asumsikan item pertama adalah default yang tidak diisi
-                    ModelState.Remove("ItemListSectionItems[0].ItemID");
-                    ModelState.Remove("ItemListSectionItems[0].Quantity"); // Meskipun defaultnya 1, jika ItemID tidak valid, ini bisa jadi error
-                    ModelState.Remove("ItemListSectionItems[0].Notes");
-                    ModelState.Remove("ItemListSectionItems[0].Details");
-                    ModelState.Remove("ItemListSectionItems[0].SalesWarranty");
-                    // Tambahkan field lain dari RfqCreateRfqItemViewModel jika perlu
-                }
-                viewModel.ItemListSectionItems?.Clear(); // Tetap panggil Clear()
-
-                if (viewModel.PurchasingRequestSectionItems != null && viewModel.PurchasingRequestSectionItems.Count == 1)
-                {
-                    // Asumsikan item pertama adalah default yang tidak diisi
-                    ModelState.Remove("PurchasingRequestSectionItems[0].ReasonForRequest");
-                    ModelState.Remove("PurchasingRequestSectionItems[0].Quantity");
-                    ModelState.Remove("PurchasingRequestSectionItems[0].RequestedItemName");
-                    ModelState.Remove("PurchasingRequestSectionItems[0].RequestedItemDescription");
-                    ModelState.Remove("PurchasingRequestSectionItems[0].SalesNotes");
-                    // Tambahkan field lain dari RfqCreatePurchasingRequestItemViewModel jika perlu
-                }
-                viewModel.PurchasingRequestSectionItems?.Clear(); // Tetap panggil Clear()
-
-                // Hapus error validasi untuk field yang di-disable/hide di Tahap 1
-                ModelState.Remove(nameof(viewModel.RequestDate));
-                ModelState.Remove(nameof(viewModel.DueDate));
-                ModelState.Remove(nameof(viewModel.OverallBudget));
-                ModelState.Remove(nameof(viewModel.OverallLeadTime));
-                ModelState.Remove(nameof(viewModel.Resource));
-                ModelState.Remove(nameof(viewModel.PersonalResourceEmployeeID));
-                // RFQCategoryID dan RFQOpportunityID sudah nullable, jadi tidak perlu dihapus dari ModelState
-                // jika memang tidak ada validasi [Required] di ViewModel untuk field tersebut.
-                // Jika ada [Required] dan Anda ingin mengabaikannya untuk Tahap 1, maka hapus:
-                // ModelState.Remove(nameof(viewModel.RFQCategoryID));
-                // ModelState.Remove(nameof(viewModel.RFQOpportunityID));
-
-                // Kosongkan list yang tidak diisi di Tahap 1 untuk menghindari validasi dari item kosong default
-                viewModel.SurveySectionItems?.Clear();
-            }
-            
 
             if (ModelState.IsValid)
             {
-                if (isCreatingNewRfqByAdminSales)
+                // Gunakan transaction untuk memastikan semua data berhasil disimpan atau tidak sama sekali
+                using (var transaction = await _context.Database.BeginTransactionAsync())
                 {
-                    var rfqEntity = new RFQ
-                    {
-                        RFQCode = GenerateUniqueRFQCode(), // Menggunakan 4 angka random
-                        RFQName = viewModel.RFQName,
-                        CustomerID = viewModel.CustomerID,
-                        ContactPersonID = viewModel.EndUserContactPersonID,
-
-                        RequestDate = viewModel.RequestDate, // Diisi nanti
-                        DueDate = viewModel.DueDate,     // Diisi nanti
-                        OverallBudget = null,
-                        OverallLeadTime = null,
-                        Resource = null,
-                        PersonalResourceEmployeeID = null,
-                        RFQCategoryID = viewModel.RFQCategoryID, // Akan null jika tidak dipilih & sudah int?
-                        RFQOpportunityID = viewModel.RFQOpportunityID, // Akan null jika tidak dipilih & sudah int?
-
-                        // Tentukan ID yang tepat untuk "Waiting Assign" dari tabel RFQStatus Anda
-                        RFQStatusID = 2, // Misalnya ID 2 adalah "Waiting Assign (New Customer)" atau status "Waiting Assign" general Anda
-
-                        CreatedByUserID = LoggedInUserId,
-                        CreationTimestamp = DateTime.UtcNow,
-                        LastUpdateTimestamp = DateTime.UtcNow,
-                        AssignedToAdminSalesID = null
-                    };
-                    _context.RFQs.Add(rfqEntity);
-
                     try
                     {
-                        // SaveChanges pertama untuk RFQ header agar RFQID ter-generate
+                        // 1. Buat dan Simpan Entitas RFQ Utama
+                        var rfqEntity = new RFQ
+                        {
+                            RFQName = viewModel.RFQName,
+                            CustomerID = viewModel.CustomerID,
+                            ContactPersonID = viewModel.EndUserContactPersonID,
+                            RequestDate = viewModel.RequestDate,
+                            DueDate = viewModel.DueDate,
+                            OverallBudget = viewModel.OverallBudget,
+                            OverallLeadTime = viewModel.OverallLeadTime,
+                            Resource = viewModel.Resource,
+                            PersonalResourceEmployeeID = viewModel.PersonalResourceEmployeeID,
+                            RFQCategoryID = viewModel.RFQCategoryID,
+                            RFQOpportunityID = viewModel.RFQOpportunityID,
+                            CreatedByUserID = LoggedInUserId,
+                            RFQStatusID = 1, // Asumsi ID 1 = Status Awal
+                            RFQCode = "RFQ-TEMP-" + DateTime.Now.Ticks // Kode sementara
+                        };
+                        _context.RFQs.Add(rfqEntity);
+                        await _context.SaveChangesAsync(); // Simpan untuk mendapatkan RFQID
+
+                        // Update RFQCode dengan ID yang baru didapat
+                        rfqEntity.RFQCode = $"RFQ{DateTime.Now:yy}{rfqEntity.RFQID:D4}";
                         await _context.SaveChangesAsync();
 
-                        // Simpan RFQ Notes
+
+                        // 2. Simpan RFQ Notes
                         if (viewModel.NotesSectionItems != null && viewModel.NotesSectionItems.Any())
                         {
-                            foreach (var noteVm in viewModel.NotesSectionItems)
+                            foreach (var noteVm in viewModel.NotesSectionItems.Where(n => !string.IsNullOrEmpty(n.ItemName)))
                             {
-                                // Validasi lagi di sini sebelum add, karena RemoveAll di atas mungkin tidak menangkap semua skenario
-                                if (!string.IsNullOrWhiteSpace(noteVm.ItemName) && !string.IsNullOrWhiteSpace(noteVm.ItemDescription))
+                                var noteEntity = new RFQNote
                                 {
-                                    var rfqNoteEntity = new RFQNote
-                                    {
-                                        RFQID = rfqEntity.RFQID, // Menggunakan RFQID dari RFQ yang baru disimpan
-                                        ItemName = noteVm.ItemName,
-                                        ItemDescription = noteVm.ItemDescription,
-                                        // Set default 0 atau 1 jika Quantity/BudgetTarget tidak diisi dan non-nullable di DB
-                                        Quantity = noteVm.Quantity > 0 ? noteVm.Quantity : 0, // Atau default lain yang sesuai
-                                        UoM = noteVm.UoM,
-                                        BudgetTarget = noteVm.BudgetTarget,
-                                        LeadTimeTarget = noteVm.LeadTimeTarget
-                                    };
-                                    _context.RFQNotes.Add(rfqNoteEntity);
-                                }
+                                    RFQID = rfqEntity.RFQID,
+                                    ItemName = noteVm.ItemName,
+                                    ItemDescription = noteVm.ItemDescription,
+                                    Quantity = noteVm.Quantity,
+                                    UoM = noteVm.UoM,
+                                    BudgetTarget = noteVm.BudgetTarget,
+                                    LeadTimeTarget = noteVm.LeadTimeTarget
+                                };
+                                _context.RFQNotes.Add(noteEntity);
                             }
                         }
 
-                        // Simpan Lampiran (Attachments)
-                        if (viewModel.AttachmentFiles != null && viewModel.AttachmentFiles.Any())
+                        // 3. Simpan RFQ Items (dari tabel Item List)
+                        if (viewModel.ItemListSectionItems != null && viewModel.ItemListSectionItems.Any())
                         {
-                            string rfqAttachmentBasePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "attachments", "rfq", rfqEntity.RFQID.ToString());
-                            Directory.CreateDirectory(rfqAttachmentBasePath);
-
-                            foreach (var file in viewModel.AttachmentFiles)
+                            foreach (var itemVm in viewModel.ItemListSectionItems.Where(i => i.ItemID > 0))
                             {
-                                if (file.Length > 0 && file.Length <= 5 * 1024 * 1024)
+                                var itemEntity = new RFQ_Item
                                 {
-                                    var originalFileName = Path.GetFileName(file.FileName);
-                                    var uniqueStoredFileName = $"{Guid.NewGuid().ToString()}{Path.GetExtension(originalFileName)}";
-                                    var filePathOnServer = Path.Combine(rfqAttachmentBasePath, uniqueStoredFileName);
-
-                                    using (var stream = new FileStream(filePathOnServer, FileMode.Create))
-                                    {
-                                        await file.CopyToAsync(stream);
-                                    }
-
-                                    var rfqAttachmentEntity = new RFQAttachment
-                                    {
-                                        RFQID = rfqEntity.RFQID,
-                                        FileName = originalFileName,
-                                        FileURL = $"/attachments/rfq/{rfqEntity.RFQID}/{uniqueStoredFileName}",
-                                        UploadTimestamp = DateTime.UtcNow,
-                                        UploadedByUserID = LoggedInUserId
-                                    };
-                                    _context.RFQAttachments.Add(rfqAttachmentEntity);
-                                }
+                                    RFQID = rfqEntity.RFQID,
+                                    ItemID = itemVm.ItemID,
+                                    Description = itemVm.ItemDescription,
+                                    Quantity = itemVm.Quantity,
+                                    UoM = itemVm.UoM,
+                                    TargetUnitPrice = itemVm.TargetUnitPrice,
+                                    Notes = itemVm.Notes,
+                                    Details = itemVm.Details,
+                                    SalesWarranty = itemVm.SalesWarranty
+                                };
+                                _context.RFQ_Items.Add(itemEntity);
                             }
                         }
 
+                        // 4. Simpan Survey Requests
                         if (viewModel.SurveySectionItems != null && viewModel.SurveySectionItems.Any())
                         {
-                            foreach (var surveyVm in viewModel.SurveySectionItems)
+                            foreach (var surveyVm in viewModel.SurveySectionItems.Where(s => !string.IsNullOrEmpty(s.SurveyName)))
                             {
-                                // Buat entitas SurveyRequest baru dari database model Anda
+                                if (surveyVm == null)
+                                {
+                                    continue;
+                                }
                                 var surveyEntity = new SurveyRequest
                                 {
-                                    RFQID = rfqEntity.RFQID, // Tautkan ke RFQ yang baru dibuat
+                                    RFQID = rfqEntity.RFQID,
                                     SurveyName = surveyVm.SurveyName,
                                     CustomerPICName = surveyVm.CustomerPICName,
                                     LocationDetails = surveyVm.LocationDetails,
                                     SalesNotesInternal = surveyVm.SalesNotesInternal,
                                     RequestStartTime = surveyVm.RequestStartTime,
                                     RequestEndTime = surveyVm.RequestEndTime,
-                                    SurveyStatusID = 1,
-                                    // TODO: Logika untuk menyimpan relasi many-to-many (kategori dan PIC)
+                                    SurveyStatusID = 1, // ID 1 = "Not Yet (Sales Request)"
+                                    CreatedByUserID = LoggedInUserId,
+                                    SurveyCode = "SV-TEMP" // Kode sementara
                                 };
+                                _context.SurveyRequests.Add(surveyEntity);
+
+                                // Menangani relasi many-to-many untuk Kategori
                                 if (surveyVm.SurveyCategoryIDs != null && surveyVm.SurveyCategoryIDs.Any())
                                 {
-                                    var selectedCategories = await _context.SurveyCategories
-                                        .Where(c => surveyVm.SurveyCategoryIDs.Contains(c.SurveyCategoryID))
-                                        .ToListAsync();
+                                    var selectedCategories = await _context.SurveyCategories.Where(c => surveyVm.SurveyCategoryIDs.Contains(c.SurveyCategoryID)).ToListAsync();
                                     surveyEntity.SurveyCategories = selectedCategories;
                                 }
 
-                                // 2. Menangani Assigned PICs (menggunakan tabel join SurveyPIC)
+                                // Menangani relasi many-to-many untuk PIC melalui tabel SurveyPIC
                                 if (surveyVm.TechnicalUserIDs != null && surveyVm.TechnicalUserIDs.Any())
                                 {
-                                    foreach (var userId in surveyVm.TechnicalUserIDs)
+                                    foreach (var picId in surveyVm.TechnicalUserIDs)
                                     {
-                                        var surveyPic = new SurveyPIC
-                                        {
-                                            SurveyRequest = surveyEntity, // Tautkan ke entitas survey
-                                            TechnicalUserID = userId              // Tautkan ke ID user
-                                        };
+                                        var surveyPic = new SurveyPIC { SurveyRequest = surveyEntity, TechnicalUserID = picId, PICApprovalStatusID = 1 };
                                         _context.SurveyPICs.Add(surveyPic);
                                     }
                                 }
-
-                                _context.SurveyRequests.Add(surveyEntity);
                             }
                         }
 
-                        // SaveChanges kedua untuk Notes dan Attachments
+                        // 5. Simpan Meeting Requests
+                        if (viewModel.MeetingSectionItems != null && viewModel.MeetingSectionItems.Any())
+                        {
+                            foreach (var meetingVm in viewModel.MeetingSectionItems.Where(m => !string.IsNullOrEmpty(m.MeetingName)))
+                            {
+                                var meetingEntity = new MeetingRequest
+                                {
+                                    RFQID = rfqEntity.RFQID,
+                                    MeetingName = meetingVm.MeetingName,
+                                    MeetingStartTime = meetingVm.MeetingStartTime,
+                                    MeetingEndTime = meetingVm.MeetingEndTime,
+                                    LocationDetails = meetingVm.LocationDetails,
+                                    NotesInternal = meetingVm.NotesInternal,
+                                    MeetingCode = "M-TEMP",
+                                    PrimaryPIC_UserID = LoggedInUserId,
+                                    CreatedByUserID = LoggedInUserId,
+                                    MeetingStatusID = 1 // ID 1 = "Not Yet"
+                                };
+                                _context.MeetingRequests.Add(meetingEntity);
+
+                                if (meetingVm.AssignedPICs != null && meetingVm.AssignedPICs.Any())
+                                {
+                                    foreach (var picId in meetingVm.AssignedPICs)
+                                    {
+                                        var meetingPic = new MeetingPIC { MeetingRequest = meetingEntity, UserID = picId, PICApprovalStatusID = 1 };
+                                        _context.MeetingPICs.Add(meetingPic);
+                                    }
+                                }
+                            }
+                        }
+
+                        // Simpan semua perubahan untuk entitas terkait
                         await _context.SaveChangesAsync();
 
-                        TempData["SuccessMessage"] = $"RFQ '{rfqEntity.RFQName}' (Code: {rfqEntity.RFQCode}) berhasil dibuat dan menunggu assignment.";
-                        return RedirectToAction(nameof(Index));
+                        // Konfirmasi transaksi jika semua berhasil
+                        await transaction.CommitAsync();
+
+                        TempData["SuccessMessage"] = $"RFQ '{rfqEntity.RFQName}' berhasil dibuat.";
+                        return RedirectToAction(nameof(CreateFull), new { id = rfqEntity.RFQID });
                     }
-                    catch (DbUpdateException ex)
+                    catch (Exception ex)
                     {
-                        ModelState.AddModelError("", "Terjadi kesalahan saat menyimpan RFQ: " + ex.Message + (ex.InnerException != null ? " Inner: " + ex.InnerException.Message : ""));
+                        // Jika terjadi error, batalkan semua perubahan
+                        await transaction.RollbackAsync();
+                        Console.WriteLine("!!!!!! TERJADI ERROR SAAT MENYIMPAN RFQ !!!!!!");
+                        Console.WriteLine(ex.ToString()); // Ini akan mencetak detail error lengkap ke konsol
+                        ModelState.AddModelError("", "Terjadi kesalahan saat menyimpan data. Silakan coba lagi.");
                     }
+
                 }
+            }
+
+            // Jika model tidak valid, tetap tampilkan form dengan pesan error
+            else
+            {
+                // Tambahkan blok ini untuk melihat error saat debugging
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
+                // Letakkan breakpoint di sini untuk memeriksa isi variabel 'errors'
+                // saat Anda menjalankan aplikasi dalam mode Debug.
             }
 
             await PopulateDropdownsForCreateFullAsync(viewModel);

@@ -109,10 +109,13 @@ namespace BQuick.Models
     {
         [StringLength(255)]
         public string MeetingName { get; set; }
-        public DateTime? RequestedDateTime { get; set; }
+        public DateTime? MeetingStartTime { get; set; }
+        public DateTime? MeetingEndTime { get; set; }
         public string LocationDetails { get; set; }
         public string NotesInternal { get; set; }
         public List<int> AssignedPICs { get; set; } = new List<int>();
+        public int MeetingStatusID { get; set; }
+        public string MeetingStatusName { get; set; }
     }
 
 
