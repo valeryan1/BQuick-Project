@@ -108,7 +108,7 @@ namespace BQuick.Controllers
 
                 // Mengisi EndUserContactPersonID (dan ContactPersonID jika fieldnya sama di ViewModel untuk tujuan berbeda)
                 // Asumsi ContactPersonID di entitas RFQ adalah End User yang dipilih di Tahap 1
-                viewModel.ContactPersonID = rfq.ContactPersonID;
+                viewModel.ContactPersonID = rfq.ContactPersonID ?? 0;
                 viewModel.EndUserContactPersonID = rfq.ContactPersonID;
 
                 // Mengisi field-field yang mungkin sudah diisi di tahap sebelumnya atau akan dilanjutkan
@@ -147,186 +147,199 @@ namespace BQuick.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateFull(RfqCreateFullViewModel viewModel)
         {
-        
-            const int LoggedInUserId = 1;
-
-
-
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                // Gunakan transaction untuk memastikan semua data berhasil disimpan atau tidak sama sekali
-                using (var transaction = await _context.Database.BeginTransactionAsync())
-                {
-                    try
-                    {
-                        // 1. Buat dan Simpan Entitas RFQ Utama
-                        var rfqEntity = new RFQ
-                        {
-                            RFQName = viewModel.RFQName,
-                            CustomerID = viewModel.CustomerID,
-                            ContactPersonID = viewModel.EndUserContactPersonID,
-                            RequestDate = viewModel.RequestDate,
-                            DueDate = viewModel.DueDate,
-                            OverallBudget = viewModel.OverallBudget,
-                            OverallLeadTime = viewModel.OverallLeadTime,
-                            Resource = viewModel.Resource,
-                            PersonalResourceEmployeeID = viewModel.PersonalResourceEmployeeID,
-                            RFQCategoryID = viewModel.RFQCategoryID,
-                            RFQOpportunityID = viewModel.RFQOpportunityID,
-                            CreatedByUserID = LoggedInUserId,
-                            RFQStatusID = 1, // Asumsi ID 1 = Status Awal
-                            RFQCode = "RFQ-TEMP-" + DateTime.Now.Ticks // Kode sementara
-                        };
-                        _context.RFQs.Add(rfqEntity);
-                        await _context.SaveChangesAsync(); // Simpan untuk mendapatkan RFQID
-
-                        // Update RFQCode dengan ID yang baru didapat
-                        rfqEntity.RFQCode = $"RFQ{DateTime.Now:yy}{rfqEntity.RFQID:D4}";
-                        await _context.SaveChangesAsync();
-
-
-                        // 2. Simpan RFQ Notes
-                        if (viewModel.NotesSectionItems != null && viewModel.NotesSectionItems.Any())
-                        {
-                            foreach (var noteVm in viewModel.NotesSectionItems.Where(n => !string.IsNullOrEmpty(n.ItemName)))
-                            {
-                                var noteEntity = new RFQNote
-                                {
-                                    RFQID = rfqEntity.RFQID,
-                                    ItemName = noteVm.ItemName,
-                                    ItemDescription = noteVm.ItemDescription,
-                                    Quantity = noteVm.Quantity,
-                                    UoM = noteVm.UoM,
-                                    BudgetTarget = noteVm.BudgetTarget,
-                                    LeadTimeTarget = noteVm.LeadTimeTarget
-                                };
-                                _context.RFQNotes.Add(noteEntity);
-                            }
-                        }
-
-                        // 3. Simpan RFQ Items (dari tabel Item List)
-                        if (viewModel.ItemListSectionItems != null && viewModel.ItemListSectionItems.Any())
-                        {
-                            foreach (var itemVm in viewModel.ItemListSectionItems.Where(i => i.ItemID > 0))
-                            {
-                                var itemEntity = new RFQ_Item
-                                {
-                                    RFQID = rfqEntity.RFQID,
-                                    ItemID = itemVm.ItemID,
-                                    Description = itemVm.ItemDescription,
-                                    Quantity = itemVm.Quantity,
-                                    UoM = itemVm.UoM,
-                                    TargetUnitPrice = itemVm.TargetUnitPrice,
-                                    Notes = itemVm.Notes,
-                                    Details = itemVm.Details,
-                                    SalesWarranty = itemVm.SalesWarranty
-                                };
-                                _context.RFQ_Items.Add(itemEntity);
-                            }
-                        }
-
-                        // 4. Simpan Survey Requests
-                        if (viewModel.SurveySectionItems != null && viewModel.SurveySectionItems.Any())
-                        {
-                            foreach (var surveyVm in viewModel.SurveySectionItems.Where(s => !string.IsNullOrEmpty(s.SurveyName)))
-                            {
-                                if (surveyVm == null)
-                                {
-                                    continue;
-                                }
-                                var surveyEntity = new SurveyRequest
-                                {
-                                    RFQID = rfqEntity.RFQID,
-                                    SurveyName = surveyVm.SurveyName,
-                                    CustomerPICName = surveyVm.CustomerPICName,
-                                    LocationDetails = surveyVm.LocationDetails,
-                                    SalesNotesInternal = surveyVm.SalesNotesInternal,
-                                    RequestStartTime = surveyVm.RequestStartTime,
-                                    RequestEndTime = surveyVm.RequestEndTime,
-                                    SurveyStatusID = 1, // ID 1 = "Not Yet (Sales Request)"
-                                    CreatedByUserID = LoggedInUserId,
-                                    SurveyCode = "SV-TEMP" // Kode sementara
-                                };
-                                _context.SurveyRequests.Add(surveyEntity);
-
-                                // Menangani relasi many-to-many untuk Kategori
-                                if (surveyVm.SurveyCategoryIDs != null && surveyVm.SurveyCategoryIDs.Any())
-                                {
-                                    var selectedCategories = await _context.SurveyCategories.Where(c => surveyVm.SurveyCategoryIDs.Contains(c.SurveyCategoryID)).ToListAsync();
-                                    surveyEntity.SurveyCategories = selectedCategories;
-                                }
-
-                                // Menangani relasi many-to-many untuk PIC melalui tabel SurveyPIC
-                                if (surveyVm.TechnicalUserIDs != null && surveyVm.TechnicalUserIDs.Any())
-                                {
-                                    foreach (var picId in surveyVm.TechnicalUserIDs)
-                                    {
-                                        var surveyPic = new SurveyPIC { SurveyRequest = surveyEntity, TechnicalUserID = picId, PICApprovalStatusID = 1 };
-                                        _context.SurveyPICs.Add(surveyPic);
-                                    }
-                                }
-                            }
-                        }
-
-                        // 5. Simpan Meeting Requests
-                        if (viewModel.MeetingSectionItems != null && viewModel.MeetingSectionItems.Any())
-                        {
-                            foreach (var meetingVm in viewModel.MeetingSectionItems.Where(m => !string.IsNullOrEmpty(m.MeetingName)))
-                            {
-                                var meetingEntity = new MeetingRequest
-                                {
-                                    RFQID = rfqEntity.RFQID,
-                                    MeetingName = meetingVm.MeetingName,
-                                    MeetingStartTime = meetingVm.MeetingStartTime,
-                                    MeetingEndTime = meetingVm.MeetingEndTime,
-                                    LocationDetails = meetingVm.LocationDetails,
-                                    NotesInternal = meetingVm.NotesInternal,
-                                    MeetingCode = "M-TEMP",
-                                    PrimaryPIC_UserID = LoggedInUserId,
-                                    CreatedByUserID = LoggedInUserId,
-                                    MeetingStatusID = 1 // ID 1 = "Not Yet"
-                                };
-                                _context.MeetingRequests.Add(meetingEntity);
-
-                                if (meetingVm.AssignedPICs != null && meetingVm.AssignedPICs.Any())
-                                {
-                                    foreach (var picId in meetingVm.AssignedPICs)
-                                    {
-                                        var meetingPic = new MeetingPIC { MeetingRequest = meetingEntity, UserID = picId, PICApprovalStatusID = 1 };
-                                        _context.MeetingPICs.Add(meetingPic);
-                                    }
-                                }
-                            }
-                        }
-
-                        // Simpan semua perubahan untuk entitas terkait
-                        await _context.SaveChangesAsync();
-
-                        // Konfirmasi transaksi jika semua berhasil
-                        await transaction.CommitAsync();
-
-                        TempData["SuccessMessage"] = $"RFQ '{rfqEntity.RFQName}' berhasil dibuat.";
-                        return RedirectToAction(nameof(CreateFull), new { id = rfqEntity.RFQID });
-                    }
-                    catch (Exception ex)
-                    {
-                        // Jika terjadi error, batalkan semua perubahan
-                        await transaction.RollbackAsync();
-                        Console.WriteLine("!!!!!! TERJADI ERROR SAAT MENYIMPAN RFQ !!!!!!");
-                        Console.WriteLine(ex.ToString()); // Ini akan mencetak detail error lengkap ke konsol
-                        ModelState.AddModelError("", "Terjadi kesalahan saat menyimpan data. Silakan coba lagi.");
-                    }
-
-                }
+                await PopulateDropdownsForCreateFullAsync(viewModel);
+                return View("Create", viewModel);
             }
 
-            // Jika model tidak valid, tetap tampilkan form dengan pesan error
-            else
+            // DEBUG: Check if user with ID 1 exists
+            var userExists = await _context.Users.AnyAsync(u => u.UserID == LoggedInUserId);
+            Debug.WriteLine($"DEBUG: User with ID {LoggedInUserId} exists: {userExists}");
+
+            if (!userExists)
             {
-                // Tambahkan blok ini untuk melihat error saat debugging
-                var errors = ModelState.Values.SelectMany(v => v.Errors);
-                // Letakkan breakpoint di sini untuk memeriksa isi variabel 'errors'
-                // saat Anda menjalankan aplikasi dalam mode Debug.
+                ModelState.AddModelError("", $"Critical Error: User with ID {LoggedInUserId} does not exist. Please contact administrator.");
+                await PopulateDropdownsForCreateFullAsync(viewModel);
+                return View("Create", viewModel);
+            }
+
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    var rfqEntity = new RFQ
+                    {
+                        RFQName = viewModel.RFQName,
+                        CustomerID = viewModel.CustomerID,
+                        ContactPersonID = viewModel.EndUserContactPersonID,
+                        RequestDate = viewModel.RequestDate,
+                        DueDate = viewModel.DueDate,
+                        OverallBudget = viewModel.OverallBudget,
+                        OverallLeadTime = viewModel.OverallLeadTime,
+                        Resource = viewModel.Resource,
+                        PersonalResourceEmployeeID = viewModel.PersonalResourceEmployeeID,
+                        RFQCategoryID = viewModel.RFQCategoryID > 0 ? viewModel.RFQCategoryID : null,
+                        RFQOpportunityID = viewModel.RFQOpportunityID > 0 ? viewModel.RFQOpportunityID : null,
+                        CreatedByUserID = LoggedInUserId,
+                        RFQStatusID = 1, // Default status
+                        RFQCode = "RFQ-TEMP" // Temporary code
+                    };
+
+                    // 1. Map Notes
+                    if (viewModel.NotesSectionItems != null)
+                    {
+                        foreach (var noteVm in viewModel.NotesSectionItems.Where(n => !string.IsNullOrWhiteSpace(n.ItemName)))
+                        {
+                            rfqEntity.Notes.Add(new RFQNote
+                            {
+                                ItemName = noteVm.ItemName,
+                                ItemDescription = noteVm.ItemDescription,
+                                Quantity = noteVm.Quantity ?? 1,
+                                UoM = noteVm.UoM ?? "Unit",
+                                BudgetTarget = noteVm.BudgetTarget,
+                                LeadTimeTarget = noteVm.LeadTimeTarget
+                            });
+                        }
+                    }
+
+                    // 2. Map RFQ Items
+                    if (viewModel.ItemListSectionItems != null)
+                    {
+                        foreach (var itemVm in viewModel.ItemListSectionItems.Where(i => i.ItemID.HasValue && i.ItemID > 0))
+                        {
+                            rfqEntity.Items.Add(new RFQ_Item
+                            {
+                                ItemID = itemVm.ItemID.Value,
+                                Description = itemVm.ItemDescription,
+                                Quantity = itemVm.Quantity ?? 1,
+                                UoM = itemVm.UoM ?? "Unit",
+                                TargetUnitPrice = itemVm.TargetUnitPrice,
+                                Notes = itemVm.Notes,
+                                Details = itemVm.Details,
+                                SalesWarranty = itemVm.SalesWarranty
+                            });
+                        }
+                    }
+
+                    // 3. Map Purchasing Requests
+                    if (viewModel.PurchasingRequestSectionItems != null)
+                    {
+                        foreach (var prVm in viewModel.PurchasingRequestSectionItems.Where(p => !string.IsNullOrWhiteSpace(p.RequestedItemName)))
+                        {
+                            rfqEntity.PurchasingRequests.Add(new PurchasingRequest
+                            {
+                                ItemID_IfExists = prVm.ItemID_IfExists,
+                                RequestedItemName = prVm.RequestedItemName,
+                                RequestedItemDescription = prVm.RequestedItemDescription,
+                                Quantity = prVm.Quantity,
+                                UoM = prVm.UoM,
+                                ReasonForRequest = prVm.ReasonForRequest,
+                                SalesNotes = prVm.SalesNotes,
+                                AssignedToPurchasingUserID = prVm.AssignedToPurchasingUserID,
+                                RequestDate = DateTime.UtcNow,
+                                PurchasingStatusID = 1, // Default status
+                                RequestedByUserID = LoggedInUserId
+                            });
+                        }
+                    }
+
+                    // 4. Map Survey Requests
+                    if (viewModel.SurveySectionItems != null)
+                    {
+                        foreach (var surveyVm in viewModel.SurveySectionItems.Where(s => !string.IsNullOrWhiteSpace(s.SurveyName)))
+                        {
+                            var surveyRequest = new SurveyRequest
+                            {
+                                SurveyName = surveyVm.SurveyName,
+                                CustomerPICName = surveyVm.CustomerPICName,
+                                RequestStartTime = surveyVm.RequestStartTime,
+                                RequestEndTime = surveyVm.RequestEndTime,
+                                LocationDetails = surveyVm.LocationDetails,
+                                SalesNotesInternal = surveyVm.SalesNotesInternal,
+                                SurveyStatusID = 1, // Default status
+                                CreatedByUserID = LoggedInUserId,
+                                SurveyCode = "SRV-TEMP" // Placeholder
+                            };
+
+                            if (surveyVm.TechnicalUserIDs != null)
+                            {
+                                foreach (var techId in surveyVm.TechnicalUserIDs)
+                                {
+                                    surveyRequest.AssignedPICs.Add(new SurveyPIC { TechnicalUserID = techId, PICApprovalStatusID = 1 });
+                                }
+                            }
+                            rfqEntity.SurveyRequests.Add(surveyRequest);
+                        }
+                    }
+
+                    // 5. Map Meeting Requests
+                    if (viewModel.MeetingSectionItems != null)
+                    {
+                        foreach (var meetingVm in viewModel.MeetingSectionItems.Where(m => !string.IsNullOrWhiteSpace(m.MeetingName)))
+                        {
+                            var meetingRequest = new MeetingRequest
+                            {
+                                MeetingName = meetingVm.MeetingName,
+                                MeetingStartTime = meetingVm.MeetingStartTime,
+                                MeetingEndTime = meetingVm.MeetingEndTime,
+                                LocationDetails = meetingVm.LocationDetails,
+                                NotesInternal = meetingVm.NotesInternal,
+                                MeetingStatusID = 1, // Default status
+                                CreatedByUserID = LoggedInUserId,
+                                PrimaryPIC_UserID = LoggedInUserId, // Or choose a specific PIC
+                                MeetingCode = "MTG-TEMP" // Placeholder
+                            };
+
+                            if (meetingVm.AssignedPICs != null)
+                            {
+                                foreach (var picId in meetingVm.AssignedPICs)
+                                {
+                                    meetingRequest.AssignedPICs.Add(new MeetingPIC { UserID = picId, PICApprovalStatusID = 1 });
+                                }
+                            }
+                            rfqEntity.MeetingRequests.Add(meetingRequest);
+                        }
+                    }
+
+                    _context.RFQs.Add(rfqEntity);
+                    await _context.SaveChangesAsync();
+
+                    // Update codes with the new IDs
+                    rfqEntity.RFQCode = $"RFQ{DateTime.Now:yy}{rfqEntity.RFQID:D4}";
+                    foreach (var survey in rfqEntity.SurveyRequests)
+                    {
+                        survey.SurveyCode = $"SRV{DateTime.Now:yy}{survey.SurveyRequestID:D4}";
+                    }
+                    foreach (var meeting in rfqEntity.MeetingRequests)
+                    {
+                        meeting.MeetingCode = $"MTG{DateTime.Now:yy}{meeting.MeetingRequestID:D4}";
+                    }
+
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    TempData["SuccessMessage"] = $"RFQ '{rfqEntity.RFQName}' and its details have been successfully created.";
+                    return RedirectToAction(nameof(CreateFull), new { id = rfqEntity.RFQID });
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    // Log the exception details for debugging
+                    Debug.WriteLine(ex.ToString());
+
+                    // Add a more detailed error message to the model state to be displayed on the view.
+                    // This helps in diagnosing the issue directly from the UI during development.
+                    var errorMessage = "An unexpected error occurred while saving the RFQ. ";
+                    var innerException = ex.InnerException;
+                    while (innerException != null)
+                    {
+                        errorMessage += $"<br/>- {innerException.Message}";
+                        innerException = innerException.InnerException;
+                    }
+                    ModelState.AddModelError("", errorMessage);
+                    ModelState.AddModelError("", $"Full error: {ex.Message}"); // Also add the top-level error
+                }
             }
 
             await PopulateDropdownsForCreateFullAsync(viewModel);

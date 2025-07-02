@@ -195,33 +195,42 @@ function renumberItemListTable() {
     const tbody = document.getElementById('itemListTableBody');
     if (!tbody) return;
 
-    let mainItemNumber = 0;
-    let addOnIndex = 0;
+    const rows = tbody.querySelectorAll('tr');
+    const collectionName = 'ItemListSectionItems';
 
-    const rows = Array.from(tbody.querySelectorAll('tr'));
-    for (let i = 0; i < rows.length; i++) {
-        const row = rows[i];
+    rows.forEach((row, index) => {
+        // Update nomor urut visual
         const numberCell = row.querySelector('td:first-child');
-        const itemDropdown = row.querySelector('.wrapp.item-dropdown');
+        if (numberCell) {
+            numberCell.textContent = (index + 1).toString();
+        }
 
-        if (!itemDropdown) continue;
+        // Update atribut 'name' untuk semua input, select, textarea
+        const inputs = row.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            const name = input.getAttribute('name');
+            if (name) {
+                // Ganti indeks di dalam nama, misal: ItemListSectionItems[5].ItemID -> ItemListSectionItems[0].ItemID
+                const newName = name.replace(/\[\d+\]/, `[${index}]`);
+                input.setAttribute('name', newName);
+            }
+        });
+    });
+}
 
-        if (!row.classList.contains('addon-row')) {
-            mainItemNumber++;
-            addOnIndex = 0;
-            if (numberCell) {
-                numberCell.textContent = mainItemNumber.toString();
-                numberCell.style.fontWeight = '500';
-            }
-        } else {
-            addOnIndex++;
-            if (numberCell) {
-                numberCell.textContent = `${mainItemNumber}.${addOnIndex}`;
-                numberCell.style.fontWeight = '500';
-            }
+document.addEventListener('click', function(e) {
+    // Event listener untuk tombol hapus di tabel Item List
+    const removeBtn = e.target.closest('.btn-remove-row-itemlist');
+    if (removeBtn) {
+        const row = removeBtn.closest('tr');
+        if (row) {
+            row.remove();
+            renumberItemListTable(); // Panggil fungsi penomoran ulang
+            updateItemListTotal();
+            updateAddItemButtonState();
         }
     }
-}
+});
 
 function renumberReqTable() {
     const tbody = document.getElementById('reqTableBody');
@@ -1517,79 +1526,102 @@ document.addEventListener("DOMContentLoaded", function () {
     function setupItemDropdown(wrapper) {
         const selectBtn = wrapper.querySelector(".select-btn");
         const searchInp = wrapper.querySelector("input[type='text']");
-        const itemOptions = wrapper.querySelector(".option");
-        // Cari input tersembunyi yang sesuai dengan dropdown ini
+        const itemOptions = wrapper.querySelector(".option"); // This is the UL element
         const hiddenInput = wrapper.closest('td').querySelector(".item-id-hidden");
 
-        // Panggil addItemOptions saat pertama kali dijalankan
-        addItemOptions(wrapper);
+        if (!selectBtn || !searchInp || !itemOptions || !hiddenInput) {
+            return;
+        }
 
-        // Fungsi yang dijalankan saat item di-klik
-        function updateItemName(selectedLi) {
+        // Use Event Delegation on the UL element.
+        itemOptions.addEventListener('click', function(e) {
+            const selectedLi = e.target.closest('li');
+            if (!selectedLi) return;
+
+            if (selectedLi.classList.contains('create-option')) {
+                const searchWord = searchInp.value.trim();
+                if (typeof createItemOption === 'function') {
+                    createItemOption(wrapper, searchWord);
+                }
+                return;
+            }
+
             const selectedValue = selectedLi.getAttribute('data-value');
             const selectedText = selectedLi.textContent;
 
-            // Perbarui tampilan dan nilai
-            selectBtn.querySelector("span").innerText = selectedText;
             if (hiddenInput) {
-                hiddenInput.value = selectedValue; // PERBARUI NILAI ID DI INPUT TERSEMBUNYI
+                hiddenInput.value = selectedValue;
             }
 
-            // Tutup dropdown
+            const span = selectBtn.querySelector("span");
+            if (span) span.innerText = selectedText;
+
             wrapper.classList.remove("active");
 
-            // (Anda bisa menambahkan logika lain di sini jika perlu)
-        }
+            // RE-INTRODUCED POP-UP LOGIC
+            const itemName = selectedText.trim();
+            const configureItemForm = document.querySelector('.configure-item-form-pop-up');
+            if (configureItemForm) {
+                if (typeof resetConfigureItemForm === 'function') resetConfigureItemForm();
+                if (typeof setDefaultVendor === 'function') setDefaultVendor();
 
-        searchInp.addEventListener("keyup", () => {
-            let searchWord = searchInp.value.trim();
-            let searchWordLower = searchWord.toLowerCase();
+                const itemNameCodeElement = document.getElementById('configure-item-name-code');
+                if (itemNameCodeElement) {
+                    itemNameCodeElement.textContent = `${itemName} [HWY00001]`;
+                }
+                const quantityInput = document.getElementById('configure-item-quantity');
+                if (quantityInput) {
+                    quantityInput.value = 1;
+                }
+                const amountElement = document.getElementById('configure-item-amount');
+                const vendorPriceElement = document.getElementById('vendor-price');
+                if (amountElement && vendorPriceElement && typeof formatCurrency === 'function' && typeof parseCurrency === 'function') {
+                    const priceText = vendorPriceElement.textContent || '0';
+                    amountElement.textContent = formatCurrency(parseCurrency(priceText));
+                }
 
-            // Filter item yang cocok dari data server
-            let arr = (typeof itemMasterDataFromServer !== 'undefined' ? itemMasterDataFromServer : []).filter(data =>
-                data.text.toLowerCase().includes(searchWordLower)
-            ).map(data => {
-                let li = document.createElement("li");
-                li.textContent = data.text;
-                li.setAttribute('data-value', data.value);
-                li.onclick = function () { updateItemName(wrapper, this); }; // Memanggil fungsi updateItemName yang sudah benar
-                return li;
-            });
-
-            itemOptions.innerHTML = ""; // Kosongkan daftar pilihan
-
-            // --- LOGIKA YANG DIKEMBALIKAN ---
-            // Jika pengguna mengetik sesuatu, tampilkan opsi untuk me-request item baru
-            if (searchWord.length > 0) {
-                let createLi = document.createElement("li");
-                createLi.className = "create-option"; // Class untuk styling jika ada
-                createLi.textContent = `Request "${searchWord}"`;
-
-                // Saat di-klik, panggil fungsi 'createItemOption' yang akan membuka pop-up request
-                createLi.onclick = function () {
-                    // 'createItemOption' adalah fungsi dari file asli Anda yang membuka pop-up
-                    // Pastikan fungsi ini masih ada di site.js
-                    createItemOption(wrapper, searchWord);
-                };
-                itemOptions.appendChild(createLi);
-            }
-            // --- AKHIR LOGIKA YANG DIKEMBALIKAN ---
-
-            // Tampilkan hasil pencarian item yang cocok
-            if (arr.length > 0) {
-                arr.forEach(li => itemOptions.appendChild(li));
+                configureItemForm.classList.add('active');
+                document.body.classList.add('pop-up-active');
+                configureItemForm.scrollTop = 0;
+                if (typeof initConfigureItemForm === 'function') {
+                    initConfigureItemForm();
+                }
             }
         });
 
-        // Event listener untuk tombol select/dropdown
+        function populateList(searchTerm = "") {
+            itemOptions.innerHTML = "";
+            const searchTermLower = searchTerm.toLowerCase();
+            const filteredItems = (typeof itemMasterDataFromServer !== 'undefined' ? itemMasterDataFromServer : []).filter(data =>
+                data.text.toLowerCase().includes(searchTermLower)
+            );
+
+            if (searchTerm) {
+                const createLi = document.createElement("li");
+                createLi.className = "create-option";
+                createLi.textContent = `Request "${searchTerm}"`;
+                itemOptions.appendChild(createLi);
+            }
+
+            filteredItems.forEach(item => {
+                const li = document.createElement("li");
+                li.textContent = item.text;
+                li.setAttribute('data-value', item.value);
+                itemOptions.appendChild(li);
+            });
+        }
+
+        searchInp.addEventListener("keyup", () => populateList(searchInp.value.trim()));
+
         selectBtn.addEventListener("click", function (e) {
             e.stopPropagation();
             const isActive = wrapper.classList.contains("active");
-            closeAllDropdowns(); // Fungsi ini dari kode Anda, sudah bagus
+            closeAllDropdowns();
             if (!isActive) {
                 searchInp.value = "";
-                addItemOptions(wrapper, selectBtn.querySelector("span").innerText);
+                populateList();
                 wrapper.classList.add("active");
+                searchInp.focus();
             }
         });
     }
@@ -1732,43 +1764,81 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const projectTypeWrapper = document.querySelector('.wrapp.project-type-dropdown');
     if (projectTypeWrapper) {
-        const projectTypeSelectBtn = projectTypeWrapper.querySelector('.select-btn');
+        const projectTypeSelectBtnText = projectTypeWrapper.querySelector('.select-btn span');
+        const projectTypeHiddenInput = document.querySelector('input[name="RFQCategoryID"]'); // Temukan hidden input berdasarkan 'name'
         const projectTypeOptions = projectTypeWrapper.querySelectorAll('.option li');
-        if (projectTypeSelectBtn) {
-            projectTypeSelectBtn.addEventListener("click", function (e) {
-                e.stopPropagation();
-                const isActive = projectTypeWrapper.classList.contains("active");
-                closeAllDropdowns();
-                if (!isActive) projectTypeWrapper.classList.add("active");
-            });
-        }
+
         projectTypeOptions.forEach(option => {
             option.addEventListener('click', function (e) {
                 e.stopPropagation();
-                projectTypeSelectBtn.firstElementChild.innerText = this.innerText;
+
+                // Ambil data dari elemen yang diklik
+                const selectedText = this.innerText;
+                const selectedValue = this.getAttribute('data-value');
+
+                // 1. Perbarui teks yang ditampilkan
+                if (projectTypeSelectBtnText) {
+                    projectTypeSelectBtnText.innerText = selectedText;
+                }
+
+                // 2. (INI BAGIAN PENTING) Perbarui nilai di hidden input
+                if (projectTypeHiddenInput) {
+                    projectTypeHiddenInput.value = selectedValue;
+                }
+
+                // 3. Tutup dropdown
                 projectTypeWrapper.classList.remove("active");
             });
+        });
+
+        // Event untuk membuka dropdown (biarkan seperti yang sudah ada)
+        projectTypeWrapper.querySelector('.select-btn').addEventListener('click', function (e) {
+            e.stopPropagation();
+            const isActive = projectTypeWrapper.classList.contains('active');
+            closeAllDropdowns();
+            if (!isActive) {
+                projectTypeWrapper.classList.add("active");
+            }
         });
     }
 
     const opportunityWrapper = document.getElementById('opportunity-dropdown');
     if (opportunityWrapper) {
-        const opportunitySelectBtn = opportunityWrapper.querySelector('.select-btn');
+        const opportunitySelectBtnText = opportunityWrapper.querySelector('.select-btn span');
+        const opportunityHiddenInput = document.querySelector('input[name="RFQOpportunityID"]'); // Temukan hidden input berdasarkan 'name'
         const opportunityOptions = opportunityWrapper.querySelectorAll('.option li');
-        if (opportunitySelectBtn) {
-            opportunitySelectBtn.addEventListener("click", function (e) {
-                e.stopPropagation();
-                const isActive = opportunityWrapper.classList.contains("active");
-                closeAllDropdowns();
-                if (!isActive) opportunityWrapper.classList.add("active");
-            });
-        }
+
         opportunityOptions.forEach(option => {
             option.addEventListener('click', function (e) {
                 e.stopPropagation();
-                opportunitySelectBtn.firstElementChild.innerText = this.innerText;
+
+                // Ambil data dari elemen yang diklik
+                const selectedText = this.innerText;
+                const selectedValue = this.getAttribute('data-value');
+
+                // 1. Perbarui teks yang ditampilkan
+                if (opportunitySelectBtnText) {
+                    opportunitySelectBtnText.innerText = selectedText;
+                }
+
+                // 2. (INI BAGIAN PENTING) Perbarui nilai di hidden input
+                if (opportunityHiddenInput) {
+                    opportunityHiddenInput.value = selectedValue;
+                }
+
+                // 3. Tutup dropdown
                 opportunityWrapper.classList.remove("active");
             });
+        });
+
+        // Event untuk membuka dropdown (biarkan seperti yang sudah ada)
+        opportunityWrapper.querySelector('.select-btn').addEventListener('click', function (e) {
+            e.stopPropagation();
+            const isActive = opportunityWrapper.classList.contains("active");
+            closeAllDropdowns();
+            if (!isActive) {
+                opportunityWrapper.classList.add("active");
+            }
         });
     }
 
@@ -1917,7 +1987,7 @@ document.addEventListener("DOMContentLoaded", function () {
             newRow.innerHTML = `
             <td class="text-center" style="font-weight: 500;">${newIndex + 1}</td>
             <td class="name">
-                <input type="hidden" name="ItemListSectionItems[${newIndex}].ItemID" value="">
+                <input type="hidden" name="ItemListSectionItems[${newIndex}].ItemID" value="" class="item-id-hidden">
                 <div class="wrapp item-dropdown" style="width: 100%;">
                     <div class="select-btn d-flex align-items-center">
                         <span></span>

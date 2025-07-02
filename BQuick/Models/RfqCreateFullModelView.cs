@@ -10,41 +10,41 @@ namespace BQuick.Models
     public class RfqCreateNoteItemViewModel
     {
         [StringLength(255)]
-        public string ItemName { get; set; }
-        public string ItemDescription { get; set; }
+        public string? ItemName { get; set; }
+        public string? ItemDescription { get; set; }
 
         [Range(0.01, double.MaxValue, ErrorMessage = "Kuantitas harus lebih besar dari 0")]
-        public decimal Quantity { get; set; } = 1;
+        public decimal? Quantity { get; set; } = 1;
 
         [StringLength(20)]
-        public string UoM { get; set; } = "Unit";
+        public string? UoM { get; set; } = "Unit";
 
         [DataType(DataType.Currency)]
         public decimal? BudgetTarget { get; set; }
 
         [StringLength(100)]
-        public string LeadTimeTarget { get; set; }
+        public string? LeadTimeTarget { get; set; }
     }
 
     // --- Sub-ViewModel untuk bagian "Item List" (RFQ_Item) ---
     public class RfqCreateRfqItemViewModel
     {
-        public int ItemID { get; set; }
+        public int? ItemID { get; set; }
 
         [Range(0.01, double.MaxValue, ErrorMessage = "Kuantitas harus lebih besar dari 0.")]
-        public decimal Quantity { get; set; } = 1;
+        public decimal? Quantity { get; set; } = 1;
 
-        public string ItemDescription { get; set; }
+        public string? ItemDescription { get; set; }
 
         [StringLength(20)]
-        public string UoM { get; set; } = "Unit";
+        public string? UoM { get; set; } = "Unit";
 
         [DataType(DataType.Currency)]
         public decimal? TargetUnitPrice { get; set; }
 
-        public string Notes { get; set; }
+        public string? Notes { get; set; }
 
-        public string Details { get; set; }
+        public string? Details { get; set; }
 
         [StringLength(100)]
         public string? SalesWarranty { get; set; }
@@ -67,9 +67,9 @@ namespace BQuick.Models
         public string UoM { get; set; } = "Unit";
 
         [StringLength(100)]
-        public string ReasonForRequest { get; set; }
+        public string? ReasonForRequest { get; set; }
 
-        public string SalesNotes { get; set; }
+        public string? SalesNotes { get; set; }
 
         public int? AssignedToPurchasingUserID { get; set; }
     }
@@ -77,15 +77,15 @@ namespace BQuick.Models
     // --- Sub-ViewModel untuk "Survey List" ---
     public class RfqCreateSurveyRequestItemViewModel
     {
-        public List<int> SurveyCategoryIDs { get; set; }
+        public List<int>? SurveyCategoryIDs { get; set; }
 
         [StringLength(255)]
-        public string SurveyName { get; set; }
+        public string? SurveyName { get; set; }
 
         [StringLength(150)]
-        public string CustomerPICName { get; set; }
+        public string? CustomerPICName { get; set; }
 
-        public List<int> TechnicalUserIDs { get; set; }
+        public List<int>? TechnicalUserIDs { get; set; }
 
         [Display(Name = "Waktu Mulai Survey")]
         public DateTime? RequestStartTime { get; set; }
@@ -93,10 +93,10 @@ namespace BQuick.Models
         [Display(Name = "Waktu Selesai Survey")]
         public DateTime? RequestEndTime { get; set; }
 
-        public string LocationDetails { get; set; }
+        public string? LocationDetails { get; set; }
 
-        public string SalesNotesInternal { get; set; }
-        public string SurveyStatus { get; set; } = "Open"; // Beri nilai default "Open"
+        public string? SalesNotesInternal { get; set; }
+        public string? SurveyStatus { get; set; } = "Open"; // Beri nilai default "Open"
 
         public RfqCreateSurveyRequestItemViewModel()
         {
@@ -108,14 +108,14 @@ namespace BQuick.Models
     public class RfqCreateMeetingItemViewModel
     {
         [StringLength(255)]
-        public string MeetingName { get; set; }
+        public string? MeetingName { get; set; }
         public DateTime? MeetingStartTime { get; set; }
         public DateTime? MeetingEndTime { get; set; }
-        public string LocationDetails { get; set; }
-        public string NotesInternal { get; set; }
-        public List<int> AssignedPICs { get; set; } = new List<int>();
-        public int MeetingStatusID { get; set; }
-        public string MeetingStatusName { get; set; }
+        public string? LocationDetails { get; set; }
+        public string? NotesInternal { get; set; }
+        public List<int>? AssignedPICs { get; set; } = new List<int>();
+        public int? MeetingStatusID { get; set; }
+        public string? MeetingStatusName { get; set; }
     }
 
 
@@ -125,7 +125,7 @@ namespace BQuick.Models
         public int? RFQID_FromEdit { get; set; } // TAMBAHKAN BARIS INI
         // --- Properti untuk RFQ Header ---
         [StringLength(50)]
-        public string RFQCode { get; set; }
+        public string? RFQCode { get; set; }
 
         [Required(ErrorMessage = "Nama RFQ harus diisi.")]
         [StringLength(255)]
@@ -134,7 +134,7 @@ namespace BQuick.Models
         [Required(ErrorMessage = "Customer (Company Name) harus dipilih.")]
         public int CustomerID { get; set; }
 
-        public int? ContactPersonID { get; set; }
+        public int ContactPersonID { get; set; }
 
         [DataType(DataType.Date)]
         public DateTime RequestDate { get; set; } = DateTime.Today;
@@ -157,6 +157,7 @@ namespace BQuick.Models
 
         public int? RFQCategoryID { get; set; }
 
+        [Required(ErrorMessage = "RFQ Opportunity harus dipilih.")]
         public int? RFQOpportunityID { get; set; }
 
         [Display(Name = "End User")]
