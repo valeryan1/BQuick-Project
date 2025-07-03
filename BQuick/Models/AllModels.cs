@@ -882,8 +882,6 @@ namespace BQuick.Models
         [Required]
         [StringLength(150)]
         public string CategoryName { get; set; } // e.g., Security Access, Network Cabling, CCTV System
-
-        [InverseProperty("SurveyCategories")]
         public virtual ICollection<SurveyRequest> SurveyRequests { get; set; }
 
         // Atribut untuk TechnicalCompetencies sudah benar, biarkan saja
@@ -951,9 +949,7 @@ namespace BQuick.Models
         [InverseProperty("SurveyRequest")]
         public virtual ICollection<SurveyInstance> SurveyInstances { get; set; }
 
-        [InverseProperty("SurveyRequests")]
         public virtual ICollection<SurveyCategory> SurveyCategories { get; set; }
-      
 
         public SurveyRequest()
         {

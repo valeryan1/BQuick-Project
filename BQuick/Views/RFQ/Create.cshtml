@@ -1249,6 +1249,7 @@
                                                 <ul class="option" style="margin-bottom: 10px;"></ul>
                                             </div>
                                         </div>
+                                        <span class="text-danger field-validation-error item-id-validation-message" style="display: none;">Item must be selected.</span>
                                     </td>
                                     <td class="desc"><input asp-for="@Model.ItemListSectionItems[i].ItemDescription" class='size form-control1'></td>
                                     <td class="qty"><input asp-for="@Model.ItemListSectionItems[i].Quantity" type='number' class='size text-center form-control1' oninput="updateRowAmount(this)"></td>

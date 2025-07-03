@@ -1,7 +1,7 @@
-﻿@* @model IEnumerable<BQuick.Models.RFQ> *@
+@model IEnumerable<BQuick.Models.RFQ>
 
 @{
-    ViewData["Title"] = "RFQ";
+    ViewData["Title"] = "RFQ List";
 }
 
 <main class="content-div mx-3">
@@ -9,7 +9,7 @@
         <div class="header mb-4 w-100 page-header" style="font-size: 29px;">
             <a class="text-decoration-none" asp-controller="RFQ" asp-action="Index"><span class="text-danger rfq-link">RFQ</span></a>&nbsp;<span>&gt;</span>&nbsp;<span class="tes text-decoration">Quotation</span>
         </div>
-        
+
         <div class="d-flex mb-3 gap-3">
             <a class="btn btn-danger d-flex align-items-center gap-1" asp-controller="RFQ" asp-action="CreateFull">
                 <i class='bx bx-plus'></i> Create RFQ
@@ -20,141 +20,70 @@
                 <i class='bx bx-search input-group-text bg-white border-start-0' style="font-size: 1rem;"></i>
             </div>
         </div>
-
         <table class="table table-bordered table-sortable mb-5">
             <thead class="table-dark">
                 <tr>
-                    <th><div class="d-flex align-items-center justify-content-between w-100 text-white">RFQ Code <span class="sort-icons"></span></div></th>
-                    <th><div class="d-flex align-items-center justify-content-between w-100 text-white">Request Date <span class="sort-icons"></span></div></th>
-                    <th><div class="d-flex align-items-center justify-content-between w-100 text-white">Due Date <span class="sort-icons"></span></div></th>
-                    <th><div class="d-flex align-items-center justify-content-between w-100 text-white">Customer Code <span class="sort-icons"></span></div></th>
-                    <th><div class="d-flex align-items-center justify-content-between w-100 text-white">RFQ Name <span class="sort-icons"></span></div></th>
-                    <th><div class="d-flex align-items-center justify-content-between w-100 text-white">Total <span class="sort-icons"></span></div></th>
-                    <th><div class="d-flex align-items-center justify-content-between w-100 text-white">Status <span class="sort-icons"></span></div></th>
+                    <th>
+                        <div class="d-flex align-items-center justify-content-between w-100 text-white">
+                            @Html.DisplayNameFor(model => model.RFQCode) <span class="sort-icons"></span>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="d-flex align-items-center justify-content-between w-100 text-white">
+                            @Html.DisplayNameFor(model => model.RFQName) <span class="sort-icons"></span>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="d-flex align-items-center justify-content-between w-100 text-white">
+                            @Html.DisplayNameFor(model => model.Customer) <span class="sort-icons"></span>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="d-flex align-items-center justify-content-between w-100 text-white">
+                            @Html.DisplayNameFor(model => model.RequestDate) <span class="sort-icons"></span>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="d-flex align-items-center justify-content-between w-100 text-white">
+                            @Html.DisplayNameFor(model => model.DueDate) <span class="sort-icons"></span>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="d-flex align-items-center justify-content-between w-100 text-white">
+                            @Html.DisplayNameFor(model => model.RFQStatus) <span class="sort-icons"></span>
+                        </div>
+                    </th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>RFQ240001</td>
-                    <td>08-07-24</td>
-                    <td>10-07-24</td>
-                    <td>PEB</td>
-                    <td>Instalasi Lan</td>
-                    <td>IDR100000000</td>
-                    <td>
-                        <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                            <span id="open" class="rounded-pill status">Open</span>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>RFQ240007</td>
-                    <td>08-07-24</td>
-                    <td>10-07-24</td>
-                    <td>BPB</td>
-                    <td>Service Data Center</td>
-                    <td>IDR100000000</td>
-                    <td>
-                        <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                            <span id="waiting-purc" class="rounded-pill status">Waiting Purc</span>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>RFQ240009</td>
-                    <td>08-07-24</td>
-                    <td>10-07-24</td>
-                    <td>BPB</td>
-                    <td>Laptop & Peripheral</td>
-                    <td>IDR100000000</td>
-                    <td>
-                        <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                            <span id="waiting-discuss" class="rounded-pill status">Waiting Discuss</span>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>RFQ240010</td>
-                    <td>08-07-24</td>
-                    <td>10-07-24</td>
-                    <td>BPB</td>
-                    <td>Instalasi Lain</td>
-                    <td>IDR100000000</td>
-                    <td>
-                        <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                            <span id="waiting-pic" class="rounded-pill status">Waiting PIC</span>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>RFQ240011</td>
-                    <td>08-07-24</td>
-                    <td>10-07-24</td>
-                    <td>PEB</td>
-                    <td>Instalasi Lain</td>
-                    <td>IDR100000000</td>
-                    <td>
-                        <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                            <span id="waiting-report" class="rounded-pill status">Waiting Report</span>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>RFQ240012</td>
-                    <td>08-07-24</td>
-                    <td>10-07-24</td>
-                    <td>ABH</td>
-                    <td>Instalasi Lain</td>
-                    <td>IDR100000000</td>
-                    <td>
-                        <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                            <span id="waiting-purc" class="rounded-pill status">Waiting Purc</span>
-                            <span id="waiting-discuss" class="rounded-pill status">Waiting Discuss</span>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>RFQ240013</td>
-                    <td>08-07-24</td>
-                    <td>10-07-24</td>
-                    <td>PEB</td>
-                    <td>Instalasi Lain</td>
-                    <td>IDR100000000</td>
-                    <td>
-                        <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                            <span id="ready-to-submit" class="rounded-pill status">Ready to Submit</span>
-                        </div>
-                    </td>
-                </tr>
-                @* @if (Model != null && Model.Any())
+                @foreach (var item in Model)
                 {
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>@item.RFQCode</td>
-                            <td>@item.RequestDate.ToString("dd-MM-yy")</td>
-                            <td>@item.DueDate.ToString("dd-MM-yy")</td>
-                            <td>@item.Company?.CompanyCode</td>
-                            <td>@item.RFQName</td>
-                            <td>@string.Format("IDR{0:N0}", item.ActualValue)</td>
-                            <td>
-                                <div class="d-flex justify-content-center align-items-center flex-column gap-1">
-                                    @{
-                                        var statuses = item.Status.Split(';', StringSplitOptions.RemoveEmptyEntries);
-                                        foreach (var status in statuses)
-                                        {
-                                            var statusTrimmed = status.Trim();
-                                            var statusId = statusTrimmed.Replace(" ", "-").ToLowerInvariant();
-                                            <span id="@statusId" class="rounded-pill status">@statusTrimmed</span>
-                                        }
-                                    }
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                } *@
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.RFQCode)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.RFQName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Customer.CompanyName)
+                        </td>
+                        <td>
+                            @item.RequestDate.ToString("dd-MM-yyyy")
+                        </td>
+                        <td>
+                            @item.DueDate.ToString("dd-MM-yyyy")
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.RFQStatus.Name)
+                        </td>
+                        <td>
+                            <a asp-action="CreateFull" asp-route-id="@item.RFQID">Edit</a> |
+                            <a asp-action="Details" asp-route-id="@item.RFQID">Details</a>
+                        </td>
+                    </tr>
+                }
             </tbody>
         </table>
-    </div>
 </main>
-

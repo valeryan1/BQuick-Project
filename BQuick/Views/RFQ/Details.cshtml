@@ -1,0 +1,293 @@
+@model BQuick.Models.RFQ
+
+@{
+    ViewData["Title"] = "RFQ Details";
+}
+
+<main class="content-div mx-3">
+    <div class="container-fluid mt-4">
+        <div class="d-flex justify-content-between align-items-center mt-4 mb-4 w-100">
+            <div class="header page-header" style="font-size: 29px;">
+                <a class="text-decoration-none" asp-controller="RFQ" asp-action="Index">
+                    <span class="text-danger rfq-link">RFQ</span>
+                </a> <span>></span>
+                <span class="tes text-decoration">RFQ Details: @Model.RFQCode</span>
+            </div>
+            <div class="d-flex gap-3" id="buttonGroup">
+                <a asp-action="CreateFull" asp-route-id="@Model.RFQID" class="btn border-0 shadow-none btn-text" style="font-size: 20px; font-weight: 500;">Edit</a>
+                <button type="button" class="btn border-0 shadow-none btn-text" style="font-size: 20px; font-weight: 500;" onclick="window.history.back();">Back to List</button>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4>Basic RFQ Information</h4>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.RFQCode)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.RFQCode)</dd>
+
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.RFQName)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.RFQName)</dd>
+
+                    <dt class="col-sm-3">Customer</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Customer.CompanyName)</dd>
+
+                    <dt class="col-sm-3">Contact Person</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.ContactPerson.FullName)</dd>
+
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.RequestDate)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.RequestDate)</dd>
+
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.DueDate)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.DueDate)</dd>
+
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.OverallBudget)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.OverallBudget)</dd>
+
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.OverallLeadTime)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.OverallLeadTime)</dd>
+
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Resource)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Resource)</dd>
+
+                    <dt class="col-sm-3">Personal Resource Employee</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.PersonalResourceEmployee.FullName)</dd>
+
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.RFQCategory)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.RFQCategory.Name)</dd>
+
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.RFQOpportunity)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.RFQOpportunity.Name)</dd>
+
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.RFQStatus)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.RFQStatus.Name)</dd>
+
+                    <dt class="col-sm-3">Created By</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.CreatedByUser.FullName)</dd>
+
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.CreationTimestamp)</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.CreationTimestamp)</dd>
+                </dl>
+            </div>
+        </div>
+
+        @if (Model.Notes != null && Model.Notes.Any())
+        {
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>RFQ Notes</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Item Name</th>
+                                <th>Description</th>
+                                <th>Quantity</th>
+                                <th>UoM</th>
+                                <th>Budget Target</th>
+                                <th>Lead Time Target</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var note in Model.Notes)
+                            {
+                                <tr>
+                                    <td>@Html.DisplayFor(modelItem => note.ItemName)</td>
+                                    <td>@Html.DisplayFor(modelItem => note.ItemDescription)</td>
+                                    <td>@Html.DisplayFor(modelItem => note.Quantity)</td>
+                                    <td>@Html.DisplayFor(modelItem => note.UoM)</td>
+                                    <td>@Html.DisplayFor(modelItem => note.BudgetTarget)</td>
+                                    <td>@Html.DisplayFor(modelItem => note.LeadTimeTarget)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+
+        @if (Model.Items != null && Model.Items.Any())
+        {
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>RFQ Items</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Item Name</th>
+                                <th>Description</th>
+                                <th>Quantity</th>
+                                <th>UoM</th>
+                                <th>Target Unit Price</th>
+                                <th>Notes</th>
+                                <th>Details</th>
+                                <th>Sales Warranty</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Items)
+                            {
+                                <tr>
+                                    <td>@Html.DisplayFor(modelItem => item.Item.ItemName)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Quantity)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.UoM)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.TargetUnitPrice)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Notes)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Details)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.SalesWarranty)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+
+        @if (Model.PurchasingRequests != null && Model.PurchasingRequests.Any())
+        {
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Purchasing Requests</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Requested Item</th>
+                                <th>Description</th>
+                                <th>Quantity</th>
+                                <th>UoM</th>
+                                <th>Reason</th>
+                                <th>Sales Notes</th>
+                                <th>Assigned To</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var pr in Model.PurchasingRequests)
+                            {
+                                <tr>
+                                    <td>@Html.DisplayFor(modelItem => pr.RequestedItemName)</td>
+                                    <td>@Html.DisplayFor(modelItem => pr.RequestedItemDescription)</td>
+                                    <td>@Html.DisplayFor(modelItem => pr.Quantity)</td>
+                                    <td>@Html.DisplayFor(modelItem => pr.UoM)</td>
+                                    <td>@Html.DisplayFor(modelItem => pr.ReasonForRequest)</td>
+                                    <td>@Html.DisplayFor(modelItem => pr.SalesNotes)</td>
+                                    <td>@Html.DisplayFor(modelItem => pr.AssignedToPurchasingUser.FullName)</td>
+                                    <td>@Html.DisplayFor(modelItem => pr.PurchasingStatus.Name)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+
+        @if (Model.SurveyRequests != null && Model.SurveyRequests.Any())
+        {
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Survey Requests</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Survey Name</th>
+                                <th>Customer PIC</th>
+                                <th>Request Start Time</th>
+                                <th>Request End Time</th>
+                                <th>Location Details</th>
+                                <th>Sales Notes</th>
+                                <th>Assigned PICs</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var sr in Model.SurveyRequests)
+                            {
+                                <tr>
+                                    <td>@Html.DisplayFor(modelItem => sr.SurveyName)</td>
+                                    <td>@Html.DisplayFor(modelItem => sr.CustomerPICName)</td>
+                                    <td>@Html.DisplayFor(modelItem => sr.RequestStartTime)</td>
+                                    <td>@Html.DisplayFor(modelItem => sr.RequestEndTime)</td>
+                                    <td>@Html.DisplayFor(modelItem => sr.LocationDetails)</td>
+                                    <td>@Html.DisplayFor(modelItem => sr.SalesNotesInternal)</td>
+                                    <td>
+                                        @if (sr.AssignedPICs != null && sr.AssignedPICs.Any())
+                                        {
+                                            <ul>
+                                                @foreach (var pic in sr.AssignedPICs)
+                                                {
+                                                    <li>@pic.TechnicalUser.FullName</li>
+                                                }
+                                            </ul>
+                                        }
+                                    </td>
+                                    <td>@Html.DisplayFor(modelItem => sr.SurveyStatus.Name)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+
+        @if (Model.MeetingRequests != null && Model.MeetingRequests.Any())
+        {
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Meeting Requests</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Meeting Name</th>
+                                <th>Meeting Start Time</th>
+                                <th>Meeting End Time</th>
+                                <th>Location Details</th>
+                                <th>Notes Internal</th>
+                                <th>Primary PIC</th>
+                                <th>Assigned PICs</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var mr in Model.MeetingRequests)
+                            {
+                                <tr>
+                                    <td>@Html.DisplayFor(modelItem => mr.MeetingName)</td>
+                                    <td>@Html.DisplayFor(modelItem => mr.MeetingStartTime)</td>
+                                    <td>@Html.DisplayFor(modelItem => mr.MeetingEndTime)</td>
+                                    <td>@Html.DisplayFor(modelItem => mr.LocationDetails)</td>
+                                    <td>@Html.DisplayFor(modelItem => mr.NotesInternal)</td>
+                                    <td>@Html.DisplayFor(modelItem => mr.PrimaryPIC_User.FullName)</td>
+                                    <td>
+                                        @if (mr.AssignedPICs != null && mr.AssignedPICs.Any())
+                                        {
+                                            <ul>
+                                                @foreach (var pic in mr.AssignedPICs)
+                                                {
+                                                    <li>@pic.User.FullName</li>
+                                                }
+                                            </ul>
+                                        }
+                                    </td>
+                                    <td>@Html.DisplayFor(modelItem => mr.MeetingStatus.Name)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+
+    </div>
+</main>

@@ -14,10 +14,10 @@ namespace BQuick.Models
         public string? ItemDescription { get; set; }
 
         [Range(0.01, double.MaxValue, ErrorMessage = "Kuantitas harus lebih besar dari 0")]
-        public decimal? Quantity { get; set; } = 1;
+        public decimal Quantity { get; set; } = 1;
 
         [StringLength(20)]
-        public string? UoM { get; set; } = "Unit";
+        public string UoM { get; set; } = "Unit";
 
         [DataType(DataType.Currency)]
         public decimal? BudgetTarget { get; set; }
@@ -29,10 +29,10 @@ namespace BQuick.Models
     // --- Sub-ViewModel untuk bagian "Item List" (RFQ_Item) ---
     public class RfqCreateRfqItemViewModel
     {
-        public int? ItemID { get; set; }
+        public int ItemID { get; set; }
 
         [Range(0.01, double.MaxValue, ErrorMessage = "Kuantitas harus lebih besar dari 0.")]
-        public decimal? Quantity { get; set; } = 1;
+        public decimal Quantity { get; set; } = 1;
 
         public string? ItemDescription { get; set; }
 
@@ -64,7 +64,7 @@ namespace BQuick.Models
         public decimal Quantity { get; set; } = 1;
 
         [StringLength(20)]
-        public string UoM { get; set; } = "Unit";
+        public string? UoM { get; set; } = "Unit";
 
         [StringLength(100)]
         public string? ReasonForRequest { get; set; }
@@ -77,7 +77,7 @@ namespace BQuick.Models
     // --- Sub-ViewModel untuk "Survey List" ---
     public class RfqCreateSurveyRequestItemViewModel
     {
-        public List<int>? SurveyCategoryIDs { get; set; }
+        public List<int> SurveyCategoryIDs { get; set; }
 
         [StringLength(255)]
         public string? SurveyName { get; set; }
@@ -85,7 +85,7 @@ namespace BQuick.Models
         [StringLength(150)]
         public string? CustomerPICName { get; set; }
 
-        public List<int>? TechnicalUserIDs { get; set; }
+        public List<int> TechnicalUserIDs { get; set; }
 
         [Display(Name = "Waktu Mulai Survey")]
         public DateTime? RequestStartTime { get; set; }
@@ -113,7 +113,7 @@ namespace BQuick.Models
         public DateTime? MeetingEndTime { get; set; }
         public string? LocationDetails { get; set; }
         public string? NotesInternal { get; set; }
-        public List<int>? AssignedPICs { get; set; } = new List<int>();
+        public List<int> AssignedPICs { get; set; } = new List<int>();
         public int? MeetingStatusID { get; set; }
         public string? MeetingStatusName { get; set; }
     }
@@ -134,7 +134,7 @@ namespace BQuick.Models
         [Required(ErrorMessage = "Customer (Company Name) harus dipilih.")]
         public int CustomerID { get; set; }
 
-        public int ContactPersonID { get; set; }
+        public int? ContactPersonID { get; set; }
 
         [DataType(DataType.Date)]
         public DateTime RequestDate { get; set; } = DateTime.Today;
@@ -157,7 +157,6 @@ namespace BQuick.Models
 
         public int? RFQCategoryID { get; set; }
 
-        [Required(ErrorMessage = "RFQ Opportunity harus dipilih.")]
         public int? RFQOpportunityID { get; set; }
 
         [Display(Name = "End User")]
@@ -186,13 +185,14 @@ namespace BQuick.Models
 
         public RfqCreateFullViewModel()
         {
-            NotesSectionItems = new List<RfqCreateNoteItemViewModel> { new RfqCreateNoteItemViewModel() };
-            ItemListSectionItems = new List<RfqCreateRfqItemViewModel> { new RfqCreateRfqItemViewModel() };
-            PurchasingRequestSectionItems = new List<RfqCreatePurchasingRequestItemViewModel> { new RfqCreatePurchasingRequestItemViewModel() };
+            // Initialize as EMPTY lists.
+            NotesSectionItems = new List<RfqCreateNoteItemViewModel>();
+            ItemListSectionItems = new List<RfqCreateRfqItemViewModel>();
+            PurchasingRequestSectionItems = new List<RfqCreatePurchasingRequestItemViewModel>();
             SurveySectionItems = new List<RfqCreateSurveyRequestItemViewModel>();
+            MeetingSectionItems = new List<RfqCreateMeetingItemViewModel>();
 
-
-            // Inisialisasi EndUserContactPersonList agar tidak null saat view pertama kali dimuat
+            // Your other initializations are good.
             EndUserContactPersonList = new SelectList(Enumerable.Empty<SelectListItem>(), "Value", "Text");
             AttachmentFiles = new List<IFormFile>();
         }
