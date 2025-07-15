@@ -798,7 +798,7 @@ namespace BQuick.Models
         [Column(TypeName = "decimal(18, 2)")]
         public decimal Quantity { get; set; }
         [StringLength(20)]
-        public string UoM { get; set; }
+        public string? UoM { get; set; }
         [Column(TypeName = "decimal(18, 2)")]
         public decimal? TargetUnitPrice { get; set; }
         public string? Notes { get; set; } // Made nullable
@@ -841,7 +841,7 @@ namespace BQuick.Models
         [StringLength(100)]
         public string ReasonForRequest { get; set; }
         public string? SalesNotes { get; set; } // Made nullable
-        public string? SalesAttachmentURL { get; set; } // Made nullable
+       public string? SalesAttachmentURL { get; set; }
 
         public int? AssignedToPurchasingUserID { get; set; }
         [ForeignKey("AssignedToPurchasingUserID")]

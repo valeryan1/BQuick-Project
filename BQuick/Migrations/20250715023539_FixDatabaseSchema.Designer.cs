@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BQuick.Migrations
 {
     [DbContext(typeof(BQuickDbContext))]
-    [Migration("20250702041206_kk")]
-    partial class kk
+    [Migration("20250715023539_FixDatabaseSchema")]
+    partial class FixDatabaseSchema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1360,7 +1360,6 @@ namespace BQuick.Migrations
                         .HasColumnType("decimal(18, 2)");
 
                     b.Property<string>("UoM")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 

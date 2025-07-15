@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BQuick.Migrations
 {
     [DbContext(typeof(BQuickDbContext))]
-    [Migration("20250619065831_InitialSchema")]
-    partial class InitialSchema
+    [Migration("20250709043316_SurveyRequestCategories")]
+    partial class SurveyRequestCategories
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -624,9 +624,15 @@ namespace BQuick.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<DateTime?>("MeetingEndTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("MeetingName")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("MeetingStartTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("MeetingStatusID")
                         .HasColumnType("int");
@@ -639,9 +645,6 @@ namespace BQuick.Migrations
 
                     b.Property<int>("RFQID")
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("RequestedDateTime")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("MeetingRequestID");
 
@@ -1357,7 +1360,6 @@ namespace BQuick.Migrations
                         .HasColumnType("decimal(18, 2)");
 
                     b.Property<string>("UoM")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
@@ -2035,7 +2037,7 @@ namespace BQuick.Migrations
 
                     b.HasIndex("SurveyRequestsSurveyRequestID");
 
-                    b.ToTable("SurveyCategorySurveyRequest");
+                    b.ToTable("SurveyRequestCategories", (string)null);
                 });
 
             modelBuilder.Entity("BQuick.Models.ApprovalHistory", b =>

@@ -7,6 +7,12 @@
 
 <main class="content-div mx-3">
     <div class="container-fluid mt-4">
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger" role="alert">
+                <strong>Error:</strong> @TempData["ErrorMessage"]
+            </div>
+        }
         <div class="d-flex justify-content-between align-items-center mt-4 mb-4 w-100">
             <div class="header page-header" style="font-size: 29px;">
                 <a class="text-decoration-none" asp-controller="RFQ" asp-action="Index">
@@ -15,7 +21,7 @@
                 <span class="tes text-decoration">Create RFQ</span>
             </div>
             <div class="d-flex gap-3" id="buttonGroup">
-                <button type="submit" id="save-rfq-btn" class="btn border-0 shadow-none btn-text" style="font-size: 20px; font-weight: 500;">Save</button>
+                <button type="submit" id="save-rfq-btn" form="create-rfq-form" class="btn border-0 shadow-none btn-text" style="font-size: 20px; font-weight: 500;">Save</button>
                 <button type="button" class="btn border-0 shadow-none btn-text" style="font-size: 20px; font-weight: 500;" id="discard-btn">
                     <a class="text-decoration-none text-black" asp-controller="RFQ" asp-action="Index">Discard</a>
                 </button>
@@ -957,171 +963,182 @@
                     <div class="row mt-5 mb-4 mx-1 justify-content-center">
                         <div class="col-12 col-sm-6 ps-0 pe-0">
                             <div class="mb-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="sejajar" style="width: 146px">
+                                <div class="d-flex">
+                                    <div class="sejajar" style="width: 146px; padding-top: 8px;">
                                         <label asp-for="CustomerID" class="form-label form-label-bold mb-0">Company Name</label>
                                     </div>
-                                    <div class="wrapp company-dropdown" style="width: 70%;">
-                                        <div class="select-btn" style="height: 40px;">
-                                            <span></span>
-                                            <i class='bx bx-chevron-down'></i>
-                                        </div>
-                                        <div class="content-search">
-                                            <div class="search">
-                                                <i class="bx bx-search-alt-2"></i>
-                                                <input type="text" placeholder="Search" />
+                                    <div style="width: 70%;">
+                                        <div class="wrapp company-dropdown" style="width: 100%;">
+                                            <div class="select-btn" style="height: 40px;">
+                                                <span>@(Model.CustomerList?.FirstOrDefault(x => x.Value == Model.CustomerID.ToString())?.Text ?? "Select Company")</span>
+                                                <i class='bx bx-chevron-down'></i>
                                             </div>
-                                            <ul class="option" style="margin-bottom: 10px;"></ul>
+                                            <div class="content-search">
+                                                <div class="search">
+                                                    <i class="bx bx-search-alt-2"></i>
+                                                    <input type="text" placeholder="Search" />
+                                                </div>
+                                                <ul class="option" style="margin-bottom: 10px;"></ul>
+                                            </div>
+                                            <input type="hidden" asp-for="CustomerID" id="hiddenCustomerId" />
                                         </div>
-                                        <input type="hidden" asp-for="CustomerID" id="hiddenCustomerId" />
+                                        <span asp-validation-for="CustomerID" class="text-danger"></span>
                                     </div>
-
                                 </div>
-                                <span asp-validation-for="CustomerID" class="text-danger"></span>
                             </div>
 
                             <div class="mb-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="sejajar" style="width: 146px">
+                                <div class="d-flex">
+                                    <div class="sejajar" style="width: 146px; padding-top: 8px;">
                                         <label asp-for="EndUserContactPersonID" class="form-label form-label-bold mb-0">End User</label>
                                     </div>
-                                    <select asp-for="EndUserContactPersonID" asp-items="Model.EndUserContactPersonList" class="select-btn" style="width:70%; height: 40px;" id="endUserDropdown">
-                                        <option value="">-- Select Company First --</option>
-                                    </select>
-                                    <span asp-validation-for="EndUserContactPersonID" class="text-danger"></span>
+                                    <div style="width: 70%;">
+                                        <select asp-for="EndUserContactPersonID" asp-items="Model.EndUserContactPersonList" class="select-btn" style="width:100%; height: 40px;" id="endUserDropdown">
+                                            <option value="">-- Select Company First --</option>
+                                        </select>
+                                        <span asp-validation-for="EndUserContactPersonID" class="text-danger"></span>
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="mb-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="sejajar" style="width: 146px">
+                                <div class="d-flex">
+                                    <div class="sejajar" style="width: 146px; padding-top: 8px;">
                                         <label asp-for="RequestDate" class="form-label form-label-bold mb-0">Request Date</label>
                                     </div>
-                                    <input asp-for="RequestDate" type='date' class="form-control1 mb-0" style="width:70%" id='request-date'>
+                                    <div style="width: 70%;">
+                                        <input asp-for="RequestDate" type='date' class="form-control1 mb-0" style="width:100%" id='request-date'>
+                                        <span asp-validation-for="RequestDate" class="text-danger"></span>
+                                    </div>
                                 </div>
-                                <span asp-validation-for="RequestDate" class="text-danger"></span>
                             </div>
 
                             <div class="mb-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="sejajar" style="width: 146px">
+                                <div class="d-flex">
+                                    <div class="sejajar" style="width: 146px; padding-top: 8px;">
                                         <label asp-for="DueDate" class='form-label form-label-bold mb-0'>Due Date</label>
                                     </div>
-                                    <input asp-for="DueDate" type='date' class="form-control1 mb-0" style="width:70%" id='due-date'>
+                                    <div style="width: 70%;">
+                                        <input asp-for="DueDate" type='date' class="form-control1 mb-0" style="width:100%" id='due-date'>
+                                        <span asp-validation-for="DueDate" class="text-danger"></span>
+                                    </div>
                                 </div>
-                                <span asp-validation-for="DueDate" class="text-danger"></span>
                             </div>
                         </div>
 
                         <div class="col-12 col-sm-6 ps-0 pe-0">
                             <div class="mb-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="sejajar" style="width: 146px">
+                                <div class="d-flex">
+                                    <div class="sejajar" style="width: 146px; padding-top: 8px;">
                                         <label asp-for="Resource" class="form-label form-label-bold mb-0">Resource</label>
                                     </div>
-                                    <div class="wrapp resource-dropdown" style="width: 70%;">
-                                        <div class="select-btn" style="height: 40px;">
-                                            <span>@(Model.Resource ?? "Select Resource")</span>
-                                            <i class='bx bx-chevron-down'></i>
-                                        </div>
-                                        <div class="content-search">
-                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
-                                                @* Opsi utama (tanpa onclick) *@
-                                                <li>Email</li>
-                                                <li>Whatsapp</li>
-                                                <li>Telephone</li>
+                                    <div style="width: 70%;">
+                                        <div class="wrapp resource-dropdown" style="width: 100%;">
+                                            <div class="select-btn" style="height: 40px;">
+                                                <span>@(Model.Resource ?? "Select Resource")</span>
+                                                <i class='bx bx-chevron-down'></i>
+                                            </div>
+                                            <div class="content-search">
+                                                <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
+                                                    @* Opsi utama (tanpa onclick) *@
+                                                    <li>Email</li>
+                                                    <li>Whatsapp</li>
+                                                    <li>Telephone</li>
 
-                                                @* Opsi "Personal" dengan sub-menu *@
-                                                <li class="has-sub" id="resource-personal-option">
-                                                    Personal
-                                                    <ul class="sub-option" id="resource-personal-sub-dropdown">
-                                                        <li class="has-sub" id="resource-personal-email">
-                                                            Email
-                                                            <ul class="sub-option second-level">
-                                                                @* Menggunakan loop untuk menampilkan semua user dari model *@
-                                                                @foreach (var user in Model.UserList)
-                                                                {
-                                                                    <li data-value="@user.Value">@user.Text</li>
-                                                                }
-                                                            </ul>
-                                                        </li>
-                                                        <li class="has-sub" id="resource-personal-phone">
-                                                            Phone
-                                                            <ul class="sub-option second-level">
-                                                                @foreach (var user in Model.UserList)
-                                                                {
-                                                                    <li data-value="@user.Value">@user.Text</li>
-                                                                }
-                                                            </ul>
-                                                        </li>
-                                                        <li class="has-sub" id="resource-personal-direct">
-                                                            Direct
-                                                            <ul class="sub-option second-level">
-                                                                @foreach (var user in Model.UserList)
-                                                                {
-                                                                    <li data-value="@user.Value">@user.Text</li>
-                                                                }
-                                                            </ul>
-                                                        </li>
-                                                    </ul>
-                                                </li>
-                                            </ul>
+                                                    @* Opsi "Personal" dengan sub-menu *@
+                                                    <li class="has-sub" id="resource-personal-option">
+                                                        Personal
+                                                        <ul class="sub-option" id="resource-personal-sub-dropdown">
+                                                            <li class="has-sub" id="resource-personal-email">
+                                                                Email
+                                                                <ul class="sub-option second-level">
+                                                                    @* Menggunakan loop untuk menampilkan semua user dari model *@
+                                                                    @foreach (var user in Model.UserList)
+                                                                    {
+                                                                        <li data-value="@user.Value">@user.Text</li>
+                                                                    }
+                                                                </ul>
+                                                            </li>
+                                                            <li class="has-sub" id="resource-personal-phone">
+                                                                Phone
+                                                                <ul class="sub-option second-level">
+                                                                    @foreach (var user in Model.UserList)
+                                                                    {
+                                                                        <li data-value="@user.Value">@user.Text</li>
+                                                                    }
+                                                                </ul>
+                                                            </li>
+                                                            <li class="has-sub" id="resource-personal-direct">
+                                                                Direct
+                                                                <ul class="sub-option second-level">
+                                                                    @foreach (var user in Model.UserList)
+                                                                    {
+                                                                        <li data-value="@user.Value">@user.Text</li>
+                                                                    }
+                                                                </ul>
+                                                            </li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </div>
                                         </div>
+                                        <input type="hidden" asp-for="Resource" />
+                                        <input type="hidden" asp-for="PersonalResourceEmployeeID" />
+                                        <span asp-validation-for="Resource" class="text-danger"></span>
                                     </div>
-                                    <input type="hidden" asp-for="Resource" />
-                                    <input type="hidden" asp-for="PersonalResourceEmployeeID" />
                                 </div>
-                                <span asp-validation-for="Resource" class="text-danger"></span>
                             </div>
 
                             <div class="mb-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="sejajar" style="width: 146px">
+                                <div class="d-flex">
+                                    <div class="sejajar" style="width: 146px; padding-top: 8px;">
                                         <label asp-for="RFQCategoryID" class="form-label form-label-bold mb-0">Category</label>
                                     </div>
-                                    <div class="wrapp project-type-dropdown" style="width: 70%;">
-                                        <div class="select-btn" style="height: 40px;">
-                                            <span>@(Model.RFQCategoryList?.FirstOrDefault(x => x.Value == Model.RFQCategoryID.ToString())?.Text ?? "Select Category")</span>
-                                            <i class='bx bx-chevron-down'></i>
+                                    <div style="width: 70%;">
+                                        <div class="wrapp project-type-dropdown" style="width: 100%;">
+                                            <div class="select-btn" style="height: 40px;">
+                                                <span>@(Model.RFQCategoryList?.FirstOrDefault(x => x.Value == Model.RFQCategoryID.ToString())?.Text ?? "Select Category")</span>
+                                                <i class='bx bx-chevron-down'></i>
+                                            </div>
+                                            <div class="content-search">
+                                                <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
+                                                    @foreach (var item in Model.RFQCategoryList ?? Enumerable.Empty<SelectListItem>())
+                                                    {
+                                                        <li data-value="@item.Value">@item.Text</li>
+                                                    }
+                                                </ul>
+                                            </div>
                                         </div>
-                                        <div class="content-search">
-                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
-                                                @foreach (var item in Model.RFQCategoryList ?? Enumerable.Empty<SelectListItem>())
-                                                {
-                                                    <li data-value="@item.Value">@item.Text</li>
-                                                }
-                                            </ul>
-                                        </div>
+                                        <input type="hidden" asp-for="RFQCategoryID" />
+                                        <span asp-validation-for="RFQCategoryID" class="text-danger"></span>
                                     </div>
-                                    <input type="hidden" asp-for="RFQCategoryID" />
-
                                 </div>
-                                <span asp-validation-for="RFQCategoryID" class="text-danger"></span>
-
                             </div>
 
                             <div class="mb-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="sejajar" style="width: 146px">
+                                <div class="d-flex">
+                                    <div class="sejajar" style="width: 146px; padding-top: 8px;">
                                         <label asp-for="RFQOpportunityID" class="form-label form-label-bold mb-0">Opportunity</label>
                                     </div>
-                                    <div class="wrapp" id="opportunity-dropdown" style="width: 70%;">
-                                        <div class="select-btn" style="height: 40px;">
-                                            <span>@(Model.RFQOpportunityList?.FirstOrDefault(x => x.Value == Model.RFQOpportunityID.ToString())?.Text ?? "Select Opportunity")</span>
-                                            <i class='bx bx-chevron-down'></i>
+                                    <div style="width: 70%;">
+                                        <div class="wrapp" id="opportunity-dropdown" style="width: 100%;">
+                                            <div class="select-btn" style="height: 40px;">
+                                                <span>@(Model.RFQOpportunityList?.FirstOrDefault(x => x.Value == Model.RFQOpportunityID.ToString())?.Text ?? "Select Opportunity")</span>
+                                                <i class='bx bx-chevron-down'></i>
+                                            </div>
+                                            <div class="content-search">
+                                                <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
+                                                    @foreach (var item in Model.RFQOpportunityList ?? Enumerable.Empty<SelectListItem>())
+                                                    {
+                                                        <li data-value="@item.Value">@item.Text</li>
+                                                    }
+                                                </ul>
+                                            </div>
                                         </div>
-                                        <div class="content-search">
-                                            <ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">
-                                                @foreach (var item in Model.RFQOpportunityList ?? Enumerable.Empty<SelectListItem>())
-                                                {
-                                                    <li data-value="@item.Value">@item.Text</li>
-                                                }
-                                            </ul>
-                                        </div>
+                                        <input type="hidden" asp-for="RFQOpportunityID" />
+                                        <span asp-validation-for="RFQOpportunityID" class="text-danger"></span>
                                     </div>
-                                    <input type="hidden" asp-for="RFQOpportunityID" />
                                 </div>
-                                <span asp-validation-for="RFQOpportunityID" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
@@ -1230,15 +1247,17 @@
                         <tbody id="itemListTableBody">
                             @for (int i = 0; i < Model.ItemListSectionItems.Count; i++)
                             {
+                                var item = Model.ItemListSectionItems[i];
+                                var selectedItem = Model.ItemMasterList.FirstOrDefault(x => x.Value == item.ItemID.ToString());
                                 <tr>
                                     <td class="text-center" style="font-weight: 500;">@(i + 1)</td>
                                     <td class="name">
 
-                                        <input type="hidden" asp-for="@Model.ItemListSectionItems[i].ItemID" class="item-id-hidden" />
+                                        <input type="hidden" asp-for="@item.ItemID" class="item-id-hidden" />
 
                                         <div class="wrapp item-dropdown" style="width: 100%;">
                                             <div class="select-btn d-flex align-items-center">
-                                                <span>Pilih Item</span>
+                                                <span>@(selectedItem?.Text ?? "Pilih Item")</span>
                                                 <i class='bx bx-chevron-down'></i>
                                             </div>
                                             <div class="content-search">
@@ -1251,13 +1270,13 @@
                                         </div>
                                         <span class="text-danger field-validation-error item-id-validation-message" style="display: none;">Item must be selected.</span>
                                     </td>
-                                    <td class="desc"><input asp-for="@Model.ItemListSectionItems[i].ItemDescription" class='size form-control1'></td>
-                                    <td class="qty"><input asp-for="@Model.ItemListSectionItems[i].Quantity" type='number' class='size text-center form-control1' oninput="updateRowAmount(this)"></td>
-                                    <td class="uom"><input asp-for="@Model.ItemListSectionItems[i].UoM" class='size form-control1'></td>
-                                    <td class="price"><input asp-for="@Model.ItemListSectionItems[i].TargetUnitPrice" type='number' class='size form-control1' oninput="updateRowAmount(this)"></td>
-                                    <td class="notes"><input asp-for="@Model.ItemListSectionItems[i].Notes" class='size form-control1'></td>
-                                    <td class="details"><input asp-for="@Model.ItemListSectionItems[i].Details" class='size form-control1'></td>
-                                    <td class="warranty"><input asp-for="@Model.ItemListSectionItems[i].SalesWarranty" class='size form-control1'></td>
+                                    <td class="desc"><input asp-for="@item.ItemDescription" class='size form-control1'></td>
+                                    <td class="qty"><input asp-for="@item.Quantity" type='number' class='size text-center form-control1' oninput="updateRowAmount(this)"></td>
+                                    <td class="uom"><input asp-for="@item.UoM" class='size form-control1'></td>
+                                    <td class="price"><input asp-for="@item.TargetUnitPrice" type='number' class='size form-control1' oninput="updateRowAmount(this)"></td>
+                                    <td class="notes"><input asp-for="@item.Notes" class='size form-control1'></td>
+                                    <td class="details"><input asp-for="@item.Details" class='size form-control1'></td>
+                                    <td class="warranty"><input asp-for="@item.SalesWarranty" class='size form-control1'></td>
                                     <td class="amount"><span class="item-price-amount"></span></td>
                                     <td class="delete"><button type="button" class="btn btn-remove-row-itemlist"><i class='bx bx-trash'></i></button></td>
                                 </tr>

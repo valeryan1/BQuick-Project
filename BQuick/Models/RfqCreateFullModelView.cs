@@ -30,6 +30,8 @@ namespace BQuick.Models
     public class RfqCreateRfqItemViewModel
     {
         public int ItemID { get; set; }
+        public string? ItemName { get; set; }
+
 
         [Range(0.01, double.MaxValue, ErrorMessage = "Kuantitas harus lebih besar dari 0.")]
         public decimal Quantity { get; set; } = 1;
@@ -42,8 +44,10 @@ namespace BQuick.Models
         [DataType(DataType.Currency)]
         public decimal? TargetUnitPrice { get; set; }
 
+        [StringLength(100)]
         public string? Notes { get; set; }
 
+        [StringLength(100)]
         public string? Details { get; set; }
 
         [StringLength(100)]
@@ -71,8 +75,11 @@ namespace BQuick.Models
 
         public string? SalesNotes { get; set; }
 
+        public string? SalesAttachmentURL { get; set; }
+
         public int? AssignedToPurchasingUserID { get; set; }
     }
+
 
     // --- Sub-ViewModel untuk "Survey List" ---
     public class RfqCreateSurveyRequestItemViewModel
@@ -134,11 +141,15 @@ namespace BQuick.Models
         [Required(ErrorMessage = "Customer (Company Name) harus dipilih.")]
         public int CustomerID { get; set; }
 
+        [StringLength(255)]
+        public string? ItemName { get; set; }
         public int? ContactPersonID { get; set; }
 
+        [Required(ErrorMessage = "Request Date harus diisi.")]
         [DataType(DataType.Date)]
         public DateTime RequestDate { get; set; } = DateTime.Today;
 
+        [Required(ErrorMessage = "Due Date harus diisi.")]
         [DataType(DataType.Date)]
         public DateTime DueDate { get; set; } = DateTime.Today.AddDays(14);
 
@@ -150,15 +161,19 @@ namespace BQuick.Models
         public string? OverallLeadTime { get; set; }
         // --- AKHIR PROPERTI YANG DITAMBAHKAN ---
 
+        [Required(ErrorMessage = "Resource harus dipilih.")]
         [StringLength(50)]
         public string Resource { get; set; }
 
         public int? PersonalResourceEmployeeID { get; set; }
 
+        [Required(ErrorMessage = "Category harus dipilih.")]
         public int? RFQCategoryID { get; set; }
 
+        [Required(ErrorMessage = "Opportunity harus dipilih.")]
         public int? RFQOpportunityID { get; set; }
 
+        [Required(ErrorMessage = "End User harus dipilih.")]
         [Display(Name = "End User")]
         public int? EndUserContactPersonID { get; set; } // Untuk menampung ID End User yang dipilih
         public SelectList? EndUserContactPersonList { get; set; } // Untuk daftar pilihan End User

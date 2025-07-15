@@ -513,6 +513,12 @@ namespace BQuick.Data
                 .WithMany(ic => ic.Items)
                 .HasForeignKey(i => i.ItemCategoryID)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Explicitly configure the many-to-many relationship
+            modelBuilder.Entity<SurveyRequest>()
+                .HasMany(sr => sr.SurveyCategories)
+                .WithMany(sc => sc.SurveyRequests)
+                .UsingEntity(j => j.ToTable("SurveyRequestCategories"));
         }
     }
 }

@@ -5,7 +5,7 @@
 namespace BQuick.Migrations
 {
     /// <inheritdoc />
-    public partial class kk : Migration
+    public partial class MakeSalesAttachmentURLNullable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

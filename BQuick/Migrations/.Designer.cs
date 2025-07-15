@@ -4,6 +4,7 @@ using BQuick.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BQuick.Migrations
 {
     [DbContext(typeof(BQuickDbContext))]
-    partial class BQuickDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250715021153_MakeSalesAttachmentURLNullable")]
+    partial class MakeSalesAttachmentURLNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,7 +43,7 @@ namespace BQuick.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("ApprovalDecisionStatuses", (string)null);
+                    b.ToTable("ApprovalDecisionStatuses");
                 });
 
             modelBuilder.Entity("BQuick.Models.ApprovalHistory", b =>
@@ -99,7 +102,7 @@ namespace BQuick.Migrations
 
                     b.HasIndex("SurveyReportInstanceID");
 
-                    b.ToTable("ApprovalHistories", (string)null);
+                    b.ToTable("ApprovalHistories");
                 });
 
             modelBuilder.Entity("BQuick.Models.Customer", b =>
@@ -225,7 +228,7 @@ namespace BQuick.Migrations
 
                     b.HasIndex("DefaultTermsOfPaymentID");
 
-                    b.ToTable("Customers", (string)null);
+                    b.ToTable("Customers");
                 });
 
             modelBuilder.Entity("BQuick.Models.CustomerContactPerson", b =>
@@ -263,7 +266,7 @@ namespace BQuick.Migrations
 
                     b.HasIndex("CustomerID");
 
-                    b.ToTable("CustomerContactPersons", (string)null);
+                    b.ToTable("CustomerContactPersons");
                 });
 
             modelBuilder.Entity("BQuick.Models.Item", b =>
@@ -392,7 +395,7 @@ namespace BQuick.Migrations
 
                     b.HasIndex("ItemTypeID");
 
-                    b.ToTable("Items", (string)null);
+                    b.ToTable("Items");
                 });
 
             modelBuilder.Entity("BQuick.Models.ItemBundle", b =>
@@ -421,7 +424,7 @@ namespace BQuick.Migrations
 
                     b.HasIndex("ParentItemID");
 
-                    b.ToTable("ItemBundles", (string)null);
+                    b.ToTable("ItemBundles");
                 });
 
             modelBuilder.Entity("BQuick.Models.ItemCategory", b =>
@@ -442,7 +445,7 @@ namespace BQuick.Migrations
                     b.HasIndex("CategoryName")
                         .IsUnique();
 
-                    b.ToTable("ItemCategories", (string)null);
+                    b.ToTable("ItemCategories");
                 });
 
             modelBuilder.Entity("BQuick.Models.ItemType", b =>
@@ -466,7 +469,7 @@ namespace BQuick.Migrations
                     b.HasIndex("ItemCategoryID", "ItemTypeName")
                         .IsUnique();
 
-                    b.ToTable("ItemTypes", (string)null);
+                    b.ToTable("ItemTypes");
                 });
 
             modelBuilder.Entity("BQuick.Models.ItemVendorPricing", b =>
@@ -529,7 +532,7 @@ namespace BQuick.Migrations
 
                     b.HasIndex("VendorID");
 
-                    b.ToTable("ItemVendorPricings", (string)null);
+                    b.ToTable("ItemVendorPricings");
                 });
 
             modelBuilder.Entity("BQuick.Models.MeetingPIC", b =>
@@ -557,7 +560,7 @@ namespace BQuick.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("MeetingPICs", (string)null);
+                    b.ToTable("MeetingPICs");
                 });
 
             modelBuilder.Entity("BQuick.Models.MeetingReportInstance", b =>
@@ -596,7 +599,7 @@ namespace BQuick.Migrations
 
                     b.HasIndex("ReportStatusID");
 
-                    b.ToTable("MeetingReportInstances", (string)null);
+                    b.ToTable("MeetingReportInstances");
                 });
 
             modelBuilder.Entity("BQuick.Models.MeetingRequest", b =>
@@ -656,7 +659,7 @@ namespace BQuick.Migrations
 
                     b.HasIndex("RFQID");
 
-                    b.ToTable("MeetingRequests", (string)null);
+                    b.ToTable("MeetingRequests");
                 });
 
             modelBuilder.Entity("BQuick.Models.MeetingStatus", b =>
@@ -677,7 +680,7 @@ namespace BQuick.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("MeetingStatuses", (string)null);
+                    b.ToTable("MeetingStatuses");
                 });
 
             modelBuilder.Entity("BQuick.Models.Notification", b =>
@@ -719,7 +722,7 @@ namespace BQuick.Migrations
 
                     b.HasIndex("RecipientUserID");
 
-                    b.ToTable("Notifications", (string)null);
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("BQuick.Models.PICApprovalStatus", b =>
@@ -740,7 +743,7 @@ namespace BQuick.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("PICApprovalStatuses", (string)null);
+                    b.ToTable("PICApprovalStatuses");
                 });
 
             modelBuilder.Entity("BQuick.Models.PaymentTerm", b =>
@@ -764,7 +767,7 @@ namespace BQuick.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("PaymentTerms", (string)null);
+                    b.ToTable("PaymentTerms");
                 });
 
             modelBuilder.Entity("BQuick.Models.PurchasingRequest", b =>
@@ -835,7 +838,7 @@ namespace BQuick.Migrations
 
                     b.HasIndex("RequestedByUserID");
 
-                    b.ToTable("PurchasingRequests", (string)null);
+                    b.ToTable("PurchasingRequests");
                 });
 
             modelBuilder.Entity("BQuick.Models.PurchasingStatus", b =>
@@ -856,7 +859,7 @@ namespace BQuick.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("PurchasingStatuses", (string)null);
+                    b.ToTable("PurchasingStatuses");
                 });
 
             modelBuilder.Entity("BQuick.Models.Quotation", b =>
@@ -981,7 +984,7 @@ namespace BQuick.Migrations
 
                     b.HasIndex("TechnicalManagerApproverID");
 
-                    b.ToTable("Quotations", (string)null);
+                    b.ToTable("Quotations");
                 });
 
             modelBuilder.Entity("BQuick.Models.QuotationItem", b =>
@@ -1060,7 +1063,7 @@ namespace BQuick.Migrations
 
                     b.HasIndex("RFQ_ItemID");
 
-                    b.ToTable("QuotationItems", (string)null);
+                    b.ToTable("QuotationItems");
                 });
 
             modelBuilder.Entity("BQuick.Models.QuotationStatus", b =>
@@ -1081,7 +1084,7 @@ namespace BQuick.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("QuotationStatuses", (string)null);
+                    b.ToTable("QuotationStatuses");
                 });
 
             modelBuilder.Entity("BQuick.Models.RFQ", b =>
@@ -1175,7 +1178,7 @@ namespace BQuick.Migrations
 
                     b.HasIndex("SalesManagerAssignerID");
 
-                    b.ToTable("RFQs", (string)null);
+                    b.ToTable("RFQs");
                 });
 
             modelBuilder.Entity("BQuick.Models.RFQAttachment", b =>
@@ -1210,7 +1213,7 @@ namespace BQuick.Migrations
 
                     b.HasIndex("UploadedByUserID");
 
-                    b.ToTable("RFQAttachments", (string)null);
+                    b.ToTable("RFQAttachments");
                 });
 
             modelBuilder.Entity("BQuick.Models.RFQCategory", b =>
@@ -1231,7 +1234,7 @@ namespace BQuick.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("RFQCategories", (string)null);
+                    b.ToTable("RFQCategories");
                 });
 
             modelBuilder.Entity("BQuick.Models.RFQNote", b =>
@@ -1272,7 +1275,7 @@ namespace BQuick.Migrations
 
                     b.HasIndex("RFQID");
 
-                    b.ToTable("RFQNotes", (string)null);
+                    b.ToTable("RFQNotes");
                 });
 
             modelBuilder.Entity("BQuick.Models.RFQOpportunity", b =>
@@ -1293,7 +1296,7 @@ namespace BQuick.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("RFQOpportunities", (string)null);
+                    b.ToTable("RFQOpportunities");
                 });
 
             modelBuilder.Entity("BQuick.Models.RFQStatus", b =>
@@ -1314,7 +1317,7 @@ namespace BQuick.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("RFQStatuses", (string)null);
+                    b.ToTable("RFQStatuses");
                 });
 
             modelBuilder.Entity("BQuick.Models.RFQ_Item", b =>
@@ -1370,7 +1373,7 @@ namespace BQuick.Migrations
 
                     b.HasIndex("RFQID");
 
-                    b.ToTable("RFQ_Items", (string)null);
+                    b.ToTable("RFQ_Items");
                 });
 
             modelBuilder.Entity("BQuick.Models.ReportMaster", b =>
@@ -1397,7 +1400,7 @@ namespace BQuick.Migrations
                     b.HasIndex("ReportName")
                         .IsUnique();
 
-                    b.ToTable("ReportMasters", (string)null);
+                    b.ToTable("ReportMasters");
                 });
 
             modelBuilder.Entity("BQuick.Models.ReportStatus", b =>
@@ -1418,7 +1421,7 @@ namespace BQuick.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("ReportStatuses", (string)null);
+                    b.ToTable("ReportStatuses");
                 });
 
             modelBuilder.Entity("BQuick.Models.Role", b =>
@@ -1439,7 +1442,7 @@ namespace BQuick.Migrations
                     b.HasIndex("RoleName")
                         .IsUnique();
 
-                    b.ToTable("Roles", (string)null);
+                    b.ToTable("Roles");
                 });
 
             modelBuilder.Entity("BQuick.Models.Setting", b =>
@@ -1475,7 +1478,7 @@ namespace BQuick.Migrations
                     b.HasIndex("SettingGroup", "SettingKey")
                         .IsUnique();
 
-                    b.ToTable("Settings", (string)null);
+                    b.ToTable("Settings");
                 });
 
             modelBuilder.Entity("BQuick.Models.ShipmentTerm", b =>
@@ -1499,7 +1502,7 @@ namespace BQuick.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("ShipmentTerms", (string)null);
+                    b.ToTable("ShipmentTerms");
                 });
 
             modelBuilder.Entity("BQuick.Models.SurveyCategory", b =>
@@ -1520,7 +1523,7 @@ namespace BQuick.Migrations
                     b.HasIndex("CategoryName")
                         .IsUnique();
 
-                    b.ToTable("SurveyCategories", (string)null);
+                    b.ToTable("SurveyCategories");
                 });
 
             modelBuilder.Entity("BQuick.Models.SurveyDocumentation", b =>
@@ -1555,7 +1558,7 @@ namespace BQuick.Migrations
 
                     b.HasIndex("UploadedByUserID");
 
-                    b.ToTable("SurveyDocumentations", (string)null);
+                    b.ToTable("SurveyDocumentations");
                 });
 
             modelBuilder.Entity("BQuick.Models.SurveyFormMaster", b =>
@@ -1582,7 +1585,7 @@ namespace BQuick.Migrations
                     b.HasIndex("FormName")
                         .IsUnique();
 
-                    b.ToTable("SurveyFormMasters", (string)null);
+                    b.ToTable("SurveyFormMasters");
                 });
 
             modelBuilder.Entity("BQuick.Models.SurveyInstance", b =>
@@ -1626,7 +1629,7 @@ namespace BQuick.Migrations
 
                     b.HasIndex("SurveyRequestID");
 
-                    b.ToTable("SurveyInstances", (string)null);
+                    b.ToTable("SurveyInstances");
                 });
 
             modelBuilder.Entity("BQuick.Models.SurveyPIC", b =>
@@ -1654,7 +1657,7 @@ namespace BQuick.Migrations
 
                     b.HasIndex("TechnicalUserID");
 
-                    b.ToTable("SurveyPICs", (string)null);
+                    b.ToTable("SurveyPICs");
                 });
 
             modelBuilder.Entity("BQuick.Models.SurveyReportInstance", b =>
@@ -1703,7 +1706,7 @@ namespace BQuick.Migrations
 
                     b.HasIndex("TechManagerReviewerID");
 
-                    b.ToTable("SurveyReportInstances", (string)null);
+                    b.ToTable("SurveyReportInstances");
                 });
 
             modelBuilder.Entity("BQuick.Models.SurveyRequest", b =>
@@ -1762,7 +1765,7 @@ namespace BQuick.Migrations
 
                     b.HasIndex("SurveyStatusID");
 
-                    b.ToTable("SurveyRequests", (string)null);
+                    b.ToTable("SurveyRequests");
                 });
 
             modelBuilder.Entity("BQuick.Models.SurveyStatus", b =>
@@ -1783,7 +1786,7 @@ namespace BQuick.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("SurveyStatuses", (string)null);
+                    b.ToTable("SurveyStatuses");
                 });
 
             modelBuilder.Entity("BQuick.Models.TechnicalCompetency", b =>
@@ -1798,7 +1801,7 @@ namespace BQuick.Migrations
 
                     b.HasIndex("SurveyCategoryID");
 
-                    b.ToTable("TechnicalCompetencies", (string)null);
+                    b.ToTable("TechnicalCompetencies");
                 });
 
             modelBuilder.Entity("BQuick.Models.User", b =>
@@ -1850,7 +1853,7 @@ namespace BQuick.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("BQuick.Models.Vendor", b =>
@@ -1978,7 +1981,7 @@ namespace BQuick.Migrations
                         .IsUnique()
                         .HasFilter("[VendorCode] IS NOT NULL");
 
-                    b.ToTable("Vendors", (string)null);
+                    b.ToTable("Vendors");
                 });
 
             modelBuilder.Entity("BQuick.Models.VendorBank", b =>
@@ -2019,7 +2022,7 @@ namespace BQuick.Migrations
 
                     b.HasIndex("VendorID");
 
-                    b.ToTable("VendorBanks", (string)null);
+                    b.ToTable("VendorBanks");
                 });
 
             modelBuilder.Entity("SurveyCategorySurveyRequest", b =>

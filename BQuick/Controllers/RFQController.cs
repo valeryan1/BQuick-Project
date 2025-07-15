@@ -84,49 +84,110 @@ namespace BQuick.Controllers
 
         // GET: RFQ/CreateFull (atau nama action Anda)
         [HttpGet]
-        public async Task<IActionResult> CreateFull(int? id)  // Ganti nama jika perlu
+        public async Task<IActionResult> CreateFull(int? id)  // Ganti nafx                                                                                                 11qma jika perlu
         {
             var viewModel = new RfqCreateFullViewModel();
 
             if (id.HasValue) // Jika ada ID, berarti mode "lanjutkan/edit"
             {
                 var rfq = await _context.RFQs
-
+                    
+                    .Include(r => r.Notes)
+                    .Include(r => r.Items)
+                        .ThenInclude(ri => ri.Item)
+                    .Include(r => r.PurchasingRequests)
+                    .Include(r => r.SurveyRequests)
+                        .ThenInclude(sr => sr.SurveyStatus)
+                    .Include(r => r.SurveyRequests)
+                        .ThenInclude(sr => sr.AssignedPICs)
+                    .Include(r => r.SurveyRequests)
+                        .ThenInclude(sr => sr.SurveyCategories) // Eager load categories
+                    .Include(r => r.MeetingRequests)
+                        .ThenInclude(mr => mr.MeetingStatus)
+                    .Include(r => r.MeetingRequests)
+                        .ThenInclude(mr => mr.AssignedPICs)
                     .FirstOrDefaultAsync(r => r.RFQID == id.Value);
 
                 if (rfq == null)
                 {
-                    return NotFound(); // Atau handle error lain jika RFQ tidak ditemukan
+                    return NotFound();
                 }
 
-                // --- Melengkapi pemetaan dari entitas RFQ ke RfqCreateFullViewModel ---
-                // viewModel.RFQID_FromEdit = rfq.RFQID; // Jika Anda menambahkan properti ini di ViewModel untuk menandai mode edit
-
+                viewModel.RFQID_FromEdit = rfq.RFQID;
                 viewModel.RFQCode = rfq.RFQCode;
                 viewModel.RFQName = rfq.RFQName;
                 viewModel.CustomerID = rfq.CustomerID;
-
-                // Mengisi EndUserContactPersonID (dan ContactPersonID jika fieldnya sama di ViewModel untuk tujuan berbeda)
-                // Asumsi ContactPersonID di entitas RFQ adalah End User yang dipilih di Tahap 1
                 viewModel.ContactPersonID = rfq.ContactPersonID;
                 viewModel.EndUserContactPersonID = rfq.ContactPersonID;
-
-                // Mengisi field-field yang mungkin sudah diisi di tahap sebelumnya atau akan dilanjutkan
-                viewModel.RequestDate = rfq.RequestDate; // Beri default jika null saat load
-                viewModel.DueDate = rfq.DueDate; // Beri default jika null saat load
+                viewModel.RequestDate = rfq.RequestDate;
+                viewModel.DueDate = rfq.DueDate;
                 viewModel.OverallBudget = rfq.OverallBudget;
                 viewModel.OverallLeadTime = rfq.OverallLeadTime;
                 viewModel.Resource = rfq.Resource;
                 viewModel.PersonalResourceEmployeeID = rfq.PersonalResourceEmployeeID;
-
-                // Untuk RFQCategoryID dan RFQOpportunityID, karena di model RFQ.cs tipe datanya int (non-nullable)
-                // Jika nilainya 0 (default untuk int jika tidak diset dan tidak nullable di DB), 
-                // Anda mungkin ingin agar dropdown tidak memilih apa-apa atau memilih opsi default "pilih..."
-                // Jika nilainya valid (misalnya > 0), maka akan otomatis terpilih di dropdown oleh SelectList.
                 viewModel.RFQCategoryID = rfq.RFQCategoryID ?? 0;
                 viewModel.RFQOpportunityID = rfq.RFQOpportunityID ?? 0;
 
+                // Map related collections
+                viewModel.NotesSectionItems = rfq.Notes.Select(n => new RfqCreateNoteItemViewModel
+                {
+                    ItemName = n.ItemName,
+                    ItemDescription = n.ItemDescription,
+                    Quantity = n.Quantity,
+                    UoM = n.UoM,
+                    BudgetTarget = n.BudgetTarget,
+                    LeadTimeTarget = n.LeadTimeTarget
+                }).ToList();
 
+                viewModel.ItemListSectionItems = rfq.Items.Select(i => new RfqCreateRfqItemViewModel
+                {
+                    ItemID = i.ItemID,
+                    ItemName = i.Item.ItemName, // Tambahkan ini
+                    ItemDescription = i.Description,
+                    Quantity = i.Quantity,
+                    UoM = i.UoM,
+                    TargetUnitPrice = i.TargetUnitPrice,
+                    Notes = i.Notes,
+                    Details = i.Details,
+                    SalesWarranty = i.SalesWarranty
+                }).ToList();
+
+                viewModel.PurchasingRequestSectionItems = rfq.PurchasingRequests.Select(pr => new RfqCreatePurchasingRequestItemViewModel
+                {
+                    ItemID_IfExists = pr.ItemID_IfExists,
+                    RequestedItemName = pr.RequestedItemName,
+                    RequestedItemDescription = pr.RequestedItemDescription,
+                    Quantity = pr.Quantity,
+                    UoM = pr.UoM,
+                    ReasonForRequest = pr.ReasonForRequest,
+                    SalesNotes = pr.SalesNotes,
+                    AssignedToPurchasingUserID = pr.AssignedToPurchasingUserID
+                }).ToList();
+
+                viewModel.SurveySectionItems = rfq.SurveyRequests.Select(sr => new RfqCreateSurveyRequestItemViewModel
+                {
+                    SurveyName = sr.SurveyName,
+                    CustomerPICName = sr.CustomerPICName,
+                    RequestStartTime = sr.RequestStartTime,
+                    RequestEndTime = sr.RequestEndTime,
+                    LocationDetails = sr.LocationDetails,
+                    SalesNotesInternal = sr.SalesNotesInternal,
+                    SurveyStatus = sr.SurveyStatus.Name,
+                    TechnicalUserIDs = sr.AssignedPICs.Select(sp => sp.TechnicalUserID).ToList(),
+                    SurveyCategoryIDs = sr.SurveyCategories.Select(sc => sc.SurveyCategoryID).ToList() // Map the category IDs
+                }).ToList();
+
+                viewModel.MeetingSectionItems = rfq.MeetingRequests.Select(mr => new RfqCreateMeetingItemViewModel
+                {
+                    MeetingName = mr.MeetingName,
+                    MeetingStartTime = mr.MeetingStartTime,
+                    MeetingEndTime = mr.MeetingEndTime,
+                    LocationDetails = mr.LocationDetails,
+                    NotesInternal = mr.NotesInternal,
+                    MeetingStatusID = mr.MeetingStatusID,
+                    MeetingStatusName = mr.MeetingStatus.Name,
+                    AssignedPICs = mr.AssignedPICs.Select(mp => mp.UserID).ToList()
+                }).ToList();
             }
             else // Mode Create Baru
             {
@@ -152,7 +213,64 @@ namespace BQuick.Controllers
 
 
 
-            if (ModelState.IsValid)
+            // DEBUG: Log all ModelState errors, regardless of IsValid
+            if (!ModelState.IsValid)
+            {
+                Debug.WriteLine("DEBUG: ModelState is NOT valid. Errors:");
+                foreach (var modelStateEntry in ModelState.Values)
+                {
+                    foreach (var error in modelStateEntry.Errors)
+                    {
+                        Debug.WriteLine($"  - {error.ErrorMessage}");
+                    }
+                }
+            }
+            else
+            {
+                Debug.WriteLine("DEBUG: ModelState is valid.");
+            }
+
+            // DEBUG: Log key ViewModel properties
+            Debug.WriteLine($"DEBUG: ViewModel.RFQName: {viewModel.RFQName}");
+            Debug.WriteLine($"DEBUG: ViewModel.CustomerID: {viewModel.CustomerID}");
+            Debug.WriteLine($"DEBUG: ViewModel.EndUserContactPersonID: {viewModel.EndUserContactPersonID}");
+            Debug.WriteLine($"DEBUG: ViewModel.RequestDate: {viewModel.RequestDate}");
+            Debug.WriteLine($"DEBUG: ViewModel.DueDate: {viewModel.DueDate}");
+
+            if (viewModel.ItemListSectionItems != null)
+            {
+                Debug.WriteLine($"DEBUG: ItemListSectionItems Count: {viewModel.ItemListSectionItems.Count}");
+                for (int i = 0; i < viewModel.ItemListSectionItems.Count; i++)
+                {
+                    var item = viewModel.ItemListSectionItems[i];
+                    Debug.WriteLine($"  Item {i}: ItemID={item.ItemID}, Desc={item.ItemDescription}, Qty={item.Quantity}, Notes={item.Notes}, Details={item.Details}, SalesWarranty={item.SalesWarranty}");
+                }
+            }
+
+            // Custom validation for ItemListSectionItems
+            if (viewModel.ItemListSectionItems != null)
+            {
+                for (int i = 0; i < viewModel.ItemListSectionItems.Count; i++)
+                {
+                    var item = viewModel.ItemListSectionItems[i];
+
+                    // A row is considered to have data if any of its fields are filled.
+                    bool rowHasData = !string.IsNullOrWhiteSpace(item.ItemDescription) ||
+                                      (item.Quantity != 1) || // Default is 1, check if it's different
+                                      item.TargetUnitPrice.HasValue ||
+                                      !string.IsNullOrWhiteSpace(item.Notes) ||
+                                      !string.IsNullOrWhiteSpace(item.Details) ||
+                                      !string.IsNullOrWhiteSpace(item.SalesWarranty);
+
+                    // If the row has data but no ItemID, it's a validation error.
+                    if (rowHasData && (item.ItemID == null || item.ItemID == 0))
+                    {
+                        ModelState.AddModelError($"ItemListSectionItems[{i}].ItemID", $"Row {i + 1}: Item must be selected when other data in the row is filled.");
+                    }
+                }
+            }
+
+            if (ModelState.IsValid) 
             {
                 // Gunakan transaction untuk memastikan semua data berhasil disimpan atau tidak sama sekali
                 using (var transaction = await _context.Database.BeginTransactionAsync())
@@ -225,15 +343,55 @@ namespace BQuick.Controllers
                             }
                         }
 
-                        // 4. Simpan Survey Requests
+                        // 4. Simpan Purchasing Requests
+                        if (viewModel.PurchasingRequestSectionItems != null && viewModel.PurchasingRequestSectionItems.Any())
+                        {
+                            foreach (var prVm in viewModel.PurchasingRequestSectionItems.Where(p => !string.IsNullOrWhiteSpace(p.RequestedItemName)))
+                            {
+                                var purchasingRequestEntity = new PurchasingRequest
+                                {
+                                    RFQID = rfqEntity.RFQID,
+                                    ItemID_IfExists = prVm.ItemID_IfExists,
+                                    RequestedItemName = prVm.RequestedItemName,
+                                    RequestedItemDescription = prVm.RequestedItemDescription,
+                                    Quantity = prVm.Quantity,
+                                    UoM = prVm.UoM,
+                                    ReasonForRequest = prVm.ReasonForRequest,
+                                    SalesNotes = prVm.SalesNotes,
+                                    AssignedToPurchasingUserID = prVm.AssignedToPurchasingUserID,
+                                    RequestedByUserID = LoggedInUserId,
+                                    PurchasingStatusID = 1, // Assuming 1 = "Open"
+                                    RequestDate = DateTime.UtcNow
+                                };
+                                _context.PurchasingRequests.Add(purchasingRequestEntity);
+                            }
+                        }
+
+                        // 5. Simpan Survey Requests
                         if (viewModel.SurveySectionItems != null && viewModel.SurveySectionItems.Any())
                         {
-                            foreach (var surveyVm in viewModel.SurveySectionItems.Where(s => !string.IsNullOrEmpty(s.SurveyName)))
+                            foreach (var surveyVm in viewModel.SurveySectionItems)
                             {
-                                if (surveyVm == null)
+                                if (surveyVm == null) // Safely skip null items
                                 {
                                     continue;
                                 }
+
+                                // Consider a row for saving if it has any meaningful data
+                                bool isRowEmpty = string.IsNullOrWhiteSpace(surveyVm.SurveyName) &&
+                                                  string.IsNullOrWhiteSpace(surveyVm.CustomerPICName) &&
+                                                  string.IsNullOrWhiteSpace(surveyVm.LocationDetails) &&
+                                                  string.IsNullOrWhiteSpace(surveyVm.SalesNotesInternal) &&
+                                                  (surveyVm.SurveyCategoryIDs == null || !surveyVm.SurveyCategoryIDs.Any()) &&
+                                                  (surveyVm.TechnicalUserIDs == null || !surveyVm.TechnicalUserIDs.Any()) &&
+                                                  !surveyVm.RequestStartTime.HasValue &&
+                                                  !surveyVm.RequestEndTime.HasValue;
+
+                                if (isRowEmpty)
+                                {
+                                    continue;
+                                }
+
                                 var surveyEntity = new SurveyRequest
                                 {
                                     RFQID = rfqEntity.RFQID,
@@ -245,11 +403,18 @@ namespace BQuick.Controllers
                                     RequestEndTime = surveyVm.RequestEndTime,
                                     SurveyStatusID = 1, // ID 1 = "Not Yet (Sales Request)"
                                     CreatedByUserID = LoggedInUserId,
-                                    SurveyCode = "SV-TEMP" // Kode sementara
+                                    SurveyCode = GenerateUniqueRFQCode() // Kode sementara
                                 };
                                 _context.SurveyRequests.Add(surveyEntity);
 
                                 // Menangani relasi many-to-many untuk Kategori
+                                if (surveyVm.SurveyCategoryIDs != null && surveyVm.SurveyCategoryIDs.Any())
+                                {
+                                    var selectedCategories = await _context.SurveyCategories
+                                        .Where(sc => surveyVm.SurveyCategoryIDs.Contains(sc.SurveyCategoryID))
+                                        .ToListAsync();
+                                    surveyEntity.SurveyCategories = selectedCategories;
+                                }
 
 
                                 // Menangani relasi many-to-many untuk PIC melalui tabel SurveyPIC
@@ -264,7 +429,7 @@ namespace BQuick.Controllers
                             }
                         }
 
-                        // 5. Simpan Meeting Requests
+                        // 6. Simpan Meeting Requests
                         if (viewModel.MeetingSectionItems != null && viewModel.MeetingSectionItems.Any())
                         {
                             foreach (var meetingVm in viewModel.MeetingSectionItems.Where(m => !string.IsNullOrEmpty(m.MeetingName)))
@@ -277,7 +442,7 @@ namespace BQuick.Controllers
                                     MeetingEndTime = meetingVm.MeetingEndTime,
                                     LocationDetails = meetingVm.LocationDetails,
                                     NotesInternal = meetingVm.NotesInternal,
-                                    MeetingCode = "M-TEMP",
+                                    MeetingCode = "M-TEMP-" + DateTime.Now.Ticks, // Kode sementara
                                     PrimaryPIC_UserID = LoggedInUserId,
                                     CreatedByUserID = LoggedInUserId,
                                     MeetingStatusID = 1 // ID 1 = "Not Yet"
@@ -298,6 +463,17 @@ namespace BQuick.Controllers
                         // Simpan semua perubahan untuk entitas terkait
                         await _context.SaveChangesAsync();
 
+                        // Sekarang, setelah semua entitas disimpan dan punya ID, update kodenya
+                        foreach (var survey in rfqEntity.SurveyRequests)
+                        {
+                            survey.SurveyCode = $"SV{DateTime.Now:yy}{survey.SurveyRequestID:D4}";
+                        }
+                        foreach (var meeting in rfqEntity.MeetingRequests)
+                        {
+                            meeting.MeetingCode = $"M{DateTime.Now:yy}{meeting.MeetingRequestID:D4}";
+                        }
+                        await _context.SaveChangesAsync(); // Simpan pembaruan kode
+
                         // Konfirmasi transaksi jika semua berhasil
                         await transaction.CommitAsync();
 
@@ -308,8 +484,8 @@ namespace BQuick.Controllers
                     {
                         // Jika terjadi error, batalkan semua perubahan
                         await transaction.RollbackAsync();
-                        Console.WriteLine("!!!!!! TERJADI ERROR SAAT MENYIMPAN RFQ !!!!!!");
-                        Console.WriteLine(ex.ToString()); // Ini akan mencetak detail error lengkap ke konsol
+                        // Simpan detail error ke TempData untuk ditampilkan di view
+                        TempData["ErrorMessage"] = $"An error occurred while saving: {ex.Message} Inner Exception: {ex.InnerException?.Message}";
                         ModelState.AddModelError("", "Terjadi kesalahan saat menyimpan data. Silakan coba lagi.");
                     }
 
@@ -321,13 +497,21 @@ namespace BQuick.Controllers
             {
                 // Tambahkan blok ini untuk melihat error saat debugging
                 var errors = ModelState.Values.SelectMany(v => v.Errors);
-                // Letakkan breakpoint di sini untuk memeriksa isi variabel 'errors'
-                // saat Anda menjalankan aplikasi dalam mode Debug.
+                foreach (var error in errors)
+                {
+                    Debug.WriteLine($"Model Error: {error.ErrorMessage}");
+                }
             }
 
             await PopulateDropdownsForCreateFullAsync(viewModel);
             return View("Create", viewModel);
         }
+
+
+
+
+
+
 
         // Action Details dan Index seperti sebelumnya
         public async Task<IActionResult> Details(int? id)
@@ -426,6 +610,19 @@ namespace BQuick.Controllers
         {
             var yearTwoDigits = DateTime.Now.ToString("yy"); // Misal "25"
             var prefix = $"RFQ{yearTwoDigits}"; // Misal "RFQ25"
+
+            // Generate 4 angka acak antara 0000 dan 9999
+            // random.Next(0, 10000) akan menghasilkan angka antara 0 dan 9999.
+            // Format "D4" akan memastikan ada padding nol di depan jika angkanya kurang dari 4 digit.
+            string uniqueNumericPart = random.Next(0, 10000).ToString("D4");
+
+            return $"{prefix}{uniqueNumericPart}"; // Contoh: RFQ251234, RFQ250087
+        }
+
+        private string GenerateUniqueSurveyCode()
+        {
+            var yearTwoDigits = DateTime.Now.ToString("yy"); // Misal "25"
+            var prefix = $"SRV{yearTwoDigits}"; // Misal "RFQ25"
 
             // Generate 4 angka acak antara 0000 dan 9999
             // random.Next(0, 10000) akan menghasilkan angka antara 0 dan 9999.

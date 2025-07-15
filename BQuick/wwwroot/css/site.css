@@ -834,6 +834,7 @@ th .sort-icons {
     vertical-align: middle;
 }
 
+
 td.item-name, td.item-desc, td.item-budget, td.item-leadtime, td.name {
     width: 20%;
 }

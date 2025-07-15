@@ -195,42 +195,33 @@ function renumberItemListTable() {
     const tbody = document.getElementById('itemListTableBody');
     if (!tbody) return;
 
-    const rows = tbody.querySelectorAll('tr');
-    const collectionName = 'ItemListSectionItems';
+    let mainItemNumber = 0;
+    let addOnIndex = 0;
 
-    rows.forEach((row, index) => {
-        // Update nomor urut visual
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
         const numberCell = row.querySelector('td:first-child');
-        if (numberCell) {
-            numberCell.textContent = (index + 1).toString();
-        }
+        const itemDropdown = row.querySelector('.wrapp.item-dropdown');
 
-        // Update atribut 'name' untuk semua input, select, textarea
-        const inputs = row.querySelectorAll('input, select, textarea');
-        inputs.forEach(input => {
-            const name = input.getAttribute('name');
-            if (name) {
-                // Ganti indeks di dalam nama, misal: ItemListSectionItems[5].ItemID -> ItemListSectionItems[0].ItemID
-                const newName = name.replace(/\[\d+\]/, `[${index}]`);
-                input.setAttribute('name', newName);
+        if (!itemDropdown) continue;
+
+        if (!row.classList.contains('addon-row')) {
+            mainItemNumber++;
+            addOnIndex = 0;
+            if (numberCell) {
+                numberCell.textContent = mainItemNumber.toString();
+                numberCell.style.fontWeight = '500';
             }
-        });
-    });
-}
-
-document.addEventListener('click', function(e) {
-    // Event listener untuk tombol hapus di tabel Item List
-    const removeBtn = e.target.closest('.btn-remove-row-itemlist');
-    if (removeBtn) {
-        const row = removeBtn.closest('tr');
-        if (row) {
-            row.remove();
-            renumberItemListTable(); // Panggil fungsi penomoran ulang
-            updateItemListTotal();
-            updateAddItemButtonState();
+        } else {
+            addOnIndex++;
+            if (numberCell) {
+                numberCell.textContent = `${mainItemNumber}.${addOnIndex}`;
+                numberCell.style.fontWeight = '500';
+            }
         }
     }
-});
+}
 
 function renumberReqTable() {
     const tbody = document.getElementById('reqTableBody');
@@ -688,13 +679,23 @@ function addToRequestPurchasing(itemData) {
     const reqTableBody = document.getElementById('reqTableBody');
     if (!reqTableBody) return;
 
+    const escapeHTML = (str) => {
+        if (str === null || str === undefined) return "";
+        return str.toString()
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    };
+
     const newIndex = reqTableBody.querySelectorAll('tr').length;
 
     // --- MEMBUAT OPSI UNTUK DROPDOWN PIC ---
     let picOptionsHtml = '<option value="">--Pilih PIC--</option>'; // Opsi default
     if (typeof purchasingUsersFromServer !== 'undefined') {
         purchasingUsersFromServer.forEach(user => {
-            picOptionsHtml += `<option value="${user.value}">${user.text}</option>`;
+            picOptionsHtml += `<option value="${escapeHTML(user.value)}">${escapeHTML(user.text)}</option>`;
         });
     }
     // --- AKHIR BAGIAN PEMBUATAN OPSI ---
@@ -706,12 +707,12 @@ function addToRequestPurchasing(itemData) {
         </td>
         <td class="nomor text-center" style="font-weight: 500;">${newIndex + 1}</td>
         <td class="reqCode">None</td>
-        <td class="name"><input type="text" class="size form-control1" name="PurchasingRequestSectionItems[${newIndex}].RequestedItemName" value="${itemData.name}" readonly></td>
-        <td class="desc"><input type="text" class="size form-control1" name="PurchasingRequestSectionItems[${newIndex}].RequestedItemDescription" value="${itemData.description}" readonly></td>
-        <td class="qty"><input type="number" class="size text-center form-control1" name="PurchasingRequestSectionItems[${newIndex}].Quantity" value="${itemData.quantity}"></td>
-        <td class="uom"><input type="text" class="size form-control1" name="PurchasingRequestSectionItems[${newIndex}].UoM" value="${itemData.uom}"></td>
-        <td class="reason"><input type="text" class="size form-control1" name="PurchasingRequestSectionItems[${newIndex}].ReasonForRequest" value="${itemData.reason}"></td>
-        <td class="notes"><input type="text" class="size form-control1" name="PurchasingRequestSectionItems[${newIndex}].SalesNotes" value="${itemData.notes}"></td>
+        <td class="name"><input type="text" class="size form-control1" name="PurchasingRequestSectionItems[${newIndex}].RequestedItemName" value="${escapeHTML(itemData.name)}" readonly></td>
+        <td class="desc"><input type="text" class="size form-control1" name="PurchasingRequestSectionItems[${newIndex}].RequestedItemDescription" value="${escapeHTML(itemData.description)}" readonly></td>
+        <td class="qty"><input type="number" class="size text-center form-control1" name="PurchasingRequestSectionItems[${newIndex}].Quantity" value="${escapeHTML(itemData.quantity)}"></td>
+        <td class="uom"><input type="text" class="size form-control1" name="PurchasingRequestSectionItems[${newIndex}].UoM" value="${escapeHTML(itemData.uom)}"></td>
+        <td class="reason"><input type="text" class="size form-control1" name="PurchasingRequestSectionItems[${newIndex}].ReasonForRequest" value="${escapeHTML(itemData.reason)}"></td>
+        <td class="notes"><input type="text" class="size form-control1" name="PurchasingRequestSectionItems[${newIndex}].SalesNotes" value="${escapeHTML(itemData.notes)}"></td>
         
         <td class="pic">
             <select class="form-select size" name="PurchasingRequestSectionItems[${newIndex}].AssignedToPurchasingUserID">
@@ -1526,58 +1527,76 @@ document.addEventListener("DOMContentLoaded", function () {
     function setupItemDropdown(wrapper) {
         const selectBtn = wrapper.querySelector(".select-btn");
         const searchInp = wrapper.querySelector("input[type='text']");
-        const itemOptions = wrapper.querySelector(".option"); // This is the UL element
-        const hiddenInput = wrapper.closest('td').querySelector(".item-id-hidden");
+        const itemOptions = wrapper.querySelector(".option");
+        // ** Crucially, find the hidden input associated with this specific dropdown **
+        const hiddenInput = wrapper.closest('td').querySelector('input[type="hidden"][name*="ItemID"]');
 
-        if (!selectBtn || !searchInp || !itemOptions || !hiddenInput) {
-            return;
+        // Function to populate the dropdown list
+        function addItemOptions(selectedText) {
+            itemOptions.innerHTML = "";
+            if (typeof itemMasterDataFromServer !== 'undefined' && Array.isArray(itemMasterDataFromServer)) {
+                itemMasterDataFromServer.sort((a, b) => a.text.localeCompare(b.text));
+
+                itemMasterDataFromServer.forEach(item => {
+                    let isSelected = item.text === selectedText ? "selected" : "";
+                    let li = document.createElement("li");
+                    li.textContent = item.text;
+                    li.setAttribute('data-value', item.value); // The ItemID
+                    li.className = isSelected;
+                    itemOptions.appendChild(li);
+                });
+            }
         }
 
-        // Use Event Delegation on the UL element.
-        itemOptions.addEventListener('click', function(e) {
-            const selectedLi = e.target.closest('li');
-            if (!selectedLi) return;
+        // Call it once on initialization
+        addItemOptions(selectBtn.querySelector("span").innerText);
 
+        // --- MAIN FIX: Use a single, reliable event listener for clicks within the dropdown ---
+        itemOptions.addEventListener('click', function (e) {
+            // Make sure a list item was clicked
+            if (e.target.tagName !== 'LI') return;
+
+            const selectedLi = e.target;
+
+            // Handle the "Request Item" option
             if (selectedLi.classList.contains('create-option')) {
-                const searchWord = searchInp.value.trim();
-                if (typeof createItemOption === 'function') {
-                    createItemOption(wrapper, searchWord);
-                }
+                const itemName = selectedLi.textContent.match(/Request "(.+)"/)[1];
+                createItemOption(wrapper, itemName); // Your existing function to open the request popup
                 return;
             }
 
+            // --- THIS IS THE LOGIC THAT WAS MISSING ---
+            // Handle a regular item selection
             const selectedValue = selectedLi.getAttribute('data-value');
             const selectedText = selectedLi.textContent;
 
+            // 1. Update the visible text
+            selectBtn.querySelector("span").innerText = selectedText;
+
+            // 2. Update the hidden input's value with the ItemID
             if (hiddenInput) {
                 hiddenInput.value = selectedValue;
             }
 
-            const span = selectBtn.querySelector("span");
-            if (span) span.innerText = selectedText;
-
+            // 3. Close the dropdown
             wrapper.classList.remove("active");
 
-            // RE-INTRODUCED POP-UP LOGIC
-            const itemName = selectedText.trim();
+            // 4. Open the "Configure Item" popup (your existing logic)
             const configureItemForm = document.querySelector('.configure-item-form-pop-up');
             if (configureItemForm) {
-                if (typeof resetConfigureItemForm === 'function') resetConfigureItemForm();
-                if (typeof setDefaultVendor === 'function') setDefaultVendor();
-
+                resetConfigureItemForm();
+                setDefaultVendor();
                 const itemNameCodeElement = document.getElementById('configure-item-name-code');
                 if (itemNameCodeElement) {
-                    itemNameCodeElement.textContent = `${itemName} [HWY00001]`;
+                    itemNameCodeElement.textContent = `${selectedText} [HWY00001]`; // Example code
                 }
                 const quantityInput = document.getElementById('configure-item-quantity');
-                if (quantityInput) {
-                    quantityInput.value = 1;
-                }
+                if (quantityInput) quantityInput.value = 1;
+
                 const amountElement = document.getElementById('configure-item-amount');
                 const vendorPriceElement = document.getElementById('vendor-price');
-                if (amountElement && vendorPriceElement && typeof formatCurrency === 'function' && typeof parseCurrency === 'function') {
-                    const priceText = vendorPriceElement.textContent || '0';
-                    amountElement.textContent = formatCurrency(parseCurrency(priceText));
+                if (amountElement && vendorPriceElement) {
+                    amountElement.textContent = formatCurrency(parseCurrency(vendorPriceElement.textContent));
                 }
 
                 configureItemForm.classList.add('active');
@@ -1589,39 +1608,44 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        function populateList(searchTerm = "") {
-            itemOptions.innerHTML = "";
-            const searchTermLower = searchTerm.toLowerCase();
-            const filteredItems = (typeof itemMasterDataFromServer !== 'undefined' ? itemMasterDataFromServer : []).filter(data =>
-                data.text.toLowerCase().includes(searchTermLower)
-            );
 
-            if (searchTerm) {
-                const createLi = document.createElement("li");
+        // Event listener for searching/filtering
+        searchInp.addEventListener("keyup", () => {
+            let searchWord = searchInp.value.trim().toLowerCase();
+            itemOptions.innerHTML = ""; // Clear existing options
+
+            // Add the "Request new item" option if user is typing
+            if (searchWord.length > 0) {
+                let createLi = document.createElement("li");
                 createLi.className = "create-option";
-                createLi.textContent = `Request "${searchTerm}"`;
+                createLi.textContent = `Request "${searchInp.value.trim()}"`;
                 itemOptions.appendChild(createLi);
             }
 
-            filteredItems.forEach(item => {
-                const li = document.createElement("li");
-                li.textContent = item.text;
-                li.setAttribute('data-value', item.value);
-                itemOptions.appendChild(li);
-            });
-        }
+            // Filter and add items from the master list
+            const filteredItems = (itemMasterDataFromServer || []).filter(data =>
+                data.text.toLowerCase().includes(searchWord)
+            );
 
-        searchInp.addEventListener("keyup", () => populateList(searchInp.value.trim()));
+            if (filteredItems.length > 0) {
+                filteredItems.forEach(data => {
+                    let li = document.createElement("li");
+                    li.textContent = data.text;
+                    li.setAttribute('data-value', data.value);
+                    itemOptions.appendChild(li);
+                });
+            }
+        });
 
+        // Event listener to open/close the dropdown
         selectBtn.addEventListener("click", function (e) {
             e.stopPropagation();
             const isActive = wrapper.classList.contains("active");
             closeAllDropdowns();
             if (!isActive) {
                 searchInp.value = "";
-                populateList();
+                addItemOptions(selectBtn.querySelector("span").innerText);
                 wrapper.classList.add("active");
-                searchInp.focus();
             }
         });
     }
@@ -1834,7 +1858,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Event untuk membuka dropdown (biarkan seperti yang sudah ada)
         opportunityWrapper.querySelector('.select-btn').addEventListener('click', function (e) {
             e.stopPropagation();
-            const isActive = opportunityWrapper.classList.contains('active');
+            const isActive = opportunityWrapper.classList.contains("active");
             closeAllDropdowns();
             if (!isActive) {
                 opportunityWrapper.classList.add("active");
@@ -1946,79 +1970,60 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    function removeRow(button) {
+        const row = button.closest('tr');
+        if (row) {
+            const tbody = row.parentNode;
+            tbody.removeChild(row);
+            // Re-number the remaining rows
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach((r, index) => {
+                // Update the row number cell
+                r.cells[0].textContent = index + 1;
+                // Update the index in the name attributes of inputs
+                r.querySelectorAll('input, select, textarea').forEach(input => {
+                    if (input.name) {
+                        input.name = input.name.replace(/\d+/, index);
+                    }
+                });
+            });
+        }
+    }
+
     const addRowBtn = document.getElementById('addRowBtn');
     const itemTableBody = document.getElementById('itemTableBody');
+
     if (addRowBtn && itemTableBody) {
         addRowBtn.addEventListener('click', () => {
-            const rowCount = itemTableBody.children.length + 1; // Nomor baris berikutnya
+            const rowCount = itemTableBody.children.length; // Index for the new row
             const newRow = document.createElement('tr');
             newRow.innerHTML = `
-                <td>${rowCount}</td>
-                <td class="name"><input type='text' class='size form-control1' name="NotesSectionItems[${rowCount - 1}].ItemName"></td>
-                <td class="desc"><input type='text' class='size form-control1' name="NotesSectionItems[${rowCount - 1}].ItemDescription"></td>
-                <td class="qty"><input type='number' class='size form-control1' name="NotesSectionItems[${rowCount - 1}].Quantity" value="1"></td>
-                <td class="uom"><input type='text' class='size tengah form-control1' name="NotesSectionItems[${rowCount - 1}].UoM" value="Unit"></td>
-                <td class="budget"><input type='number' class='size form-control1' name="NotesSectionItems[${rowCount - 1}].BudgetTarget"></td>
-                <td class="leadtime"><input type='text' class='size tengah form-control1' name="NotesSectionItems[${rowCount - 1}].LeadTimeTarget"></td>
+                <td>${rowCount + 1}</td>
+                <td class="name"><input type='text' class='size form-control1' name="NotesSectionItems[${rowCount}].ItemName"></td>
+                <td class="desc"><input type='text' class='size form-control1' name="NotesSectionItems[${rowCount}].ItemDescription"></td>
+                <td class="qty"><input type='number' class='size form-control1' name="NotesSectionItems[${rowCount}].Quantity" value="1"></td>
+                <td class="uom"><input type='text' class='size tengah form-control1' name="NotesSectionItems[${rowCount}].UoM" value="Unit"></td>
+                <td class="budget"><input type='number' class='size form-control1' name="NotesSectionItems[${rowCount}].BudgetTarget"></td>
+                <td class="leadtime"><input type='text' class='size tengah form-control1' name="NotesSectionItems[${rowCount}].LeadTimeTarget"></td>
                 <td class="delete"><button type="button" onclick="removeRow(this)" class="btn"><i class='bx bx-trash'></i></button></td>
             `;
             itemTableBody.appendChild(newRow);
         });
-        itemTableBody.addEventListener('click', function (e) {
-            if (e.target.closest('.btn-remove-row')) {
-                const row = e.target.closest('tr');
-                if (row) row.parentNode.removeChild(row);
-                Array.from(itemTableBody.children).forEach((tr, i) => {
-                    tr.querySelector('td').innerText = i + 1;
-                });
-            }
-        });
     }
-
-    function validateRow(row) {
-        const inputs = row.querySelectorAll('input, select, textarea');
-        const validationMessage = row.querySelector('.item-id-validation-message');
-        const itemIdHiddenInput = row.querySelector('.item-id-hidden');
-
-        function checkValidation() {
-            let hasData = false;
-            inputs.forEach(input => {
-                if (input.type !== 'hidden' && input.value.trim() !== '' && input.value.trim() !== '1' && input.value.trim() !== 'Unit') {
-                    hasData = true;
-                }
-            });
-
-            if (hasData && (!itemIdHiddenInput.value || itemIdHiddenInput.value === '0')) {
-                validationMessage.style.display = 'block';
-            } else {
-                validationMessage.style.display = 'none';
-            }
-        }
-
-        inputs.forEach(input => {
-            input.addEventListener('input', checkValidation);
-        });
-
-        const dropdown = row.querySelector('.wrapp.item-dropdown');
-        if (dropdown) {
-            const observer = new MutationObserver(checkValidation);
-            observer.observe(dropdown.querySelector('.select-btn span'), { childList: true, subtree: true });
-        }
-    }
-
-    document.querySelectorAll("#itemListTableBody tr").forEach(validateRow);
 
     const addRowBtnItem = document.getElementById('addRowBtnItem');
     if (addRowBtnItem) {
         addRowBtnItem.addEventListener('click', function () {
             const tbody = document.getElementById('itemListTableBody');
+            // Dapatkan indeks untuk baris baru SEBELUM baris ditambahkan
             const newIndex = tbody.querySelectorAll('tr').length;
             const newRow = document.createElement('tr');
+
 
             newRow.innerHTML = `
             <td class="text-center" style="font-weight: 500;">${newIndex + 1}</td>
             <td class="name">
-                <input type="hidden" name="ItemListSectionItems[${newIndex}].ItemID" value="" class="item-id-hidden">
+                <input type="hidden" name="ItemListSectionItems[${newIndex}].ItemID" value="">
                 <div class="wrapp item-dropdown" style="width: 100%;">
                     <div class="select-btn d-flex align-items-center">
                         <span></span>
@@ -2032,32 +2037,1697 @@ document.addEventListener("DOMContentLoaded", function () {
                         <ul class="option" style="margin-bottom: 10px;"></ul>
                     </div>
                 </div>
-                <span class="text-danger field-validation-error item-id-validation-message" style="display: none;">Item must be selected.</span>
             </td>
-            <td class="desc"><input name="ItemListSectionItems[${newIndex}].ItemDescription" class='size form-control1'></td>
-            <td class="qty"><input name="ItemListSectionItems[${newIndex}].Quantity" type='number' class='size text-center form-control1' oninput="updateRowAmount(this)"></td>
-            <td class="uom"><input name="ItemListSectionItems[${newIndex}].UoM" class='size form-control1'></td>
-            <td class="price"><input name="ItemListSectionItems[${newIndex}].TargetUnitPrice" type='number' class='size form-control1' oninput="updateRowAmount(this)"></td>
-            <td class="notes"><input name="ItemListSectionItems[${newIndex}].Notes" class='size form-control1'></td>
-            <td class="details"><input name="ItemListSectionItems[${newIndex}].Details" class='size form-control1'></td>
-            <td class="warranty"><input name="ItemListSectionItems[${newIndex}].SalesWarranty" class='size form-control1'></td>
+            <td class="desc"><input type='text' class='size form-control1' name="ItemListSectionItems[${newIndex}].ItemDescription"></td>
+            <td class="qty"><input type='number' class='size text-center form-control1' name="ItemListSectionItems[${newIndex}].Quantity" oninput="updateRowAmount(this)"></td>
+            <td class="uom"><input type='text' class='size form-control1' name="ItemListSectionItems[${newIndex}].UoM"></td>
+            <td class="price"><input type='number' class='size form-control1' name="ItemListSectionItems[${newIndex}].TargetUnitPrice" oninput="updateRowAmount(this)"></td>
+            <td class="notes"><input type='text' class='size form-control1' name="ItemListSectionItems[${newIndex}].Notes"></td>
+            <td class="details"><input type='text' class='size form-control1' name="ItemListSectionItems[${newIndex}].Details"></td>
+            <td class="warranty"><input type='text' class='size form-control1' name="ItemListSectionItems[${newIndex}].SalesWarranty"></td>
             <td class="amount"><span class="item-price-amount"></span></td>
             <td class="delete"><button type="button" class="btn btn-remove-row-itemlist"><i class='bx bx-trash'></i></button></td>
-            `;
+        `;
 
             tbody.appendChild(newRow);
+            renumberItemListTable();
+
             setupItemDropdown(newRow.querySelector('.wrapp.item-dropdown'));
-            validateRow(newRow);
+
+            newRow.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', function () {
+                    updateAddItemButtonState();
+                });
+            });
+
+            const selectBtn = newRow.querySelector('.select-btn');
+            if (selectBtn) {
+                selectBtn.addEventListener('click', function () {
+                    setTimeout(updateAddItemButtonState, 100);
+                });
+            }
+
+            updateAddItemButtonState();
+        });
+
+        updateAddItemButtonState();
+    }
+
+    function recalculateTotal() {
+        updateItemListTotal();
+    }
+    const itemListTableBody = document.getElementById('itemListTableBody');
+    if (itemListTableBody) {
+        itemListTableBody.addEventListener('click', function (e) {
+            if (e.target.closest('.btn-remove-row-itemlist')) {
+                const row = e.target.closest('tr');
+                if (row) {
+                    if (!row.classList.contains('addon-row')) {
+                        let next = row.nextElementSibling;
+                        while (next && next.classList.contains('addon-row')) {
+                            const toRemove = next;
+                            next = next.nextElementSibling;
+                            toRemove.parentNode.removeChild(toRemove);
+                        }
+                    }
+                    itemListTableBody.removeChild(row);
+                    renumberItemListTable();
+                    updateItemListTotal();
+                    updateAddItemButtonState();
+                }
+            }
+        });
+
+        itemListTableBody.addEventListener('input', function (e) {
+            const input = e.target;
+            if (input.closest('td.qty') || input.closest('td.price')) {
+                updateRowAmount(input);
+            }
+
+            updateAddItemButtonState();
         });
     }
 
-    document.querySelectorAll('.configure-item-form-confirm-btn, .configure-item-form-cancel-btn').forEach(btn => {
-        btn.addEventListener('click', function () {
-            const modal = document.querySelector('.configure-item-form-pop-up');
-            if (modal) {
-                modal.classList.remove('active');
-                document.body.classList.remove('pop-up-active');
-            }
+    recalculateTotal();
+
+    document.querySelectorAll('#itemListTableBody .qty input, #itemListTableBody .price input').forEach(input => {
+        input.addEventListener('input', function () {
+            updateRowAmount(this);
         });
     });
+
+    document.querySelectorAll('#itemListTableBody input').forEach(input => {
+        input.addEventListener('input', function () {
+            updateAddItemButtonState();
+        });
+    });
+
+    document.querySelectorAll('#itemListTableBody .wrapp.item-dropdown .select-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            setTimeout(updateAddItemButtonState, 100);
+        });
+    });
+
+    updateAddItemButtonState();
+
+    document.querySelectorAll('#itemListTableBody tr').forEach(row => {
+        const qtyInput = row.querySelector('.qty input');
+        if (qtyInput) updateRowAmount(qtyInput);
+    });
+
+    const reqTableBody = document.getElementById('reqTableBody');
+    if (reqTableBody) {
+        reqTableBody.addEventListener('click', function (e) {
+            if (e.target.closest('.bx-plus')) {
+                const row = e.target.closest('tr');
+                if (!row) return;
+
+                // 1. Ambil data dari baris "Request Item to Purchasing" yang di-klik
+                const name = row.querySelector('td.name input')?.value.trim();
+                const desc = row.querySelector('td.desc input')?.value.trim();
+                const qty = row.querySelector('td.qty input')?.value.trim();
+                const uom = row.querySelector('td.uom input')?.value.trim();
+
+                if (!(name || desc || qty || uom)) return;
+
+                const itemListTbody = document.getElementById('itemListTableBody');
+                let foundEmptyRow = null;
+                for (const tr of itemListTbody.children) {
+                    const inputs = tr.querySelectorAll('input');
+                    const allEmpty = Array.from(inputs).every(input => input.value.trim() === '');
+                    if (allEmpty) {
+                        foundEmptyRow = tr;
+                        break;
+                    }
+                }
+
+                let targetRow;
+                if (foundEmptyRow) {
+                    targetRow = foundEmptyRow;
+                } else {
+                    const newIndex = itemListTbody.querySelectorAll('tr').length;
+                    targetRow = document.createElement('tr');
+                    targetRow.innerHTML = `
+           <td class="text-center" style="font-weight: 500;">${newIndex + 1}</td>
+            <td class="name">
+                <input type="hidden" name="ItemListSectionItems[${newIndex}].ItemID" value="">
+                <div class="wrapp item-dropdown" style="width: 100%;">
+                    <div class="select-btn d-flex align-items-center">
+                        <span>${name}</span>
+                        <i class='bx bx-chevron-down'></i>
+                    </div>
+                    <div class="content-search">
+                        <div class="search"><i class="bx bx-search-alt-2"></i><input type="text" placeholder="Search"></div>
+                        <ul class="option" style="margin-bottom: 10px;"></ul>
+                    </div>
+                </div>
+            </td>
+            <td class="desc"><input type="text" class="size form-control1" name="ItemListSectionItems[${newIndex}].ItemDescription" value="${desc}"></td>
+            <td class="qty"><input type="number" class="size text-center form-control1" name="ItemListSectionItems[${newIndex}].Quantity" value="${qty}" oninput="updateRowAmount(this)"></td>
+            <td class="uom"><input type="text" class="size form-control1" name="ItemListSectionItems[${newIndex}].UoM" value="${uom}"></td>
+            <td class="price"><input type="number" class="size form-control1" name="ItemListSectionItems[${newIndex}].TargetUnitPrice" oninput="updateRowAmount(this)"></td>
+            <td class="notes"><input type="text" class="size form-control1" name="ItemListSectionItems[${newIndex}].Notes"></td>
+            <td class="details"><input type="text" class="size form-control1" name="ItemListSectionItems[${newIndex}].Details"></td>
+            <td class="warranty"><input type="text" class="size form-control1" name="ItemListSectionItems[${newIndex}].SalesWarranty"></td>
+            <td class="amount"><span class="item-price-amount"></span></td>
+            <td class="delete"><button type="button" class="btn btn-remove-row-itemlist"><i class="bx bx-trash"></i></button></td>
+        `;
+
+                    // 4. Tambahkan baris baru ke tabel "Item List"
+                    itemListTbody.appendChild(targetRow);
+
+                    setupItemDropdown(targetRow.querySelector('.wrapp.item-dropdown'));
+                }
+
+                const nameDropdown = targetRow.querySelector('.name .select-btn span');
+                if (nameDropdown) nameDropdown.textContent = name;
+                targetRow.querySelector('td.desc input').value = desc;
+                targetRow.querySelector('td.qty input').value = qty;
+                targetRow.querySelector('td.uom input').value = uom;
+                updateRowAmount(targetRow.querySelector('td.qty input'));
+
+                const itemDropdown = targetRow.querySelector('.wrapp.item-dropdown');
+                if (itemDropdown) {
+                    itemDropdown.classList.add('disabled-by-script');
+                    itemDropdown.setAttribute('tabindex', '-1');
+                }
+
+                let next = row.nextElementSibling;
+                let insertAfter = targetRow;
+                while (next && next.classList.contains('addon-row')) {
+                    const addOnRow = next;
+                    next = next.nextElementSibling;
+
+                    const addOnName = addOnRow.querySelector('td.name input').value.trim();
+                    const addOnDesc = addOnRow.querySelector('td.desc input').value.trim();
+                    const addOnQty = addOnRow.querySelector('td.qty input').value.trim();
+                    const addOnUom = addOnRow.querySelector('td.uom input').value.trim();
+                    const addOnPrice = addOnRow.querySelector('td.price input')?.value.trim() || 0;
+
+
+                    const newAddOnRow = document.createElement('tr');
+                    newAddOnRow.classList.add('addon-row');
+                    const newAddonIndex = itemListTbody.querySelectorAll('tr').length;
+                    newAddOnRow.innerHTML = `
+                    <td></td>
+                    <td class="name">
+                        <input type="hidden" name="ItemListSectionItems[${newAddonIndex}].ItemID" value="">
+                        <div class="wrapp item-dropdown" style="width: 100%;">
+                            <div class="select-btn d-flex align-items-center">
+                                <span>${addOnName}</span><i class='bx bx-chevron-down'></i>
+                            </div>
+                            <div class="content-search">
+                                <div class="search"><i class="bx bx-search-alt-2"></i><input type="text" placeholder="Search" /></div>
+                                <ul class="option" style="margin-bottom: 10px;"></ul>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="desc"><input type='text' class='size form-control1' name="ItemListSectionItems[${newAddonIndex}].ItemDescription" value="${addOnDesc}"></td>
+                    <td class="qty"><input type='number' class='size text-center form-control1' name="ItemListSectionItems[${newAddonIndex}].Quantity" value="${addOnQty}"></td>
+                    <td class="uom"><input type='text' class='size form-control1' name="ItemListSectionItems[${newAddonIndex}].UoM" value="${addOnUom}"></td>
+                    <td class="price"><input type='number' class='size form-control1' name="ItemListSectionItems[${newAddonIndex}].TargetUnitPrice"></td>
+                    <td class="notes"><input type='text' class='size form-control1' name="ItemListSectionItems[${newAddonIndex}].Notes"></td>
+                    <td class="details"><input type='text' class='size form-control1' name="ItemListSectionItems[${newAddonIndex}].Details"></td>
+                    <td class="warranty"><input type='text' class='size form-control1' name="ItemListSectionItems[${newAddonIndex}].SalesWarranty"></td>
+                    <td class="amount"><span class="item-price-amount"></span></td>
+                    <td class="delete"><button type="button" class="btn btn-remove-row-itemlist"><i class='bx bx-trash'></i></button></td>
+                `;
+
+                    if (insertAfter && insertAfter.nextSibling) {
+                        itemListTbody.insertBefore(newAddOnRow, insertAfter.nextSibling);
+                    } else {
+                        itemListTbody.appendChild(newAddOnRow);
+                    }
+                    insertAfter = newAddOnRow;
+
+                    setupItemDropdown(newAddOnRow.querySelector('.wrapp.item-dropdown'));
+                    const addOnDropdown = newAddOnRow.querySelector('.wrapp.item-dropdown');
+                    if (addOnDropdown) {
+                        addOnDropdown.classList.add('disabled-by-script');
+                        addOnDropdown.setAttribute('tabindex', '-1');
+                    }
+                    newAddOnRow.querySelectorAll('input').forEach(input => {
+                        input.addEventListener('input', function () {
+                            updateAddItemButtonState();
+                        });
+                    });
+                    const selectBtn = newAddOnRow.querySelector('.select-btn');
+                    if (selectBtn) {
+                        selectBtn.addEventListener('click', function () {
+                            setTimeout(updateAddItemButtonState, 100);
+                        });
+                    }
+                    const deleteBtn = newAddOnRow.querySelector('.btn-remove-row-itemlist');
+                    deleteBtn.addEventListener('click', function () {
+                        newAddOnRow.remove();
+                        renumberItemListTable();
+                        updateItemListTotal();
+                        updateAddItemButtonState();
+                    });
+
+                    updateRowAmount(newAddOnRow.querySelector('.qty input'));
+
+                    addOnRow.parentNode.removeChild(addOnRow);
+                }
+
+
+
+                row.parentNode.removeChild(row);
+                renumberItemListTable();
+                renumberReqTable();
+                updateAddItemButtonState();
+            }
+        });
+    }
+    function initFileUpload(wrapper) {
+        if (!wrapper.uploadedFiles) wrapper.uploadedFiles = [];
+
+        const formUpload = wrapper.querySelector('.form-upload');
+        const fileInput = wrapper.querySelector(".file-input");
+        const attachedFilesContainer = wrapper.querySelector('#attached-files');
+        const attachmentCount = wrapper.querySelector('.attachment-count');
+
+        if (!formUpload || !fileInput || !attachedFilesContainer || !attachmentCount) return;
+
+        function renderFiles() {
+            attachedFilesContainer.innerHTML = '';
+            wrapper.uploadedFiles.forEach((file, idx) => {
+                let iconClass = 'fas fa-file';
+                if (file.type.startsWith('image/')) iconClass = 'fas fa-file-image';
+                else if (file.type.startsWith('application/pdf')) iconClass = 'fas fa-file-pdf';
+                else if (file.type.startsWith('application/msword') || file.type.startsWith('application/vnd.openxmlformats-officedocument.wordprocessingml.document')) iconClass = 'fas fa-file-word';
+
+                let fileTotal = Math.floor(file.size / 1024);
+                let fileSize = (fileTotal < 1000) ? fileTotal + " KB" : (file.size / (1024 * 1024)).toFixed(2) + " MB";
+                const fileInfo = document.createElement('div');
+                fileInfo.classList.add('row');
+                fileInfo.innerHTML = `
+                    <div class="content upload">
+                        <i class="${iconClass}"></i>
+                        <div class="details">
+                            <span class="name">${formatFileName(file.name)}</span>
+                            <span class="size">${fileSize}</span>
+                        </div>
+                        <div class="button-function">
+                            <button type="button" class="delete-button float-end me-1"><i class="fas fa-times"></i></button>
+                            <button type="button" class="download-button float-end me-2"><i class="fas fa-download"></i></button> 
+                        </div>
+                    </div>
+                `;
+
+                fileInfo.querySelector('.download-button').addEventListener('click', () => {
+                    const url = URL.createObjectURL(file);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = file.name;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                });
+
+                fileInfo.querySelector('.delete-button').addEventListener('click', () => {
+                    wrapper.uploadedFiles.splice(idx, 1);
+                    renderFiles();
+                    updateCount();
+                });
+
+                attachedFilesContainer.appendChild(fileInfo);
+            });
+            updateCount();
+        }
+
+        function updateCount() {
+            attachmentCount.textContent = wrapper.uploadedFiles.length;
+            attachedFilesContainer.style.display = wrapper.uploadedFiles.length > 0 ? 'block' : 'none';
+        }
+
+        function handleDroppedFiles(files) {
+            const currentCount = wrapper.uploadedFiles.length;
+            if (currentCount >= 5) {
+                alert('You can only upload a maximum of 5 files.');
+                return;
+            }
+            const newFiles = Array.from(files);
+            const maxToAdd = 5 - currentCount;
+            const filesToAdd = newFiles.slice(0, maxToAdd);
+
+            const validFiles = [];
+            filesToAdd.forEach(file => {
+                if (file.size > 5 * 1024 * 1024) {
+                    alert(`File "${file.name}" is more than 5MB and cannot be uploaded.`);
+                } else {
+                    validFiles.push(file);
+                }
+            });
+
+            validFiles.forEach((file) => {
+                wrapper.uploadedFiles.push(file);
+            });
+            renderFiles();
+        }
+
+        formUpload.onclick = null;
+        fileInput.onchange = null;
+        formUpload.ondragover = null;
+        formUpload.ondragleave = null;
+        formUpload.ondrop = null;
+
+        formUpload.addEventListener("click", function (e) {
+            if (e.target === fileInput) return;
+            if (wrapper.uploadedFiles.length >= 5) {
+                alert('You can only upload a maximum of 5 files.');
+                return;
+            }
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', function () {
+            const files = this.files;
+            if (files && files.length > 0) {
+                handleDroppedFiles(files);
+            }
+            this.value = '';
+        });
+
+        formUpload.addEventListener('dragover', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!formUpload.classList.contains('disabled-by-script') &&
+                !formUpload.hasAttribute('disabled')) {
+                formUpload.classList.add('active');
+            }
+        });
+
+        formUpload.addEventListener('dragleave', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            formUpload.classList.remove('active');
+        });
+
+        formUpload.addEventListener('drop', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            formUpload.classList.remove('active');
+            if (formUpload.classList.contains('disabled-by-script') ||
+                formUpload.hasAttribute('disabled') ||
+                fileInput.hasAttribute('disabled')) {
+                return;
+            }
+            const files = e.dataTransfer.files;
+            if (files && files.length > 0) {
+                handleDroppedFiles(files);
+            }
+        });
+
+        renderFiles();
+    }
+
+    document.querySelectorAll('.wrapper-2').forEach(function (wrapper) {
+        initFileUpload(wrapper);
+    });
+
+   /* const itemTableBody = document.getElementById('itemTableBody');*/
+    if (itemTableBody) {
+        itemTableBody.addEventListener('click', function (e) {
+            if (e.target.closest('.btn-remove-row')) {
+                const row = e.target.closest('tr');
+                if (row) {
+                    this.removeChild(row);
+                    Array.from(this.children).forEach((tr, i) => {
+                        tr.querySelector('td').innerText = i + 1;
+                    });
+                }
+            }
+        });
+    }
+
+    //const itemListTableBody = document.getElementById('itemListTableBody');
+    if (itemListTableBody) {
+        itemListTableBody.addEventListener('click', function (e) {
+            if (e.target.closest('.btn-remove-row-itemlist')) {
+                const row = e.target.closest('tr');
+                if (row) {
+                    this.removeChild(row);
+                    Array.from(this.children).forEach((tr, i) => {
+                        tr.querySelector('td').innerText = i + 1;
+                    });
+                }
+            }
+        });
+    }
+
+ 
+    if (reqTableBody) {
+        reqTableBody.addEventListener('click', function (e) {
+            if (e.target.closest('.btn-remove-row-req')) {
+                const row = e.target.closest('tr');
+                if (row) {
+                    if (!row.classList.contains('addon-row')) {
+                        let next = row.nextElementSibling;
+                        while (next && next.classList.contains('addon-row')) {
+                            let toRemove = next;
+                            next = next.nextElementSibling;
+                            toRemove.parentNode.removeChild(toRemove);
+                        }
+                    }
+                    row.parentNode.removeChild(row);
+                    renumberReqTable();
+                }
+            }
+        });
+    }
+
+    function updateAmount(row) {
+        const qtyInput = row.querySelector('td.qty input');
+        const priceInput = row.querySelector('td.price input');
+        const amountSpan = row.querySelector('td.amount span');
+        const qty = parseFloat(qtyInput.value) || 0;
+        const price = parseFloat(priceInput.value) || 0;
+        const amount = qty * price;
+        amountSpan.textContent = amount ? amount.toLocaleString('id-ID') : '';
+    }
+
+    function updateAllAmounts() {
+        const rows = document.querySelectorAll('#itemListTableBody tr');
+        rows.forEach(row => updateAmount(row));
+        let total = 0;
+        rows.forEach(row => {
+            const amountSpan = row.querySelector('td.amount span');
+            const amount = parseFloat(amountSpan.textContent.replace(/\./g, '').replace(/,/g, '.')) || 0;
+            total += amount;
+        });
+        const totalBox = document.querySelector('#itemListTotalBox .total-value');
+        if (totalBox) totalBox.textContent = 'Rp' + total.toLocaleString('id-ID');
+    }
+
+    document.getElementById('itemListTableBody').addEventListener('input', function (e) {
+        if (e.target.matches('td.qty input') || e.target.matches('td.price input')) {
+            const row = e.target.closest('tr');
+            updateAmount(row);
+            updateAllAmounts();
+        }
+    });
+
+    updateAllAmounts();
+
+    const reasonSelect = document.getElementById('reason-for-request');
+    const otherReasonContainer = document.getElementById('other-reason-container');
+    const otherReasonInput = document.getElementById('other-reason-input');
+
+    if (reasonSelect && otherReasonContainer) {
+        reasonSelect.addEventListener('change', function () {
+            if (this.value === 'Other') {
+                otherReasonContainer.style.display = '';
+                if (otherReasonInput) otherReasonInput.required = true;
+            } else {
+                otherReasonContainer.style.display = 'none';
+                if (otherReasonInput) {
+                    otherReasonInput.value = '';
+                    otherReasonInput.required = false;
+                }
+            }
+        });
+    }
+
+    function initConfigureItemForm() {
+        updateAddOnsAmount();
+
+        const minusBtn = document.querySelector('.js-minus');
+        const plusBtn = document.querySelector('.js-plus');
+        const resultInput = document.querySelector('.js-result');
+        const amountSpan = document.getElementById('configure-item-amount');
+
+        const vendorPriceElement = document.getElementById('vendor-price');
+        if (vendorPriceElement) {
+            vendorPriceElement.textContent = formatCurrency(parseCurrency(vendorPriceElement.textContent));
+        }
+        if (amountSpan) {
+            amountSpan.textContent = formatCurrency(parseCurrency(amountSpan.textContent));
+        }
+
+        document.querySelectorAll('.other-vendors-table tr:nth-child(2) td:not(:first-child)').forEach(td => {
+            td.textContent = formatCurrency(parseCurrency(td.textContent));
+        });
+
+        function updateTotalAmountWithAddOns() {
+            const quantity = parseInt(document.getElementById('configure-item-quantity').value) || 1;
+            const unitPrice = parseCurrency(document.getElementById('vendor-price').textContent);
+            const baseAmount = unitPrice * quantity;
+            let addOnsTotal = 0;
+            document.querySelectorAll('#add-ons-table-body tr').forEach(row => {
+                const checkbox = row.querySelector('.add-on-checkbox');
+                if (checkbox && checkbox.checked) {
+                    const addOnUnitPrice = parseCurrency(row.cells[6].textContent);
+                    addOnsTotal += addOnUnitPrice * quantity;
+                }
+            });
+            document.getElementById('configure-item-amount').textContent = formatCurrency(baseAmount + addOnsTotal);
+        }
+
+        window.updateTotalAmountWithAddOns = updateTotalAmountWithAddOns;
+
+        const originalUpdateAddOnsAmount = window.updateAddOnsAmount;
+        window.updateAddOnsAmount = function () {
+            if (typeof originalUpdateAddOnsAmount === 'function') {
+                originalUpdateAddOnsAmount();
+            }
+            updateTotalAmountWithAddOns();
+        };
+
+        if (minusBtn && plusBtn && resultInput) {
+            const newMinusBtn = minusBtn.cloneNode(true);
+            const newPlusBtn = plusBtn.cloneNode(true);
+            minusBtn.parentNode.replaceChild(newMinusBtn, minusBtn);
+            plusBtn.parentNode.replaceChild(newPlusBtn, plusBtn);
+
+            let unitPrice = parseCurrency(document.getElementById('vendor-price').textContent) || 10000000;
+
+            function updateAmount() {
+                const resultInput = document.getElementById('configure-item-quantity');
+                const amountSpan = document.getElementById('configure-item-amount');
+                const vendorPrice = parseCurrency(document.getElementById('vendor-price').textContent);
+                const quantity = parseInt(resultInput.value) || 0;
+                amountSpan.textContent = formatCurrency(quantity * vendorPrice);
+            }
+
+            newMinusBtn.addEventListener('click', function () {
+                let value = parseInt(resultInput.value) || 0;
+                if (value > 1) {
+                    resultInput.value = value - 1;
+                    updateAmount();
+                    updateAddOnsAmount();
+                }
+            });
+            newPlusBtn.addEventListener('click', function () {
+                let value = parseInt(resultInput.value) || 0;
+                resultInput.value = value + 1;
+                updateAmount();
+                updateAddOnsAmount();
+            });
+
+            resultInput.addEventListener('input', function () {
+                let value = parseInt(this.value) || 0;
+                if (value < 1) {
+                    this.value = 1;
+                }
+                updateAmount();
+                updateAddOnsAmount();
+            });
+        }
+
+        document.querySelectorAll('#add-ons-table-body .add-on-checkbox').forEach(cb => {
+            cb.addEventListener('change', function () {
+                updateTotalAmountWithAddOns();
+            });
+        });
+
+        const configureQtyInput = document.getElementById('configure-item-quantity');
+        if (configureQtyInput) {
+            configureQtyInput.addEventListener('input', updateAddOnsAmount);
+
+            configureQtyInput.addEventListener('change', function () {
+                updateAddOnsAmount();
+                updateTotalAmountWithAddOns();
+            });
+        }
+
+        function updateStockHeader() {
+            const stockHeader = document.getElementById('stock-header');
+            const stockTotalItem = document.getElementById('stock-total-item');
+            const totalItems = parseInt(stockTotalItem.textContent) || 0;
+
+            if (totalItems > 0) {
+                stockHeader.style.backgroundColor = '#02b013';
+                stockHeader.classList.remove('out-of-stock');
+            } else {
+                stockHeader.style.backgroundColor = '#fe0000';
+                stockHeader.classList.add('out-of-stock');
+            }
+        }
+
+        updateStockHeader();
+
+        const otherVendorBtn = document.getElementById('other-vendor-btn');
+        const otherVendorsTable = document.querySelector('.other-vendors-table');
+        const requestToPurchasingForm = document.querySelector('.request-to-purchasing-form');
+        const requestToPurchasingBtn = document.getElementById('request-to-purchasing-btn');
+
+        if (otherVendorsTable) otherVendorsTable.style.display = 'none';
+        if (requestToPurchasingForm) requestToPurchasingForm.style.display = 'none';
+
+        if (otherVendorBtn && otherVendorsTable) {
+            const newOtherVendorBtn = otherVendorBtn.cloneNode(true);
+            otherVendorBtn.parentNode.replaceChild(newOtherVendorBtn, otherVendorBtn);
+            newOtherVendorBtn.addEventListener('click', function () {
+                otherVendorsTable.style.display = otherVendorsTable.style.display === 'none' ? 'block' : 'none';
+                if (requestToPurchasingForm) {
+                    requestToPurchasingForm.style.display = 'none';
+                }
+            });
+        }
+
+        if (requestToPurchasingBtn && requestToPurchasingForm) {
+            const newRequestToPurchasingBtn = requestToPurchasingBtn.cloneNode(true);
+            requestToPurchasingBtn.parentNode.replaceChild(newRequestToPurchasingBtn, requestToPurchasingBtn);
+            newRequestToPurchasingBtn.addEventListener('click', function () {
+                requestToPurchasingForm.style.display = requestToPurchasingForm.style.display === 'none' ? 'block' : 'none';
+                if (otherVendorsTable) {
+                    otherVendorsTable.style.display = 'none';
+                }
+            });
+        }
+
+        const chooseButtons = document.querySelectorAll('.btn-choose');
+        chooseButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const index = parseInt(this.getAttribute('data-index'));
+                const vendor = vendorData[index];
+
+                if (vendor) {
+                    document.getElementById('vendor-name').textContent = vendor.name;
+                    document.getElementById('vendor-location').textContent = vendor.location;
+                    document.getElementById('vendor-price').textContent = formatCurrency(vendor.price);
+                    document.getElementById('vendor-validity').textContent = vendor.validityDate;
+                    document.getElementById('vendor-leadtime').textContent = vendor.leadtime;
+
+                    const resultInput = document.getElementById('configure-item-quantity');
+                    const amountSpan = document.getElementById('configure-item-amount');
+                    const quantity = parseInt(resultInput.value) || 0;
+                    amountSpan.textContent = formatCurrency(quantity * vendor.price);
+
+                    updateAddOnsAmount();
+                }
+                if (otherVendorsTable) otherVendorsTable.style.display = 'none';
+            });
+        });
+
+        const closeBtn = document.getElementById('configure-item-form-close-btn');
+        configureItemForm = document.querySelector('.configure-item-form-pop-up');
+        if (closeBtn && configureItemForm) {
+            closeBtn.addEventListener('click', function () {
+                configureItemForm.classList.remove('active');
+                document.body.classList.remove('pop-up-active');
+                clearActiveItemListName();
+            });
+        }
+
+        const cancelBtn = document.querySelector('.configure-item-form-cancel-btn');
+        if (cancelBtn && configureItemForm) {
+            cancelBtn.addEventListener('click', function () {
+                configureItemForm.classList.remove('active');
+                document.body.classList.remove('pop-up-active');
+                clearActiveItemListName();
+            });
+        }
+
+        const confirmBtn = document.querySelector('.configure-item-form-confirm-btn');
+        if (confirmBtn) {
+            const newConfirmBtn = confirmBtn.cloneNode(true);
+            confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+            newConfirmBtn.addEventListener('click', function () {
+                const configureItemForm = document.querySelector('.configure-item-form-pop-up');
+                const requestToPurchasingForm = document.querySelector('.request-to-purchasing-form');
+
+                // --- DEKLARASI VARIABEL DIPINDAHKAN KE ATAS SINI ---
+                // Ambil data dari pop-up sekali saja di sini agar bisa dipakai di semua kondisi.
+                const itemName = document.getElementById('configure-item-name-code').textContent.split(' [')[0].trim();
+                const itemDesc = document.getElementById('configure-item-description').textContent.trim();
+                const quantity = document.getElementById('configure-item-quantity').value;
+                const price = parseCurrency(document.getElementById('vendor-price').textContent);
+                // --- AKHIR BAGIAN DEKLARASI ---
+
+                const isRequestToPurchasing = requestToPurchasingForm && requestToPurchasingForm.style.display !== 'none';
+
+                if (isRequestToPurchasing) {
+                    // --- LOGIKA UNTUK "REQUEST TO PURCHASING" ---
+                    let reason = document.getElementById('reason-for-request').value;
+                    if (reason === 'Other') {
+                        reason = document.getElementById('other-reason-input').value.trim();
+                    }
+                    const notes = document.getElementById('request-details-notes').value.trim();
+
+                    // Panggil fungsi untuk menambahkan baris baru ke tabel purchasing
+                    addToRequestPurchasing({
+                        name: itemName,
+                        description: itemDesc,
+                        quantity: quantity,
+                        uom: 'Unit',
+                        reason: reason,
+                        notes: notes
+                    });
+
+                    // Hapus item dari tabel "Item List"
+                    const itemListTableBody = document.getElementById('itemListTableBody');
+                    if (itemListTableBody) {
+                        const rows = Array.from(itemListTableBody.querySelectorAll('tr'));
+                        for (const row of rows) {
+                            const nameSpan = row.querySelector('.name .select-btn span');
+                            if (nameSpan && nameSpan.textContent.trim() === itemName) {
+                                row.remove();
+                                break;
+                            }
+                        }
+                        renumberItemListTable();
+                        updateItemListTotal();
+                        updateAddItemButtonState();
+                    }
+
+                    const addOnCheckboxes = document.querySelectorAll('#add-ons-table-body .add-on-checkbox:checked');
+
+                    addOnCheckboxes.forEach(checkbox => {
+                        const row = checkbox.closest('tr');
+                        if (!row) return;
+
+                        // Ambil data add-on seperti biasa
+                        const addOnName = row.cells[2].textContent.trim();
+                        const addOnDesc = row.cells[3].textContent.trim();
+                        const addOnQty = quantity; // Tetap menggunakan kuantitas dari item utama
+                        const addOnUom = row.cells[5].textContent.trim();
+
+                        // 1. Kumpulkan semua data add-on ke dalam SATU OBJEK
+                        const addOnItemData = {
+                            name: addOnName,
+                            description: addOnDesc,
+                            quantity: addOnQty,
+                            uom: addOnUom,
+                            reason: reason, // 'reason' dari item utama
+                            notes: notes    // 'notes' dari item utama
+                        };
+
+                        // 2. Panggil fungsi dengan SATU OBJEK tersebut
+                        addToRequestPurchasing(addOnItemData);
+                    });
+
+                    renumberReqTable();
+                } else {
+                    const itemListTableBody = document.getElementById('itemListTableBody');
+                    let targetRow = null;
+                    if (itemListTableBody) {
+                        const rows = Array.from(itemListTableBody.querySelectorAll('tr'));
+                        for (const row of rows) {
+                            const nameSpan = row.querySelector('.name .select-btn span');
+                            if (nameSpan && nameSpan.textContent.trim() === itemName) {
+                                targetRow = row;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (targetRow) {
+                        targetRow.querySelector('.desc input').value = itemDesc;
+                        targetRow.querySelector('.qty input').value = quantity;
+                        targetRow.querySelector('.price input').value = price;
+                        const itemDropdown = targetRow.querySelector('.wrapp.item-dropdown');
+                        if (itemDropdown) {
+                            itemDropdown.classList.add('disabled-by-script');
+                            itemDropdown.setAttribute('tabindex', '-1');
+                        }
+                        updateRowAmount(targetRow.querySelector('.qty input'));
+                    } else {
+                        addToItemList(itemName, itemDesc, quantity, price);
+                        const rows = Array.from(itemListTableBody.querySelectorAll('tr'));
+                        targetRow = rows[rows.length - 1];
+                    }
+
+                    const addOnCheckboxes = document.querySelectorAll('#add-ons-table-body .add-on-checkbox:checked');
+                    let insertAfter = targetRow;
+                    addOnCheckboxes.forEach(checkbox => {
+                        const row = checkbox.closest('tr');
+                        if (!row) return;
+                        const addOnName = row.cells[2].textContent.trim();
+                        const addOnDesc = row.cells[3].textContent.trim();
+                        const addOnQty = row.cells[4].textContent.trim();
+                        const addOnUom = row.cells[5].textContent.trim();
+                        const addOnPrice = parseCurrency(row.cells[6].textContent);
+
+                        const newRow = document.createElement('tr');
+                        newRow.classList.add('addon-row');
+                        const newAddonIndex = itemListTableBody.querySelectorAll('tr').length;
+                        newRow.innerHTML = `
+                            <td></td>
+                            <td class="name">
+                                <input type="hidden" name="ItemListSectionItems[${newAddonIndex}].ItemID" value="">
+                                <div class="wrapp item-dropdown" style="width: 100%;">
+                                    <div class="select-btn d-flex align-items-center"><span>${addOnName}</span><i class='bx bx-chevron-down'></i></div>
+                                    <div class="content-search">
+                                        <div class="search"><i class="bx bx-search-alt-2"></i><input type="text" placeholder="Search" /></div>
+                                        <ul class="option" style="margin-bottom: 10px;"></ul>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="desc"><input type='text' class='size form-control1' name="ItemListSectionItems[${newAddonIndex}].ItemDescription" value="${addOnDesc}"></td>
+                            <td class="qty"><input type='number' class='size text-center form-control1' name="ItemListSectionItems[${newAddonIndex}].Quantity" value="${addOnQty}"></td>
+                            <td class="uom"><input type='text' class='size form-control1' name="ItemListSectionItems[${newAddonIndex}].UoM" value="${addOnUom}"></td>
+                            <td class="price"><input type='number' class='size form-control1' name="ItemListSectionItems[${newAddonIndex}].TargetUnitPrice" value="${addOnPrice}"></td>
+                            <td class="notes"><input type='text' class='size form-control1' name="ItemListSectionItems[${newAddonIndex}].Notes"></td>
+                            <td class="details"><input type='text' class='size form-control1' name="ItemListSectionItems[${newAddonIndex}].Details"></td>
+                            <td class="warranty"><input type='text' class='size form-control1' name="ItemListSectionItems[${newAddonIndex}].SalesWarranty"></td>
+                            <td class="amount"><span class="item-price-amount"></span></td>
+                            <td class="delete"><button type="button" class="btn btn-remove-row-itemlist"><i class='bx bx-trash'></i></button></td>
+                        `;
+                        if (insertAfter && insertAfter.nextSibling) {
+                            itemListTableBody.insertBefore(newRow, insertAfter.nextSibling);
+                        } else {
+                            itemListTableBody.appendChild(newRow);
+                        }
+                        insertAfter = newRow;
+
+                        setupItemDropdown(newRow.querySelector('.wrapp.item-dropdown'));
+                        const addOnDropdown = newRow.querySelector('.wrapp.item-dropdown');
+                        if (addOnDropdown) {
+                            addOnDropdown.classList.add('disabled-by-script');
+                            addOnDropdown.setAttribute('tabindex', '-1');
+                        }
+                        newRow.querySelectorAll('input').forEach(input => {
+                            input.addEventListener('input', function () {
+                                updateAddItemButtonState();
+                            });
+                        });
+                        const selectBtn = newRow.querySelector('.select-btn');
+                        if (selectBtn) {
+                            selectBtn.addEventListener('click', function () {
+                                setTimeout(updateAddItemButtonState, 100);
+                            });
+                        }
+                        const deleteBtn = newRow.querySelector('.btn-remove-row-itemlist');
+                        deleteBtn.addEventListener('click', function () {
+                            newRow.remove();
+                            renumberItemListTable();
+                            updateItemListTotal();
+                            updateAddItemButtonState();
+                        });
+
+                        updateRowAmount(newRow.querySelector('.qty input'));
+                    });
+
+                    renumberItemListTable();
+                    updateItemListTotal();
+                    updateAddItemButtonState();
+                }
+
+                if (configureItemForm) {
+                    configureItemForm.classList.remove('active');
+                }
+                document.body.classList.remove('pop-up-active');
+            });
+        }
+    }
+
+    function setupConfigureItemPopup() {
+        const itemListTableBody = document.getElementById('itemListTableBody');
+        if (!itemListTableBody) return;
+
+        itemListTableBody.addEventListener('click', function (e) {
+            const target = e.target;
+            const itemNameElement = target.closest('.select-btn span');
+
+            if (itemNameElement && !itemNameElement.textContent.includes('Create "')) {
+                const itemName = itemNameElement.textContent.trim();
+
+                configureItemForm = document.querySelector('.configure-item-form-pop-up');
+                if (configureItemForm) {
+                    resetConfigureItemForm();
+                    setDefaultVendor();
+
+                    const itemNameCodeElement = document.getElementById('configure-item-name-code');
+                    if (itemNameCodeElement) {
+                        itemNameCodeElement.textContent = `${itemName} [HWY00001]`;
+                    }
+
+                    const quantityInput = document.getElementById('configure-item-quantity');
+                    if (quantityInput) {
+                        quantityInput.value = 1;
+                    }
+
+                    const amountElement = document.getElementById('configure-item-amount');
+                    const vendorPriceElement = document.getElementById('vendor-price');
+                    if (amountElement && vendorPriceElement) {
+                        amountElement.textContent = formatCurrency(parseCurrency(vendorPriceElement.textContent));
+
+                    }
+
+                    configureItemForm.classList.add('active');
+                    document.body.classList.add('pop-up-active');
+
+                    initConfigureItemForm();
+                }
+            }
+        });
+    }
+
+    setupConfigureItemPopup();
+
+    const existingItemDropdowns = document.querySelectorAll('.wrapp.item-dropdown');
+    existingItemDropdowns.forEach(dropdown => {
+        const selectBtn = dropdown.querySelector('.select-btn');
+        if (selectBtn) {
+            selectBtn.addEventListener('click', function (e) {
+                setTimeout(() => {
+                    const options = dropdown.querySelectorAll('.option li:not(.create-option)');
+                    options.forEach(option => {
+                        option.addEventListener('click', function () {
+                            const itemName = this.textContent.trim();
+                            if (itemName && !itemName.includes('Create "')) {
+                                configureItemForm = document.querySelector('.configure-item-form-pop-up');
+                                if (configureItemForm) {
+                                    const itemNameCodeElement = document.getElementById('configure-item-name-code');
+                                    if (itemNameCodeElement) {
+                                        itemNameCodeElement.textContent = `${itemName} [HWY00001]`;
+                                    }
+
+                                    const quantityInput = document.getElementById('configure-item-quantity');
+                                    if (quantityInput) {
+                                        quantityInput.value = 1;
+                                    }
+
+                                    const amountElement = document.getElementById('configure-item-amount');
+                                    const vendorPriceElement = document.getElementById('vendor-price');
+                                    if (amountElement && vendorPriceElement) {
+                                        amountElement.textContent = formatCurrency(parseCurrency(vendorPriceElement.textContent));
+
+                                    }
+
+                                    configureItemForm.classList.add('active');
+                                    document.body.classList.add('pop-up-active');
+
+                                    initConfigureItemForm();
+                                }
+                            }
+                        });
+                    });
+                }, 100);
+            });
+        }
+    });
+
+    document.querySelectorAll('.survey-category-dropdown').forEach(setupMultiSelectDropdown);
+    document.querySelectorAll('.survey-pic-dropdown').forEach(setupMultiSelectDropdown);
+    document.querySelectorAll('.meeting-pic-dropdown').forEach(setupMultiSelectDropdown);
+
+    /*    const surveyTableBody = document.getElementById("surveyTableBody");
+        const addRowBtnSurvey = document.getElementById("addRowBtnSurvey");
+    
+        if (addRowBtnSurvey) {
+            addRowBtnSurvey.addEventListener("click", function () {
+                const tbody = document.getElementById("surveyTableBody");
+                const rows = tbody.querySelectorAll("tr");
+                const newIndex = tbody.querySelectorAll("tr").length;
+                const lastRow = rows[rows.length - 1];
+    
+                *//*const categoryChecked = lastRow.querySelectorAll('.survey-category-dropdown .survey-list-checkboxes:checked').length > 0;
+const surveyName = lastRow.querySelector('.survey-name input')?.value.trim();
+const picChecked = lastRow.querySelectorAll('.survey-pic-dropdown .survey-list-checkboxes:checked').length > 0;
+const customerPic = lastRow.querySelector('.survey-customer-pic input')?.value.trim();
+const reqDateTime = lastRow.querySelector('.survey-req-date-time input')?.value.trim();
+const detailLocation = lastRow.querySelector('.survey-detail-location input')?.value.trim();
+const notes = lastRow.querySelector('.survey-notes input')?.value.trim();
+
+if (
+!categoryChecked &&
+!surveyName &&
+!picChecked &&
+!customerPic &&
+!reqDateTime &&
+!detailLocation &&
+!notes
+) {
+return;
+}*//*
+
+    // --- MEMBUAT OPSI UNTUK DROPDOWN CATEGORY ---
+    let categoryOptionsHtml = '';
+    if (typeof surveyCategoriesFromServer !== 'undefined') {
+        surveyCategoriesFromServer.forEach(cat => {
+            categoryOptionsHtml += `
+            <li>
+                <input type="checkbox" class="survey-list-checkboxes me-2" name="SurveySectionItems[${newIndex}].SurveyCategoryIDs" value="${cat.value}">
+                <span>${cat.text}</span>
+            </li>`;
+        });
+    }
+
+    // --- MEMBUAT OPSI UNTUK DROPDOWN PIC ---
+    let picOptionsHtml = '';
+    // Gunakan 'surveyUsersFromServer' yang baru, bukan 'usersFromServer'
+    if (typeof surveyUsersFromServer !== 'undefined') {
+        surveyUsersFromServer.forEach(user => {
+            picOptionsHtml += `
+            <li>
+                <input type="checkbox" class="survey-list-checkboxes me-2" name="SurveySectionItems[${newIndex}].TechnicalUserIDs" value="${user.value}">
+                <span>${user.text}</span>
+            </li>`;
+        });
+    }
+
+    const rowCount = surveyTableBody.querySelectorAll("tr").length;
+    const newRow = document.createElement("tr");
+    newRow.innerHTML = `
+    <td class="text-center" style="font-weight: 500;">${newIndex + 1}</td>
+    <td class="survey-code">None</td>
+    <td class="survey-category">
+        <div class="wrapp survey-category-dropdown">
+            <div class="select-btn py-0">
+                <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" placeholder="Pilih Kategori"/>
+                <i class='bx bx-chevron-down'></i>
+            </div>
+            <div class="content-search"><ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">${categoryOptionsHtml}</ul></div>
+        </div>
+    </td>
+    <td class="survey-name"><input type="text" class="size form-control1" name="SurveySectionItems[${newIndex}].SurveyName"></td>
+    <td class="survey-pic">
+        <div class="wrapp survey-pic-dropdown">
+            <div class="select-btn py-0">
+                <input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" placeholder="Pilih PIC"/>
+                <i class='bx bx-chevron-down'></i>
+            </div>
+            <div class="content-search"><ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">${picOptionsHtml}</ul></div>
+        </div>
+    </td>
+    <td class="survey-customer-pic"><input type="text" class="size form-control1" name="SurveySectionItems[${newIndex}].CustomerPICName"></td>
+    <td class="survey-req-date-time">
+        <input type="hidden" asp-for="SurveySectionItems[${newIndex}].RequestedDateTime" />
+        <div class="d-flex flex-column gap-1">
+            <input type="date" class="form-control form-control-sm survey-date" 
+                   value="@Model.SurveySectionItems[${newIndex}].RequestedDateTime.ToString("yyyy-MM-dd")">
+            <div class="d-flex gap-1 align-items-center">
+                <input type="time" class="form-control form-control-sm survey-time-start" 
+                       value="@Model.SurveySectionItems[${newIndex}].RequestedDateTime.ToString("HH:mm")">
+                <span>-</span>
+                <input type="time" class="form-control form-control-sm survey-time-end">
+            </div>
+        </div>
+    </td>
+    <td class="survey-detail-location"><input type="text" class="size form-control1" name="SurveySectionItems[${newIndex}].LocationDetails"></td>
+    <td class="survey-notes"><input type="text" class="size form-control1" name="SurveySectionItems[${newIndex}].SalesNotesInternal"></td>
+    <td class="survey-status"><div class="d-flex justify-content-center align-items-center flex-column gap-1"><span class="rounded-pill status">Open</span></div></td>
+    <td class="survey-actions">
+        <div class="d-flex justify-content-center">
+            <button type="button" class="btn"><i class='bx bx-file'></i></button>
+            <button type="button" class="btn btn-remove-row-survey"><i class='bx bx-trash'></i></button>
+        </div>
+    </td>
+`;
+    tbody.appendChild(newRow);
+    renumberTableRows("surveyTableBody");
+
+    setupMultiSelectDropdown(newRow.querySelector('.survey-category-dropdown'));
+    setupMultiSelectDropdown(newRow.querySelector('.survey-pic-dropdown'));
+
+    const newCategoryDropdown = newRow.querySelector('.survey-category-dropdown');
+    if (newCategoryDropdown) setupMultiSelectDropdown(newCategoryDropdown);
+
+    const newPicDropdown = newRow.querySelector('.survey-pic-dropdown');
+    if (newPicDropdown) setupMultiSelectDropdown(newPicDropdown);
 });
+}
+
+surveyTableBody.addEventListener("click", function (e) {
+if (e.target.closest(".btn-remove-row-survey")) {
+    const row = e.target.closest("tr");
+    if (row) {
+        row.remove();
+        renumberTableRows("surveyTableBody");
+    }
+}
+});
+
+document.getElementById('surveyTableBody').addEventListener('click', function (e) {
+const dropdown = e.target.closest('.wrapp#survey-category-dropdown');
+if (dropdown) {
+    closeAllDropdowns();
+    dropdown.classList.add('active');
+}
+});
+
+document.getElementById('surveyTableBody').addEventListener('click', function (e) {
+if (e.target.matches('.wrapp#survey-category-dropdown .option li')) {
+    const li = e.target;
+    const dropdown = li.closest('.wrapp#survey-category-dropdown');
+    const span = dropdown.querySelector('.select-btn span');
+    if (span) span.textContent = li.textContent;
+    dropdown.classList.remove('active');
+}
+});
+
+document.addEventListener('click', function (e) {
+if (!e.target.closest('.wrapp#survey-category-dropdown')) {
+    document.querySelectorAll('.wrapp#survey-category-dropdown').forEach(d => d.classList.remove('active'));
+}
+});
+
+document.getElementById('surveyTableBody').addEventListener('click', function (e) {
+const dropdown = e.target.closest('.wrapp#survey-pic-dropdown');
+if (dropdown) {
+    document.querySelectorAll('.wrapp#survey-pic-dropdown').forEach(d => {
+        if (d !== dropdown) d.classList.remove('active');
+    });
+    dropdown.classList.toggle('active');
+}
+});
+
+document.getElementById('surveyTableBody').addEventListener('click', function (e) {
+if (e.target.matches('.wrapp#survey-pic-dropdown .option li')) {
+    const li = e.target;
+    const dropdown = li.closest('.wrapp#survey-pic-dropdown');
+    const span = dropdown.querySelector('.select-btn span');
+    if (span) span.textContent = li.textContent.trim();
+    dropdown.classList.remove('active');
+}
+});
+
+document.addEventListener('click', function (e) {
+if (!e.target.closest('.wrapp#survey-pic-dropdown')) {
+    document.querySelectorAll('.wrapp#survey-pic-dropdown').forEach(d => d.classList.remove('active'));
+}
+});
+
+document.getElementById('surveyTableBody').addEventListener('input', function (e) {
+const row = e.target.closest('tr');
+if (!row) return;
+const date = row.querySelector('.survey-date')?.value;
+const timeStart = row.querySelector('.survey-time-start')?.value;
+const timeEnd = row.querySelector('.survey-time-end')?.value;
+const display = row.querySelector('.survey-date-display');
+
+if (timeStart && timeEnd) {
+    if (timeEnd < timeStart) {
+        row.querySelector('.survey-time-end').value = '';
+        row.querySelector('.survey-time-end').classList.add('is-invalid');
+        if (!row.querySelector('.survey-time-end').nextElementSibling || !row.querySelector('.survey-time-end').nextElementSibling.classList.contains('invalid-feedback')) {
+            const feedback = document.createElement('div');
+            feedback.className = 'invalid-feedback';
+            feedback.textContent = 'End time must be after start time';
+            row.querySelector('.survey-time-end').after(feedback);
+        }
+    } else {
+        row.querySelector('.survey-time-end').classList.remove('is-invalid');
+        const feedback = row.querySelector('.survey-time-end').nextElementSibling;
+        if (feedback && feedback.classList.contains('invalid-feedback')) {
+            feedback.remove();
+        }
+    }
+} else {
+    row.querySelector('.survey-time-end')?.classList.remove('is-invalid');
+    const feedback = row.querySelector('.survey-time-end')?.nextElementSibling;
+    if (feedback && feedback.classList.contains('invalid-feedback')) {
+        feedback.remove();
+    }
+}
+
+if (display) {
+    if (timeStart && timeEnd && timeEnd >= timeStart) {
+        display.value = formatSurveyDateTime(date, timeStart, timeEnd);
+    } else {
+        display.value = '';
+    }
+}
+});*/
+
+    // Di dalam file wwwroot/js/site.js, di dalam DOMContentLoaded
+
+    // Hapus fungsi setupMultiSelectDropdown yang lama dan semua event listener
+    // yang berhubungan dengan surveyTableBody. Ganti dengan kode di bawah ini.
+
+    // =======================================================================
+    // BLOK KODE BARU UNTUK MENGELOLA SEMUA INTERAKSI TABEL SURVEY
+    // =======================================================================
+
+    const surveyTableBody = document.getElementById("surveyTableBody");
+
+    // Fungsi ini HANYA untuk memperbarui teks di display dropdown
+    function updateMultiSelectDisplay(wrapp) {
+        const displayInput = wrapp.querySelector('.select-btn input[type="text"]');
+        const checkboxes = wrapp.querySelectorAll('.option .survey-list-checkboxes:checked');
+
+        const selectedTexts = Array.from(checkboxes).map(cb => {
+            return cb.nextElementSibling?.textContent.trim();
+        });
+
+        if (displayInput) {
+            displayInput.value = selectedTexts.join(', ');
+        }
+    }
+
+    // Fungsi ini HANYA untuk menangani klik buka/tutup dropdown
+    function handleDropdownToggle(e) {
+        const selectBtn = e.target.closest('.select-btn');
+        if (!selectBtn) return;
+
+        const wrapp = selectBtn.closest('.wrapp');
+        if (!wrapp) return;
+
+        e.stopPropagation();
+        const isActive = wrapp.classList.contains('active');
+        closeAllDropdowns(); // Gunakan fungsi global Anda
+        if (!isActive) {
+            wrapp.classList.add('active');
+        }
+    }
+
+    // SATU EVENT LISTENER UTAMA untuk seluruh tabel survey
+    if (surveyTableBody) {
+        surveyTableBody.addEventListener('click', function (e) {
+            // Menangani buka/tutup dropdown
+            handleDropdownToggle(e);
+
+            // Menangani klik pada checkbox untuk update display
+            if (e.target.classList.contains('survey-list-checkboxes')) {
+                const wrapp = e.target.closest('.wrapp');
+                updateMultiSelectDisplay(wrapp);
+            }
+
+            // Menangani tombol hapus baris
+            if (e.target.closest('.btn-remove-row-survey')) {
+                e.target.closest('tr').remove();
+                renumberTableRows('surveyTableBody');
+            }
+        });
+
+        // Menangani perubahan pada input tanggal & waktu
+        surveyTableBody.addEventListener('change', function (e) {
+            if (e.target.matches('.survey-date, .survey-time-start, .survey-time-end')) {
+                const row = e.target.closest('tr');
+                if (!row) return;
+
+                // Ambil semua elemen input yang relevan dari baris tersebut
+                const dateInput = row.querySelector('.survey-date');
+                const startTimeInput = row.querySelector('.survey-time-start');
+                const endTimeInput = row.querySelector('.survey-time-end');
+                const displayInput = row.querySelector('.survey-date-display');
+
+                // Dapatkan kedua input tersembunyi berdasarkan atribut 'name' mereka
+                const hiddenStartInput = row.querySelector('input[name*="RequestStartTime"]');
+                const hiddenEndInput = row.querySelector('input[name*="RequestEndTime"]');
+
+                let isValid = true;
+                // 1. Selalu cari dan hapus pesan error yang mungkin sudah ada di baris ini
+                const existingError = row.querySelector('.invalid-feedback');
+                if (existingError) {
+                    existingError.remove();
+                }
+                endTimeInput.classList.remove('is-invalid');
+
+                // 2. Lakukan perbandingan jika kedua input waktu sudah diisi
+                if (startTimeInput.value && endTimeInput.value) {
+                    if (endTimeInput.value < startTimeInput.value) {
+                        // Beri tanda visual pada input yang salah
+                        endTimeInput.classList.add('is-invalid');
+
+                        // Buat elemen div untuk pesan error
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'invalid-feedback d-block';
+                        errorDiv.innerText = '*Waktu selesai tidak boleh lebih awal dari waktu mulai.';
+
+                        // 3. Tempatkan pesan error TEPAT DI BAWAH input display tanggal
+                        if (displayInput) {
+                            displayInput.after(errorDiv);
+                        }
+
+                        isValid = false; // Tandai sebagai tidak valid
+                    }
+                }
+
+                // Hanya update nilai jika valid
+                if (isValid) {
+                    // Update hidden input untuk Waktu Mulai
+                    if (dateInput?.value && startTimeInput?.value && hiddenStartInput) {
+                        hiddenStartInput.value = `${dateInput.value}T${startTimeInput.value}`;
+                    }
+
+                    // Update hidden input untuk Waktu Selesai
+                    if (dateInput?.value && endTimeInput?.value && hiddenEndInput) {
+                        hiddenEndInput.value = `${dateInput.value}T${endTimeInput.value}`;
+                    }
+
+                    // Update teks display jika semua input valid dan terisi
+                    if (displayInput && dateInput.value && startTimeInput.value && endTimeInput.value) {
+                        displayInput.value = formatSurveyDateTime(dateInput.value, startTimeInput.value, endTimeInput.value);
+                    } else if (displayInput) {
+                        displayInput.value = '';
+                    }
+                } else {
+                    // Jika tidak valid, kosongkan nilai yang salah dan display
+                    if (displayInput) displayInput.value = '';
+                    if (hiddenEndInput) hiddenEndInput.value = '';
+                }
+            }
+        });
+    }
+
+
+    // Logika untuk tombol "Add Survey"
+    const addRowBtnSurvey = document.getElementById("addRowBtnSurvey");
+    if (addRowBtnSurvey) {
+        addRowBtnSurvey.addEventListener("click", function () {
+            const tbody = document.getElementById("surveyTableBody");
+            const newIndex = tbody.querySelectorAll("tr").length;
+            const newRow = document.createElement("tr");
+
+            let categoryOptionsHtml = (surveyCategoriesFromServer || []).map(cat => `
+            <li>
+                <label class="posisi-sejajar">
+                    <input type="checkbox" class="survey-list-checkboxes me-2" name="SurveySectionItems[${newIndex}].SurveyCategoryIDs" value="${cat.value}">
+                    <span>${cat.text}</span>
+                </label>
+            </li>`).join('');
+
+            // --- REVISI DI SINI: Tambahkan <label> ---
+            let picOptionsHtml = (surveyUsersFromServer || []).map(user => `
+            <li>
+                <label class="posisi-sejajar">
+                    <input type="checkbox" class="survey-list-checkboxes me-2" name="SurveySectionItems[${newIndex}].TechnicalUserIDs" value="${user.value}">
+                    <span>${user.text}</span>
+                </label>
+            </li>`).join('');
+
+            newRow.innerHTML = `
+            <td class="text-center" style="font-weight: 500;">${newIndex + 1}</td>
+            <td class="survey-code">None</td>
+            <td class="survey-category">
+                <div class="wrapp survey-category-dropdown"><div class="select-btn py-0"><input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" placeholder="Pilih Kategori"/><i class='bx bx-chevron-down'></i></div><div class="content-search"><ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">${categoryOptionsHtml}</ul></div></div>
+            </td>
+            <td class="survey-name"><input type="text" class="size form-control1" name="SurveySectionItems[${newIndex}].SurveyName"></td>
+            <td class="survey-pic">
+                <div class="wrapp survey-pic-dropdown"><div class="select-btn py-0"><input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" placeholder="Pilih PIC"/><i class='bx bx-chevron-down'></i></div><div class="content-search"><ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">${picOptionsHtml}</ul></div></div>
+            </td>
+            <td class="survey-customer-pic"><input type="text" class="size form-control1" name="SurveySectionItems[${newIndex}].CustomerPICName"></td>
+            <td class="survey-req-date-time">
+                <input type="hidden" name="SurveySectionItems[${newIndex}].RequestStartTime" />
+                <input type="hidden" name="SurveySectionItems[${newIndex}].RequestEndTime" />
+                <div class="d-flex flex-column gap-1">
+                    <input type="date" class="form-control form-control-sm survey-date">
+                    <div class="d-flex gap-1 align-items-center">
+                        <input type="time" class="form-control form-control-sm survey-time-start">
+                        <span>-</span>
+                        <input type="time" class="form-control form-control-sm survey-time-end">
+                    </div>
+                        <input type="text" class="form-control form-control-sm survey-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;">
+                </div>
+            </td>
+            <td class="survey-detail-location"><input type="text" class="size form-control1" name="SurveySectionItems[${newIndex}].LocationDetails"></td>
+            <td class="survey-notes"><input type="text" class="size form-control1" name="SurveySectionItems[${newIndex}].SalesNotesInternal"></td>
+            <td class="survey-status"><div class="d-flex justify-content-center align-items-center flex-column gap-1"><span id="open" class="rounded-pill status">Open</span></div></td>
+            <td class="survey-actions"><div class="d-flex justify-content-center"><button type="button" class="btn"><i class="bx bx-file"></i></button><button type="button" class="btn btn-remove-row-survey"><i class="bx bx-trash"></i></button></div></td>
+        `;
+
+            tbody.appendChild(newRow);
+        });
+    }
+
+    // Inisialisasi untuk baris yang sudah ada saat halaman dimuat
+    document.querySelectorAll('.survey-category-dropdown, .survey-pic-dropdown').forEach(wrapp => {
+        updateMultiSelectDisplay(wrapp);
+    });
+    // =======================================================================
+
+
+    function initializeMeetingTable() {
+        const meetingTableBody = document.getElementById("meetingTableBody");
+        if (!meetingTableBody) return;
+
+        // Fungsi untuk memperbarui display awal
+        const updateAllRowsDisplay = () => {
+            meetingTableBody.querySelectorAll('tr').forEach(row => {
+                const dateInput = row.querySelector('.meeting-date');
+                const startTimeInput = row.querySelector('.meeting-time-start');
+                const endTimeInput = row.querySelector('.meeting-time-end');
+                const displayInput = row.querySelector('.meeting-date-display');
+                if (displayInput && dateInput.value && startTimeInput.value && endTimeInput.value) {
+                    displayInput.value = formatMeetingDateTime(dateInput.value, startTimeInput.value, endTimeInput.value);
+                }
+            });
+        };
+
+        updateAllRowsDisplay();
+        meetingTableBody.querySelectorAll('.meeting-pic-dropdown').forEach(updateMultiSelectDisplay);
+
+        // Event listener utama untuk semua klik
+        meetingTableBody.addEventListener('click', function (e) { /* ... (kode ini sama seperti sebelumnya) ... */ });
+
+        // Event listener untuk perubahan input tanggal & waktu dengan validasi
+        meetingTableBody.addEventListener('change', function (e) {
+            if (e.target.matches('.meeting-date, .meeting-time-start, .meeting-time-end')) {
+                const row = e.target.closest('tr');
+                if (!row) return;
+
+                const dateTimeCell = e.target.closest('.meeting-req-date-time');
+                const dateInput = row.querySelector('.meeting-date');
+                const startTimeInput = row.querySelector('.meeting-time-start');
+                const endTimeInput = row.querySelector('.meeting-time-end');
+                const displayInput = row.querySelector('.meeting-date-display');
+                const hiddenStartInput = row.querySelector('input[name*="MeetingStartTime"]');
+                const hiddenEndInput = row.querySelector('input[name*="MeetingEndTime"]');
+                let isValid = true;
+
+                const existingError = dateTimeCell.querySelector('.invalid-feedback');
+                if (existingError) { existingError.remove(); }
+                endTimeInput.classList.remove('is-invalid');
+
+                if (startTimeInput.value && endTimeInput.value) {
+                    if (endTimeInput.value < startTimeInput.value) {
+                        endTimeInput.classList.add('is-invalid');
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'invalid-feedback d-block';
+                        errorDiv.innerText = 'Waktu selesai tidak boleh lebih awal dari waktu mulai.';
+                        if (displayInput) { displayInput.after(errorDiv); }
+                        isValid = false;
+                    }
+                }
+
+                if (isValid) {
+                    if (dateInput?.value && startTimeInput?.value) { hiddenStartInput.value = `${dateInput.value}T${startTimeInput.value}`; }
+                    if (dateInput?.value && endTimeInput?.value) { hiddenEndInput.value = `${dateInput.value}T${endTimeInput.value}`; }
+                    if (displayInput && dateInput.value && startTimeInput.value && endTimeInput.value) {
+                        displayInput.value = formatMeetingDateTime(dateInput.value, startTimeInput.value, endTimeInput.value);
+                    } else if (displayInput) {
+                        displayInput.value = '';
+                    }
+                } else {
+                    if (displayInput) displayInput.value = '';
+                    if (hiddenEndInput) hiddenEndInput.value = '';
+                }
+            }
+        });
+
+        // Logika untuk tombol "Add Meeting"
+        const addMeetingBtn = document.getElementById("addMeetingBtn");
+        if (addMeetingBtn) {
+            addMeetingBtn.addEventListener("click", function () {
+                const newIndex = meetingTableBody.querySelectorAll("tr").length;
+                const newRow = document.createElement("tr");
+
+                let picOptionsHtml = (usersFromServer || []).map(user => `<li><label><input type="checkbox" class="survey-list-checkboxes me-2" name="MeetingSectionItems[${newIndex}].AssignedPICs" value="${user.value}"><span>${user.text}</span></label></li>`).join('');
+
+                newRow.innerHTML = `
+                <td class="text-center" style="font-weight: 500;">${newIndex + 1}</td>
+                <td class="meeting-code">None</td>
+                <td class="meeting-name"><input type="text" class="size form-control1" name="MeetingSectionItems[${newIndex}].MeetingName"></td>
+                <td class="meeting-pic"><div class="wrapp meeting-pic-dropdown"><div class="select-btn py-0"><input type="text" class="form-control ps-0" readonly style="background: transparent; border: none; box-shadow: none;" placeholder="Pilih PIC"/><i class="bx bx-chevron-down"></i></div><div class="content-search"><ul class="option" style="margin-bottom: 10px; padding-left: 0rem;">${picOptionsHtml}</ul></div></div></td>
+                <td class="meeting-req-date-time">
+                    <input type="hidden" name="MeetingSectionItems[${newIndex}].MeetingStartTime" />
+                    <input type="hidden" name="MeetingSectionItems[${newIndex}].MeetingEndTime" />
+                    <div class="d-flex flex-column gap-1">
+                        <input type="date" class="form-control form-control-sm meeting-date">
+                        <div class="d-flex gap-1 align-items-center">
+                            <input type="time" class="form-control form-control-sm meeting-time-start">
+                            <span>-</span>
+                            <input type="time" class="form-control form-control-sm meeting-time-end">
+                        </div>
+                        <input type="text" class="form-control form-control-sm meeting-date-display" readonly style="background: #f8f9fa; border: none; font-weight: 500;">
+                    </div>
+                </td>
+                <td class="meeting-detail-location"><input type="text" class="size form-control1" name="MeetingSectionItems[${newIndex}].LocationDetails"></td>
+                <td class="meeting-notes"><input type="text" class="size form-control1" name="MeetingSectionItems[${newIndex}].NotesInternal"></td>
+                <td class="meeting-status"><div class="d-flex justify-content-center align-items-center flex-column gap-1"><span class="rounded-pill status">Open</span></div></td>
+                <td class="meeting-actions"><div class="d-flex justify-content-center"><button type="button" class="btn"><i class='bx bx-file'></i></button><button type="button" class="btn btn-remove-row-meeting"><i class='bx bx-trash'></i></button></div></td>
+            `;
+                meetingTableBody.appendChild(newRow);
+            });
+        }
+    }
+
+    // Panggil fungsi inisialisasi utama untuk tabel meeting
+    initializeMeetingTable();
+
+
+    const buttonGroup = document.getElementById('buttonGroup');
+    const saveBtn = document.getElementById('save-rfq-btn');
+    const discardBtn = document.getElementById('discard-btn');
+
+    function renderSaveDiscard() {
+        buttonGroup.innerHTML = `
+            <button type="submit" id="save-rfq-btn" class="btn border-0 shadow-none btn-text" style="font-size: 20px; font-weight: 500;">Save</button>
+            <button type="button" class="btn border-0 shadow-none btn-text" style="font-size: 20px; font-weight: 500;" id="discard-btn">
+                <a class="text-decoration-none text-black" href="/RFQ/Index">Discard</a>
+            </button>
+        `;
+        document.getElementById('save-rfq-btn').addEventListener('click', onSaveClick);
+        document.getElementById('discard-btn').addEventListener('click', () => window.location.href = '/RFQ/Index');
+    }
+
+    function renderSendEditDiscard() {
+        buttonGroup.innerHTML = `
+            <button type="button" id="send-btn" class="btn border-0 shadow-none btn-text" style="font-size: 20px; font-weight: 500;">Send</button>
+            <button type="button" id="edit-btn" class="btn border-0 shadow-none btn-text" style="font-size: 20px; font-weight: 500;">Edit</button>
+            <button type="button" id="discard-btn" class="btn border-0 shadow-none btn-text" style="font-size: 20px; font-weight: 500;">
+                <a class="text-decoration-none text-black" href="/RFQ/Index">Discard</a>
+            </button>
+        `;
+        document.getElementById('edit-btn').addEventListener('click', onEditClick);
+        document.getElementById('discard-btn').addEventListener('click', () => window.location.href = '/RFQ/Index');
+    }
+
+    function isNotesRowEmpty(row) {
+        const name = row.querySelector('td.name input')?.value.trim();
+        const desc = row.querySelector('td.desc input')?.value.trim();
+        const qty = row.querySelector('td.qty input')?.value.trim();
+        const uom = row.querySelector('td.uom input')?.value.trim();
+        const budget = row.querySelector('td.budget input')?.value.trim();
+        const leadtime = row.querySelector('td.leadtime input')?.value.trim();
+        return !name && !desc && !qty && !uom && !budget && !leadtime;
+    }
+
+    function isItemListRowEmpty(row) {
+        const name = row.querySelector('.name .select-btn span')?.textContent.trim();
+        const desc = row.querySelector('td.desc input')?.value.trim();
+        const qty = row.querySelector('td.qty input')?.value.trim();
+        const uom = row.querySelector('td.uom input')?.value.trim();
+        const price = row.querySelector('td.price input')?.value.trim();
+        const notes = row.querySelector('td.notes input')?.value.trim();
+        const details = row.querySelector('td.details input')?.value.trim();
+        const warranty = row.querySelector('td.warranty input')?.value.trim();
+        return !name && !desc && !qty && !uom && !price && !notes && !details && !warranty;
+    }
+
+    function isSurveyListRowEmpty(row) {
+        // Ambil semua input yang bisa diisi pengguna (teks, tanggal, waktu, angka)
+        const inputs = row.querySelectorAll('input[type="text"], input[type="date"], input[type="time"], input[type="number"]');
+
+        // Cek apakah semua input tersebut benar-benar kosong
+        const allInputsEmpty = Array.from(inputs).every(input => !input.value.trim());
+
+        // Cek apakah ada satu saja checkbox yang tercentang
+        const anyCheckboxChecked = row.querySelector('input[type="checkbox"]:checked');
+
+        // Baris dianggap kosong HANYA JIKA semua input teks/tanggal/dll kosong DAN tidak ada satupun checkbox yang tercentang.
+        return allInputsEmpty && !anyCheckboxChecked;
+    }
+
+    function onSaveClick(e) {
+        // 1. Hentikan pengiriman otomatis untuk memberi waktu pada script
+        e.preventDefault();
+
+        // 2. Jalankan pembersihan untuk setiap tabel
+        const notesTableBody = document.getElementById('itemTableBody');
+        if (notesTableBody) {
+            Array.from(notesTableBody.querySelectorAll('tr')).forEach(row => {
+                if (isNotesRowEmpty(row)) row.remove();
+            });
+        }
+
+        const itemListTableBody = document.getElementById('itemListTableBody');
+        if (itemListTableBody) {
+            Array.from(itemListTableBody.querySelectorAll('tr')).forEach(row => {
+                if (isItemListRowEmpty(row)) row.remove();
+            });
+        }
+
+        const surveyTableBody = document.getElementById('surveyTableBody');
+        if (surveyTableBody) {
+            Array.from(surveyTableBody.querySelectorAll('tr')).forEach(row => {
+                if (isSurveyListRowEmpty(row)) row.remove();
+            });
+        }
+
+        const meetingTableBody = document.getElementById('meetingTableBody');
+        if (meetingTableBody) {
+            Array.from(meetingTableBody.querySelectorAll('tr')).forEach(row => {
+                if (isMeetingRowEmpty(row)) row.remove();
+            });
+        }
+
+        // Penomoran ulang dan kalkulasi setelah semua potensi penghapusan selesai
+        if (notesTableBody) renumberTableRows('itemTableBody');
+        if (itemListTableBody) {
+            renumberItemListTable();
+            updateItemListTotal();
+        }
+        if (surveyTableBody) renumberTableRows('surveyTableBody');
+        if (meetingTableBody) renumberTableRows('meetingTableBody');
+
+
+        // 3. Submit form SETELAH jeda singkat untuk memastikan DOM sudah terupdate
+        const form = document.getElementById('create-rfq-form');
+        if (form) {
+            setTimeout(function () {
+                form.submit();
+            }, 1000); // Jeda 100 milidetik
+        }
+    }
+
+
+    function onEditClick() {
+        enableAllFormFields();
+        renderSaveDiscard();
+    }
+
+
+    if (buttonGroup) {
+        const saveBtn = buttonGroup.querySelector('#save-rfq-btn');
+        const discardBtn = buttonGroup.querySelector('#discard-btn');
+
+        if (saveBtn) {
+            saveBtn.addEventListener('click', onSaveClick);
+        }
+        if (discardBtn) {
+            // Asumsi discard hanya kembali ke halaman index
+            discardBtn.addEventListener('click', () => {
+                window.location.href = '/RFQ/Index';
+            });
+        }
+    }
+
+    const rfqIdInput = document.querySelector('input[name="RFQID_FromEdit"]');
+    if (rfqIdInput && rfqIdInput.value) {
+        // Jika halaman dimuat dengan ID RFQ (artinya sudah tersimpan),
+        // maka nonaktifkan semua field dan ubah tombolnya.
+        disableAllFormFields();
+        renderSendEditDiscard();
+    }
+});
+
+function populateEndUserDropdown(customerId) {
+    const endUserSelect = $('#endUserDropdown'); // Menggunakan jQuery selector agar lebih mudah
+    endUserSelect.empty(); // Kosongkan pilihan lama
+    endUserSelect.prop('disabled', true); // Nonaktifkan selama proses loading
+
+    if (customerId && customerId !== "" && customerId !== "0") {
+        endUserSelect.append($('<option></option>').val('').text('Loading...'));
+
+        $.ajax({
+            url: '/RFQ/GetContactPersonsByCustomerId', // URL ke action di RFQController
+            type: 'GET',
+            data: { customerId: customerId },
+            success: function (data) {
+                endUserSelect.empty();
+                endUserSelect.append($('<option></option>').val('').text('-- Pilih End User --'));
+                if (data && data.length > 0) {
+                    $.each(data, function (index, item) {
+                        endUserSelect.append($('<option></option>').val(item.value).text(item.text));
+                    });
+                } else {
+                    endUserSelect.append($('<option></option>').val('').text('Tidak ada kontak'));
+                }
+                endUserSelect.prop('disabled', false); // Aktifkan kembali dropdown
+            },
+            error: function () {
+                endUserSelect.empty();
+                endUserSelect.append($('<option></option>').val('').text('Error memuat data'));
+            }
+        });
+    } else {
+        endUserSelect.append($('<option></option>').val('').text('-- Pilih Perusahaan --'));
+    }
+}
