@@ -12,9 +12,11 @@ namespace BQuick.Controllers
         private readonly BQuickDbContext _context;
         private const int LoggedInUserId = 1; // GANTI DENGAN MEKANISME USER ID AKTUAL
 
-        public RFQController(BQuickDbContext context)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public RFQController(BQuickDbContext context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         private async Task PopulateDropdownsForCreateFullAsync(RfqCreateFullViewModel viewModel)
@@ -212,7 +214,6 @@ namespace BQuick.Controllers
             const int LoggedInUserId = 1;
 
 
-
             // DEBUG: Log all ModelState errors, regardless of IsValid
             if (!ModelState.IsValid)
             {
@@ -225,6 +226,7 @@ namespace BQuick.Controllers
                     }
                 }
             }
+
             else
             {
                 Debug.WriteLine("DEBUG: ModelState is valid.");
@@ -236,6 +238,21 @@ namespace BQuick.Controllers
             Debug.WriteLine($"DEBUG: ViewModel.EndUserContactPersonID: {viewModel.EndUserContactPersonID}");
             Debug.WriteLine($"DEBUG: ViewModel.RequestDate: {viewModel.RequestDate}");
             Debug.WriteLine($"DEBUG: ViewModel.DueDate: {viewModel.DueDate}");
+
+            // =================== START ATTACHMENT DEBUGGING ===================
+            if (viewModel.AttachmentFiles == null)
+            {
+                Debug.WriteLine("DEBUG: AttachmentFiles is NULL.");
+            }
+            else
+            {
+                Debug.WriteLine($"DEBUG: AttachmentFiles Count: {viewModel.AttachmentFiles.Count}");
+                foreach (var file in viewModel.AttachmentFiles)
+                {
+                    Debug.WriteLine($"  - File: {file.FileName}, Size: {file.Length}");
+                }
+            }
+            // ===================  END ATTACHMENT DEBUGGING  ===================
 
             if (viewModel.ItemListSectionItems != null)
             {
@@ -300,7 +317,7 @@ namespace BQuick.Controllers
 
                         // Update RFQCode dengan ID yang baru didapat
                         rfqEntity.RFQCode = $"RFQ{DateTime.Now:yy}{rfqEntity.RFQID:D4}";
-                        await _context.SaveChangesAsync();
+                      
 
 
                         // 2. Simpan RFQ Notes
@@ -456,6 +473,39 @@ namespace BQuick.Controllers
                                         var meetingPic = new MeetingPIC { MeetingRequest = meetingEntity, UserID = picId, PICApprovalStatusID = 1 };
                                         _context.MeetingPICs.Add(meetingPic);
                                     }
+                                }
+                            }
+                        }
+
+                        // 7. Simpan Attachments
+                        if (viewModel.AttachmentFiles != null && viewModel.AttachmentFiles.Any())
+                        {
+                            string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "attachment/rfq");
+                            if (!Directory.Exists(uploadsFolder))
+                            {
+                                Directory.CreateDirectory(uploadsFolder);
+                            }
+
+                            foreach (var file in viewModel.AttachmentFiles)
+                            {
+                                if (file.Length > 0)
+                                {
+                                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(file.FileName);
+                                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                                    {
+                                        await file.CopyToAsync(fileStream);
+                                    }
+
+                                    var attachment = new RFQAttachment
+                                    {
+                                        RFQID = rfqEntity.RFQID,
+                                        FileName = file.FileName,
+                                        FileURL = "/attachment/rfq/" + uniqueFileName, // Simpan path relatif
+                                        UploadedByUserID = LoggedInUserId,
+                                        UploadTimestamp = DateTime.UtcNow
+                                    };
+                                    _context.RFQAttachments.Add(attachment);
                                 }
                             }
                         }

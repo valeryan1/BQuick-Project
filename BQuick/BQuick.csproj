@@ -18,8 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="wwwroot\attachment\Purchasing\" />
+    <Folder Include="wwwroot\attachment\RFQ\" />
     <Folder Include="wwwroot\attachment\rfq\" />
-    <Folder Include="wwwroot\attachment\" />
   </ItemGroup>
 
 </Project>

@@ -548,7 +548,7 @@
                         </div>
 
                         <div class="d-flex justify-content-center gap-2">
-                            <button type="submit "  id="save-rfq-btn" form="create-rfq-form" class="btn btn-success add-customer-form-save-btn btn-uniform">
+                            <button type="submit"  id="save-rfq-btn" form="create-rfq-form" class="btn btn-success add-customer-form-save-btn btn-uniform">
                                 Save
                             </button>
 
@@ -909,7 +909,7 @@
                             <input class="form-control" id="request-item-detail" />
                         </div>
 
-                        <div class="wrapper-2 mt-5 mb-5">
+                        <div class="wrapper-2 mt-5 mb-5" id="main-rfq-attachment-wrapper">
                             <div class="form-upload">
                                 <input class="file-input" type="file" name="file" hidden>
                                 <div class="rounding"><i class="fa-solid fa-paperclip"></i></div>
@@ -1204,9 +1204,9 @@
                     </div>
                     <button type="button" id="addRowBtn" class="btn btn-dark mt-1 btn-uniform">Add Row</button>
 
-                    <div class="wrapper-2 mt-3 mb-5">
+                    <div class="wrapper-2 mt-3 mb-5" id="main-rfq-attachment-wrapper">
                         <div class="form-upload">
-                            <input class="file-input" type="file" name="file" hidden>
+                            <input class="file-input" type="file" id="attachmentFiles" name="AttachmentFiles" multiple hidden>
                             <div class="rounding"><i class="fa-solid fa-paperclip"></i></div>
                             <div class="desc">
                                 <p class="mt-3">Attachment: <span class="attachment-count">0</span></p>

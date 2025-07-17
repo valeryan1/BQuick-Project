@@ -291,7 +291,8 @@ function resetConfigureItemForm() {
             el.checked = false;
         } else if (el.type === 'file') {
             el.value = null;
-        } else {
+        }
+        else {
             el.value = '';
         }
     });
@@ -742,7 +743,7 @@ function isMeetingRowEmpty(row) {
 window.currentCompanyIsNew = false;
 window.lastActiveItemDropdown = null;
 
-/*window.items = [
+/*window.items =
     "Hikvision CCTV", "Arm Chair", "Printer Zebra", "Scanner CK-96",
     "Raspberry Pi 3", "RFID Scanner", "Raspberry Pi 4", "Raspberry Pi 5",
     "Raspberry Pi 6", "Barcode Scanner Zebra MC9300", "Barcode Scanner Datalogic Skorpio X5", "Barcode Scanner Cognex MX-1502",
@@ -1326,7 +1327,7 @@ document.addEventListener("DOMContentLoaded", function () {
             addCompany(customerName);
             companyWrapper.classList.remove("active");
             const code = getCompanyCode(customerName);
-            companySelectBtn.firstElementChild.innerText = code ? `${customerName} (${code})` : customerName;
+            companySelectBtn.firstElementChild.innerText = code ? `${customerName} (${code})` : companyName;
 
             window.currentCompanyIsNew = false;
             updateCompanyStatusLabel(null);
@@ -2001,10 +2002,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 <td>${rowCount + 1}</td>
                 <td class="name"><input type='text' class='size form-control1' name="NotesSectionItems[${rowCount}].ItemName"></td>
                 <td class="desc"><input type='text' class='size form-control1' name="NotesSectionItems[${rowCount}].ItemDescription"></td>
-                <td class="qty"><input type='number' class='size form-control1' name="NotesSectionItems[${rowCount}].Quantity" value="1"></td>
-                <td class="uom"><input type='text' class='size tengah form-control1' name="NotesSectionItems[${rowCount}].UoM" value="Unit"></td>
+                <td class="qty"><input type='number' class='size text-center form-control1' name="NotesSectionItems[${rowCount}].Quantity" value="1"></td>
+                <td class="uom"><input type='text' class='size form-control1' name="NotesSectionItems[${rowCount}].UoM" value="Unit"></td>
                 <td class="budget"><input type='number' class='size form-control1' name="NotesSectionItems[${rowCount}].BudgetTarget"></td>
-                <td class="leadtime"><input type='text' class='size tengah form-control1' name="NotesSectionItems[${rowCount}].LeadTimeTarget"></td>
+                <td class="leadtime"><input type='text' class='size form-control1' name="NotesSectionItems[${rowCount}].LeadTimeTarget"></td>
                 <td class="delete"><button type="button" onclick="removeRow(this)" class="btn"><i class='bx bx-trash'></i></button></td>
             `;
             itemTableBody.appendChild(newRow);
@@ -2090,7 +2091,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             toRemove.parentNode.removeChild(toRemove);
                         }
                     }
-                    itemListTableBody.removeChild(row);
+                    row.remove();
                     renumberItemListTable();
                     updateItemListTotal();
                     updateAddItemButtonState();
@@ -2462,13 +2463,14 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+
     //const itemListTableBody = document.getElementById('itemListTableBody');
     if (itemListTableBody) {
         itemListTableBody.addEventListener('click', function (e) {
             if (e.target.closest('.btn-remove-row-itemlist')) {
                 const row = e.target.closest('tr');
                 if (row) {
-                    this.removeChild(row);
+                    row.remove(); 
                     Array.from(this.children).forEach((tr, i) => {
                         tr.querySelector('td').innerText = i + 1;
                     });
@@ -2521,6 +2523,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (totalBox) totalBox.textContent = 'Rp' + total.toLocaleString('id-ID');
     }
 
+    if (itemListTableBody) { 
     document.getElementById('itemListTableBody').addEventListener('input', function (e) {
         if (e.target.matches('td.qty input') || e.target.matches('td.price input')) {
             const row = e.target.closest('tr');
@@ -2528,6 +2531,7 @@ document.addEventListener("DOMContentLoaded", function () {
             updateAllAmounts();
         }
     });
+    }
 
     updateAllAmounts();
 
@@ -3036,7 +3040,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const newIndex = tbody.querySelectorAll("tr").length;
                 const lastRow = rows[rows.length - 1];
     
-                *//*const categoryChecked = lastRow.querySelectorAll('.survey-category-dropdown .survey-list-checkboxes:checked').length > 0;
+                /*const categoryChecked = lastRow.querySelectorAll('.survey-category-dropdown .survey-list-checkboxes:checked').length > 0;
 const surveyName = lastRow.querySelector('.survey-name input')?.value.trim();
 const picChecked = lastRow.querySelectorAll('.survey-pic-dropdown .survey-list-checkboxes:checked').length > 0;
 const customerPic = lastRow.querySelector('.survey-customer-pic input')?.value.trim();
@@ -3429,7 +3433,7 @@ if (display) {
             <td class="survey-detail-location"><input type="text" class="size form-control1" name="SurveySectionItems[${newIndex}].LocationDetails"></td>
             <td class="survey-notes"><input type="text" class="size form-control1" name="SurveySectionItems[${newIndex}].SalesNotesInternal"></td>
             <td class="survey-status"><div class="d-flex justify-content-center align-items-center flex-column gap-1"><span id="open" class="rounded-pill status">Open</span></div></td>
-            <td class="survey-actions"><div class="d-flex justify-content-center"><button type="button" class="btn"><i class="bx bx-file"></i></button><button type="button" class="btn btn-remove-row-survey"><i class="bx bx-trash"></i></button></div></td>
+            <td class="survey-actions"><div class="d-flex justify-content-center"><button type="button" class="btn"><i class='bx bx-file'></i></button><button type="button" class="btn btn-remove-row-survey"><i class="bx bx-trash"></i></button></div></td>
         `;
 
             tbody.appendChild(newRow);
