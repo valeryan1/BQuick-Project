@@ -186,6 +186,9 @@ namespace BQuick.Models
         public List<RfqCreatePurchasingRequestItemViewModel> PurchasingRequestSectionItems { get; set; }
         public List<RfqCreateSurveyRequestItemViewModel> SurveySectionItems { get; set; }
         public List<RfqCreateMeetingItemViewModel> MeetingSectionItems { get; set; } = new List<RfqCreateMeetingItemViewModel>();
+        [Display(Name = "Existing Attachments")]
+        public List<RFQAttachment> ExistingAttachments { get; set; } = new List<RFQAttachment>();
+
 
         // --- Properti untuk mengisi Dropdown Lists ---
         public SelectList? CustomerList { get; set; }

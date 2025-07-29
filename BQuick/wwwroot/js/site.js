@@ -2010,6 +2010,25 @@ document.addEventListener("DOMContentLoaded", function () {
             `;
             itemTableBody.appendChild(newRow);
         });
+   
+
+
+/*    // Attach files to the form on submission
+    const mainForm = document.getElementById('create-rfq-form');
+        if (mainForm) {
+            mainForm.addEventListener('submit', function (e) {
+                const mainAttachmentWrapper = document.getElementById('main-rfq-attachment-wrapper');
+                const fileInput = document.getElementById('attachmentFiles');
+
+                if (mainAttachmentWrapper && fileInput && mainAttachmentWrapper.uploadedFiles) {
+                    const dataTransfer = new DataTransfer();
+                    mainAttachmentWrapper.uploadedFiles.forEach(file => {
+                        dataTransfer.items.add(file);
+                    });
+                    fileInput.files = dataTransfer.files;
+                }
+            });
+        }*/
     }
 
     const addRowBtnItem = document.getElementById('addRowBtnItem');
@@ -2206,7 +2225,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 targetRow.querySelector('td.qty input').value = qty;
                 targetRow.querySelector('td.uom input').value = uom;
                 updateRowAmount(targetRow.querySelector('td.qty input'));
-
+                
                 const itemDropdown = targetRow.querySelector('.wrapp.item-dropdown');
                 if (itemDropdown) {
                     itemDropdown.classList.add('disabled-by-script');
@@ -2300,6 +2319,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
+
     function initFileUpload(wrapper) {
         if (!wrapper.uploadedFiles) wrapper.uploadedFiles = [];
 
@@ -2308,7 +2328,17 @@ document.addEventListener("DOMContentLoaded", function () {
         const attachedFilesContainer = wrapper.querySelector('#attached-files');
         const attachmentCount = wrapper.querySelector('.attachment-count');
 
+
         if (!formUpload || !fileInput || !attachedFilesContainer || !attachmentCount) return;
+
+        function updateFileInputValue() {
+            const dataTransfer = new DataTransfer();
+            wrapper.uploadedFiles.forEach(file => dataTransfer.items.add(file));
+            fileInput.files = dataTransfer.files;
+            // 3. (OPSIONAL) Tampilkan isi array global di console untuk verifikasi
+            console.log("Isi terkini di 'fileInput':", wrapper.uploadedFiles);
+            console.log("Isi terkini di 'fileInput':", fileInput.files);
+        }
 
         function renderFiles() {
             attachedFilesContainer.innerHTML = '';
@@ -2351,6 +2381,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     wrapper.uploadedFiles.splice(idx, 1);
                     renderFiles();
                     updateCount();
+                    updateFileInputValue();
                 });
 
                 attachedFilesContainer.appendChild(fileInfo);
@@ -2363,9 +2394,11 @@ document.addEventListener("DOMContentLoaded", function () {
             attachedFilesContainer.style.display = wrapper.uploadedFiles.length > 0 ? 'block' : 'none';
         }
 
+       
+
         function handleDroppedFiles(files) {
             const currentCount = wrapper.uploadedFiles.length;
-            if (currentCount >= 5) {
+            if (fileInput.files.length > 5) {
                 alert('You can only upload a maximum of 5 files.');
                 return;
             }
@@ -2384,8 +2417,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
             validFiles.forEach((file) => {
                 wrapper.uploadedFiles.push(file);
+        
             });
+
+            updateFileInputValue();
             renderFiles();
+           
+            
         }
 
         formUpload.onclick = null;
@@ -2408,7 +2446,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (files && files.length > 0) {
                 handleDroppedFiles(files);
             }
-            this.value = '';
+        //    this.value = '';
         });
 
         formUpload.addEventListener('dragover', function (e) {
@@ -2447,6 +2485,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll('.wrapper-2').forEach(function (wrapper) {
         initFileUpload(wrapper);
     });
+
 
    /* const itemTableBody = document.getElementById('itemTableBody');*/
     if (itemTableBody) {
@@ -3721,7 +3760,7 @@ function populateEndUserDropdown(customerId) {
                     $.each(data, function (index, item) {
                         endUserSelect.append($('<option></option>').val(item.value).text(item.text));
                     });
-                } else {
+                } else { 
                     endUserSelect.append($('<option></option>').val('').text('Tidak ada kontak'));
                 }
                 endUserSelect.prop('disabled', false); // Aktifkan kembali dropdown

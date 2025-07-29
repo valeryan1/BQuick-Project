@@ -1,4 +1,6 @@
-﻿using BQuick.Data;
+﻿using System.Diagnostics;
+using System.Net;
+using BQuick.Data;
 using BQuick.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -13,10 +15,11 @@ namespace BQuick.Controllers
         private const int LoggedInUserId = 1; // GANTI DENGAN MEKANISME USER ID AKTUAL
 
         private readonly IWebHostEnvironment _webHostEnvironment;
+    
         public RFQController(BQuickDbContext context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
-            _webHostEnvironment = webHostEnvironment;
+            _webHostEnvironment = webHostEnvironment;        
         }
 
         private async Task PopulateDropdownsForCreateFullAsync(RfqCreateFullViewModel viewModel)
@@ -190,6 +193,10 @@ namespace BQuick.Controllers
                     MeetingStatusName = mr.MeetingStatus.Name,
                     AssignedPICs = mr.AssignedPICs.Select(mp => mp.UserID).ToList()
                 }).ToList();
+
+                viewModel.ExistingAttachments = await _context.RFQAttachments
+                   .Where(a => a.RFQID == id.Value)
+                   .ToListAsync();
             }
             else // Mode Create Baru
             {
@@ -225,6 +232,16 @@ namespace BQuick.Controllers
                         Debug.WriteLine($"  - {error.ErrorMessage}");
                     }
                 }
+
+                if (viewModel.RFQID_FromEdit > 0)
+                {
+                    viewModel.ExistingAttachments = await _context.RFQAttachments
+                        .Where(a => a.RFQID == viewModel.RFQID_FromEdit)
+                        .ToListAsync();
+                }
+
+                await PopulateDropdownsForCreateFullAsync(viewModel);
+                return View("Create", viewModel);
             }
 
             else
@@ -486,27 +503,41 @@ namespace BQuick.Controllers
                                 Directory.CreateDirectory(uploadsFolder);
                             }
 
-                            foreach (var file in viewModel.AttachmentFiles)
+                            try
                             {
-                                if (file.Length > 0)
+                                foreach (var file in viewModel.AttachmentFiles)
                                 {
-                                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(file.FileName);
-                                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-                                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                                    if (file.Length > 0)
                                     {
-                                        await file.CopyToAsync(fileStream);
-                                    }
+                                        // Buat nama file unik
+                                        string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(file.FileName);
+                                        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-                                    var attachment = new RFQAttachment
-                                    {
-                                        RFQID = rfqEntity.RFQID,
-                                        FileName = file.FileName,
-                                        FileURL = "/attachment/rfq/" + uniqueFileName, // Simpan path relatif
-                                        UploadedByUserID = LoggedInUserId,
-                                        UploadTimestamp = DateTime.UtcNow
-                                    };
-                                    _context.RFQAttachments.Add(attachment);
+                                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                                        {
+                                            await file.CopyToAsync(fileStream);
+                                        }
+
+                                        // Simpan informasi attachment ke database
+                                        var attachment = new RFQAttachment
+                                        {
+                                            RFQID = rfqEntity.RFQID,
+                                            FileName = file.FileName,
+                                            FileURL = "/attachment/rfq/" + uniqueFileName, // Simpan path relatif
+                                            UploadedByUserID = LoggedInUserId,
+                                            UploadTimestamp = DateTime.UtcNow
+                                        };
+
+                                        _context.RFQAttachments.Add(attachment);
+                                    }
                                 }
+
+                            }
+                            catch (Exception ex)
+                            {
+                             
+                               ModelState.AddModelError(string.Empty, "Gagal meng-upload file. Error: " + ex.Message);
+                                
                             }
                         }
 
