@@ -28,15 +28,38 @@
             </div>
         </div>
 
-         <div class="add-customer-form-pop-up px-5 py-3">
-            <form method="post" enctype="multipart/form-data" class="add-customer-form">
+         <div class="add-customer-form-pop-up">
+            <div class="navbar sticky-top px-4 py-3">
+                <h5 class="fw-bold mb-0">Add New Customer</h5>
+                <button type="button" class="btn-close add-customer-form-close-btn-x"></button>
+            </div>
+            
+            <form method="post" enctype="multipart/form-data" class="add-customer-form px-5 py-3" id="add-customer-actual-form">
                 <div class="row justify-content-center">
                     <div class="col-12">
                         <div class="mb-3">
                             <label class="form-label form-label-bold">
                                 Company Name
                             </label>
-                            <input class="form-control" placeholder="Company Name" required />
+                            <input class="form-control" placeholder="Company Name" required name="CompanyName" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label form-label-bold">
+                                Customer Code
+                            </label>
+                            <input class="form-control" placeholder="Customer Code" required name="CustomerCode" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label form-label-bold">
+                                Customer Type
+                            </label>
+                            <select class="form-select" name="CustomerType" required>
+                                <option value="" hidden>Select Customer Type</option>
+                                <option value="Company">Company</option>
+                                <option value="Personal">Personal</option>
+                            </select>
                         </div>
 
                         <div class="mb-5">
@@ -48,7 +71,7 @@
 
                         <div class="mb-5 row">
                             <div class="mb-1 d-flex align-items-center gap-1" style="font-size: 20px;">
-                                <i class='bx bx-info-circle fw-bold'></i>
+                                <i class='bx bx-info-circle'></i>
                                 <span class="fw-bold">
                                     Basic Information
                                 </span>
@@ -59,14 +82,14 @@
                                     <label class="form-label form-label-bold">
                                         Fax
                                     </label>
-                                    <input type="tel" class="form-control" id="customer-fax" placeholder="Fax">
+                                    <input type="tel" class="form-control" id="customer-fax" placeholder="Fax" name="Fax">
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label form-label-bold">
                                         Currency default
                                     </label>
-                                    <select class="form-select">
+                                    <select class="form-select" name="DefaultCurrency">
                                         <option value="" hidden>Currency default</option>
                                         <option value="IDR">IDR</option>
                                         <option value="USD">USD</option>
@@ -78,21 +101,21 @@
                                     <label class="form-label form-label-bold">
                                         Phone
                                     </label>
-                                    <input type="tel" class="form-control" id="customer-phone" placeholder="Phone">
+                                    <input type="tel" class="form-control" id="customer-phone" placeholder="Phone" name="Phone">
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label form-label-bold">
                                         Mobile
                                     </label>
-                                    <input type="tel" class="form-control" id="customer-mobile" placeholder="Mobile">
+                                    <input type="tel" class="form-control" id="customer-mobile" placeholder="Mobile" name="Mobile">
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label form-label-bold">
                                         Account Receivable
                                     </label>
-                                    <input type="text" class="form-control" id="customer-account-receivable" placeholder="Account Receivable">
+                                    <input type="text" class="form-control" id="customer-account-receivable" placeholder="Account Receivable" name="AccountReceivableCode">
                                 </div>
                             </div>
 
@@ -101,23 +124,23 @@
                                     <label class="form-label form-label-bold">
                                         Email
                                     </label>
-                                    <input type="email" class="form-control" id="customer-email" placeholder="Email">
+                                    <input type="email" class="form-control" id="customer-email" placeholder="Email" name="Email">
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label form-label-bold">
                                         TOP
                                     </label>
-                                    <select class="form-select">
+                                    <select class="form-select" name="DefaultTermsOfPaymentID">
                                         <option value="" hidden>TOP</option>
-                                        <option value="30 days">30 days</option>
-                                        <option value="45 days">45 days</option>
-                                        <option value="60 days">60 days</option>
-                                        <option value="65 days">65 days</option>
-                                        <option value="90 days">90 days</option>
-                                        <option value="Cash in Advance">Cash in Advance</option>
-                                        <option value="Cash before Delivery">Cash before Delivery</option>
-                                        <option value="Cash on Delivery">Cash on Delivery</option>
+                                        <option value="1">30 days</option>
+                                        <option value="2">45 days</option>
+                                        <option value="3">60 days</option>
+                                        <option value="4">65 days</option>
+                                        <option value="5">90 days</option>
+                                        <option value="6">Cash in Advance</option>
+                                        <option value="7">Cash before Delivery</option>
+                                        <option value="8">Cash on Delivery</option>
                                     </select>
                                 </div>
 
@@ -125,14 +148,14 @@
                                     <label class="form-label form-label-bold">
                                         NPWP
                                     </label>
-                                    <input type="text" class="form-control" id="customer-npwp" placeholder="NPWP">
+                                    <input type="text" class="form-control" id="customer-npwp" placeholder="NPWP" name="NPWP">
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label form-label-bold">
                                         Account Payable
                                     </label>
-                                    <input type="text" class="form-control" id="customer-account-payable" placeholder="Account Payable">
+                                    <input type="text" class="form-control" id="customer-account-payable" placeholder="Account Payable" name="AccountPayableCode">
                                 </div>
                             </div>
 
@@ -167,14 +190,14 @@
                                         <label class="form-label form-label-bold">
                                             Billing Address
                                         </label>
-                                        <input type="text" class="form-control" id="customer-billing-address" placeholder="Billing Address">
+                                        <input type="text" class="form-control" id="customer-billing-address" placeholder="Billing Address" name="BillingAddressDetail">
                                     </div>
 
                                     <div class="mb-3">
                                         <label class="form-label form-label-bold">
                                             Street
                                         </label>
-                                        <input type="text" class="form-control" id="customer-billing-street" placeholder="Street">
+                                        <input type="text" class="form-control" id="customer-billing-street" placeholder="Street" name="BillingAddressStreet">
                                     </div>
 
                                     <div class="row">
@@ -183,14 +206,14 @@
                                                 <label class="form-label form-label-bold">
                                                     City
                                                 </label>
-                                                <input type="text" class="form-control" id="customer-billing-city" placeholder="City">
+                                                <input type="text" class="form-control" id="customer-billing-city" placeholder="City" name="BillingAddressCity">
                                             </div>
 
                                             <div class="customer-address-details mb-3">
                                                 <label class="form-label form-label-bold">
                                                     Country
                                                 </label>
-                                                <input type="text" class="form-control" id="customer-billing-country" placeholder="Country">
+                                                <input type="text" class="form-control" id="customer-billing-country" placeholder="Country" name="BillingAddressCountry">
                                             </div>
                                         </div>
 
@@ -199,14 +222,14 @@
                                                 <label class="form-label form-label-bold">
                                                     Province
                                                 </label>
-                                                <input type="text" class="form-control" id="customer-billing-province" placeholder="Province">
+                                                <input type="text" class="form-control" id="customer-billing-province" placeholder="Province" name="BillingAddressProvince">
                                             </div>
 
                                             <div class="customer-address-details mb-3">
                                                 <label class="form-label form-label-bold">
                                                     ZIP Code
                                                 </label>
-                                                <input type="text" class="form-control" id="customer-billing-zip-code" placeholder="ZIP Code">
+                                                <input type="text" class="form-control" id="customer-billing-zip-code" placeholder="ZIP Code" name="BillingAddressZipCode">
                                             </div>
                                         </div>
 
@@ -224,14 +247,14 @@
                                         <label class="form-label form-label-bold">
                                             Shipping Address
                                         </label>
-                                        <input type="text" class="form-control" id="customer-shipping-address" placeholder="Shipping Address">
+                                        <input type="text" class="form-control" id="customer-shipping-address" placeholder="Shipping Address" name="ShippingAddressDetail" >
                                     </div>
 
                                     <div class="mb-3">
                                         <label class="form-label form-label-bold">
                                             Street
                                         </label>
-                                        <input type="text" class="form-control" id="customer-shipping-street" placeholder="Street">
+                                        <input type="text" class="form-control" id="customer-shipping-street" placeholder="Street" name="ShippingAddressStreet">
                                     </div>
 
                                     <div class="row">
@@ -240,14 +263,14 @@
                                                 <label class="form-label form-label-bold">
                                                     City
                                                 </label>
-                                                <input type="text" class="form-control" id="customer-shipping-city" placeholder="City">
+                                                <input type="text" class="form-control" id="customer-shipping-city" placeholder="City" name="ShippingAddressCity">
                                             </div>
 
                                             <div class="customer-address-details mb-3">
                                                 <label class="form-label form-label-bold">
                                                     Country
                                                 </label>
-                                                <input type="text" class="form-control" id="customer-shipping-country" placeholder="Country">
+                                                <input type="text" class="form-control" id="customer-shipping-country" placeholder="Country" name="ShippingAddressCountry">
                                             </div>
                                         </div>
 
@@ -256,14 +279,14 @@
                                                 <label class="form-label form-label-bold">
                                                     Province
                                                 </label>
-                                                <input type="text" class="form-control" id="customer-shipping-province" placeholder="Province">
+                                                <input type="text" class="form-control" id="customer-shipping-province" placeholder="Province" name="ShippingAddressProvince">
                                             </div>
 
                                             <div class="customer-address-details mb-3">
                                                 <label class="form-label form-label-bold">
                                                     ZIP Code
                                                 </label>
-                                                <input type="text" class="form-control" id="customer-shipping-zip-code" placeholder="ZIP Code">
+                                                <input type="text" class="form-control" id="customer-shipping-zip-code" placeholder="ZIP Code" name="ShippingAddressZipCode">
                                             </div>
                                         </div>
 
@@ -280,7 +303,7 @@
 
                         <div class="mb-5">
                             <div class="d-flex align-items-center gap-1" style="font-size: 20px;">
-                                <i class='bx bx-info-circle fw-bold'></i>
+                                <i class='bx bx-info-circle'></i>
                                 <span class="fw-bold">
                                     Bank Information
                                 </span>
@@ -306,91 +329,73 @@
                                 </button>
                             </div>
 
-                            <div class="mx-4 add-customer-contact-form-pop-up">
-                                <div class="d-flex align-items-center gap-1" style="font-size: 20px;">
-                                    <i class='bx bx-info-circle fw-bold'></i>
-                                    <span class="fw-bold">
-                                        User Information
-                                    </span>
-
-                                    <i class='bx bx-chevron-down ms-auto' id="customer-contact-form-open-chevron"></i>
-                                </div>
-
-                                <hr />
+                            <div class="mx-1 add-customer-contact-form-pop-up">
 
                                 <div class="show-customer-contact-form-pop-up">
                                     <div id="customer-end-user-panel" class="customer-contact-panel" role="tabpanel" aria-labelledby="tab-end-user">
-                                        <div class="mb-5 d-flex align-items-center gap-1">
-                                            <span class="fw-bold">
-                                                End User Information
-                                            </span>
-
-                                            <i class='bx bx-chevron-right ms-auto' id="customer-contact-information-form-close-chevron-end-user" style="font-size: 20px;"></i>
-                                            <i class='bx bx-minus ms-auto' id="customer-contact-information-form-open-minus-end-user" style="font-size: 20px;"></i>
+                                        <div id="end-user-forms-container">
+                                            <div class="end-user-form" data-index="0">
+                                                <div class="end-user-form-header mb-3 d-flex align-items-center gap-1" style="font-size: 20px; cursor: pointer;">
+                                                    <i class='bx bx-info-circle' style="font-size: 18px;"></i>
+                                                    <span class="fw-bold">End User Information</span>
+                                                    <span class="end-user-number ms-3" style="background-color: black; color: white; border-radius: 50%; width: 18px; height: 18px; display: inline-flex; justify-content: center; align-items: center; font-size: 12px; margin-left: 10px;">1</span>
+                                                    <div class="ms-auto">
+                                                        <i class="bx bx-minus remove-end-user-btn remove-end-user-btn text-danger" style="display: none; cursor: pointer; margin-left: auto;"></i>
+                                                        <i class='bx bx-chevron-down toggle-form-icon'></i>
+                                                    </div>
+                                                    
+                                                </div>
+                                                <div class="end-user-form-body px-4">
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Customer Name</label>
+                                                        <input class="form-control" placeholder="Customer Name" name="ContactPersons[0].FullName" required />
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Profile Picture</label>
+                                                        <input class="form-control" type="file" name="ContactPersons[0].ProfilePicture">
+                                                    </div>
+                                                    <div class="mb-5 row">
+                                                        <div class="col-12 col-sm-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label form-label-bold">Email</label>
+                                                                <input type="email" class="form-control" placeholder="Email" name="ContactPersons[0].Email">
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label class="form-label form-label-bold">Phone</label>
+                                                                <input type="tel" class="form-control" placeholder="Phone" name="ContactPersons[0].PhoneNumber">
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label class="form-label form-label-bold">Mobile</label>
+                                                                <input type="tel" class="form-control" placeholder="Mobile" name="ContactPersons[0].Mobile">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-12 col-sm-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label form-label-bold">Title</label>
+                                                                <select class="form-select" name="ContactPersons[0].Position">
+                                                                    <option value="" hidden>Title</option>
+                                                                    <option value="Mr">Mr</option>
+                                                                    <option value="Mrs">Mrs</option>
+                                                                    <option value="Ms">Ms</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label class="form-label form-label-bold">Job Position</label>
+                                                                <input type="text" class="form-control" placeholder="Job Position" name="ContactPersons[0].JobPosition">
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label class="form-label form-label-bold">Notes</label>
+                                                                <input type="text" class="form-control" placeholder="Notes" name="ContactPersons[0].Notes">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-
-                                        <div class="show-customer-contact-information-form-pop-up">
-                                            <div class="mb-3">
-                                                <label class="form-label form-label-bold">Customer Name</label>
-                                                <input class="form-control" placeholder="Customer Name" id="customer-contact-name" required />
-                                            </div>
-
-                                            <div class="mb-5">
-                                                <label class="form-label form-label-bold">Profile Picture</label>
-                                                <input class="form-control" type="file" name="enduser-profile-picture">
-                                            </div>
-
-                                            <div class="mb-5 row">
-                                                <div class="mb-1 d-flex align-items-center gap-1" style="font-size: 20px;">
-                                                    <i class='bx bx-info-circle fw-bold'></i>
-                                                    <span class="fw-bold">
-                                                        Basic Information
-                                                    </span>
-                                                </div>
-
-                                                <div class="col-12 col-sm-6">
-                                                    <div class="mb-3">
-                                                        <label class="form-label form-label-bold">Email</label>
-                                                        <input type="email" class="form-control" placeholder="Email">
-                                                    </div>
-
-                                                    <div class="mb-3">
-                                                        <label class="form-label form-label-bold">Phone</label>
-                                                        <input type="tel" class="form-control" placeholder="Phone">
-                                                    </div>
-
-                                                    <div class="mb-3">
-                                                        <label class="form-label form-label-bold">Mobile</label>
-                                                        <input type="tel" class="form-control" placeholder="Mobile">
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-12 col-sm-6">
-                                                    <div class="mb-3">
-                                                        <label class="form-label form-label-bold">Title</label>
-                                                        <select class="form-select" id="customer-contact-title">
-                                                            <option value="" hidden>Title</option>
-                                                            <option value="Mr">Mr</option>
-                                                            <option value="Mrs">Mrs</option>
-                                                            <option value="Ms">Ms</option>
-                                                        </select>
-                                                    </div>
-
-                                                    <div class="mb-3">
-                                                        <label class="form-label form-label-bold">Job Position</label>
-                                                        <input type="text" class="form-control" placeholder="Job Position">
-                                                    </div>
-
-                                                    <div class="mb-3">
-                                                        <label class="form-label form-label-bold">Notes</label>
-                                                        <input type="text" class="form-control" placeholder="Notes">
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="d-flex justify-content-start">
-                                                <button type="button" class="btn btn-success">Add User</button>
-                                            </div>
+                                        <div class="d-flex justify-content-start mt-3">
+                                            <button type="button" class="btn btn-light add-end-user-btn">
+                                                <i class='bx bxs-user-plus add-end-user-btn' style="font-size: 25px;"></i>
+                                            </button>
                                         </div>
                                     </div>
 
@@ -410,14 +415,14 @@
                                                 <input class="form-control" placeholder="Customer Name" id="customer-contact-name" required />
                                             </div>
 
-                                            <div class="mb-5">
+                                            <div class="mb-3">
                                                 <label class="form-label form-label-bold">Profile Picture</label>
                                                 <input class="form-control" type="file" name="purchasing-profile-picture">
                                             </div>
 
-                                            <div class="mb-5 row">
+                                            <div class="mb-2 row">
                                                 <div class="mb-1 d-flex align-items-center gap-1" style="font-size: 20px;">
-                                                    <i class='bx bx-info-circle fw-bold'></i>
+                                                    <i class='bx bx-info-circle'></i>
                                                     <span class="fw-bold">
                                                         Basic Information
                                                     </span>
@@ -492,7 +497,7 @@
 
                                             <div class="mb-5 row">
                                                 <div class="mb-1 d-flex align-items-center gap-1" style="font-size: 20px;">
-                                                    <i class='bx bx-info-circle fw-bold'></i>
+                                                    <i class='bx bx-info-circle'></i>
                                                     <span class="fw-bold">
                                                         Basic Information
                                                     </span>
@@ -548,7 +553,7 @@
                         </div>
 
                         <div class="d-flex justify-content-center gap-2">
-                            <button type="submit"  id="save-rfq-btn" form="create-rfq-form" class="btn btn-success add-customer-form-save-btn btn-uniform">
+                            <button type="submit" id="save-rfq-btn" form="create-rfq-form" class="btn add-customer-form-save-btn btn-uniform">
                                 Save
                             </button>
 

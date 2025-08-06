@@ -590,7 +590,7 @@ th .sort-icons {
 }
 
     .customer-address-checkboxes:checked, .add-on-checkbox:checked, .survey-list-checkboxes:checked {
-        background-color: #39c337;
+        background-color: #0a58ca;
         border: 0px solid #39c337;
         position: relative;
     }
@@ -1593,6 +1593,16 @@ body.pop-up-active.notif-bar-active::before {
     display: flex;
     align-items: center;
 }
+
+.add-customer-form-save-btn {
+    background-color: #154fa4;
+    color: #ffffff;
+}
+
+.add-customer-form-save-btn:hover {
+    background-color: #183578;
+}
+
 /*.btn-link-style {
     background: none;*/ /* Menghapus background */
     /*border: none;*/ /* Menghapus border */

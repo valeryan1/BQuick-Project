@@ -662,6 +662,73 @@ namespace BQuick.Controllers
             return Json(contactPersons);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> CreateCustomer([FromForm] CustomerCreateViewModel viewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                return Json(new { success = false, errors = errors });
+            }
+
+            // Check for duplicate CustomerCode
+            if (await _context.Customers.AnyAsync(c => c.CustomerCode == viewModel.CustomerCode))
+            {
+                return Json(new { success = false, errors = new[] { "Customer Code already exists." } });
+            }
+
+            try
+            {
+                var customer = new Customer
+                {
+                    CompanyName = viewModel.CompanyName,
+                    CustomerCode = viewModel.CustomerCode,
+                    CustomerType = viewModel.CustomerType,
+                    Fax = viewModel.Fax,
+                    Email = viewModel.Email,
+                    Phone = viewModel.Phone,
+                    Mobile = viewModel.Mobile,
+                    DefaultCurrency = viewModel.DefaultCurrency ?? "IDR",
+                    DefaultTermsOfPaymentID = viewModel.DefaultTermsOfPaymentID,
+                    NPWP = viewModel.NPWP,
+                    AccountReceivableCode = viewModel.AccountReceivableCode,
+                    AccountPayableCode = viewModel.AccountPayableCode,
+                    BillingAddressStreet = viewModel.BillingAddressStreet,
+                    BillingAddressCity = viewModel.BillingAddressCity,
+                    BillingAddressProvince = viewModel.BillingAddressProvince,
+                    BillingAddressCountry = viewModel.BillingAddressCountry,
+                    BillingAddressZipCode = viewModel.BillingAddressZipCode,
+                    BillingAddressDetail = viewModel.BillingAddressDetail,
+                    ShippingAddressStreet = viewModel.ShippingAddressStreet,
+                    ShippingAddressCity = viewModel.ShippingAddressCity,
+                    ShippingAddressProvince = viewModel.ShippingAddressProvince,
+                    ShippingAddressCountry = viewModel.ShippingAddressCountry,
+                    ShippingAddressZipCode = viewModel.ShippingAddressZipCode,
+                    ShippingAddressDetail = viewModel.ShippingAddressDetail,
+                    CreatedTimestamp = DateTime.UtcNow,
+                    LastModifiedTimestamp = DateTime.UtcNow
+                };
+
+                _context.Customers.Add(customer);
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, customerId = customer.CustomerID, customerName = customer.CompanyName });
+            }
+            catch (Exception ex)
+            {
+                // Log the detailed exception
+                Debug.WriteLine($"Exception saving customer: {ex.ToString()}");
+                var innerEx = ex.InnerException;
+                string errorMessage = ex.Message;
+                while (innerEx != null)
+                {
+                    errorMessage += "\nInner Exception: " + innerEx.Message;
+                    innerEx = innerEx.InnerException;
+                }
+                return Json(new { success = false, errors = new[] { "An internal server error occurred while saving the customer.", errorMessage } });
+            }
+        }
+
         /*   public async Task<IActionResult> Index()
            {
                *//*var rfqs = await _context.RFQs
@@ -669,7 +736,7 @@ namespace BQuick.Controllers
                    .ToListAsync();
                return View(rfqs);*//*
                return View();
-           }*/
+           }*//*
 
 
         ///=============================================

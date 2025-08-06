@@ -1159,7 +1159,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 
-    document.querySelectorAll(".add-customer-form-close-btn").forEach(btn => {
+        document.querySelectorAll(".add-customer-form-close-btn, .add-customer-form-close-btn-x").forEach(btn => {
         btn.addEventListener("click", function () {
             const modal = document.querySelector(".add-customer-form-pop-up");
             if (modal) modal.classList.remove("active");
@@ -1179,37 +1179,90 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.querySelectorAll(".add-customer-form-save-btn").forEach(btn => {
         btn.addEventListener("click", function (e) {
-            e.preventDefault();
+            e.preventDefault(); // Prevent default form submission
+
             const modal = document.querySelector(".add-customer-form-pop-up");
             if (!modal) return;
-            const companyNameInput = modal.querySelector('input[placeholder="Company Name"]');
+
+            const form = document.getElementById('add-customer-actual-form');
+            if (!form) return;
+
+            const companyNameInput = modal.querySelector('input[name="CompanyName"]');
             const companyName = companyNameInput ? companyNameInput.value.trim() : "";
             if (!companyName) {
-                modal.classList.remove("active");
-                document.body.classList.remove("pop-up-active");
+                alert("Company Name is required.");
                 return;
             }
-            modal.classList.remove("active");
-            document.body.classList.remove("pop-up-active");
 
-            if (window.companies && window.addCompany && window.companyWrapper) {
-                if (!companies.includes(companyName)) {
-                    companies.unshift(companyName);
-                }
-                const code = getCompanyCode(companyName);
-                companyWrapper.querySelector(".select-btn").firstElementChild.innerText = code ? `${companyName} (${code})` : companyName;
-                companyWrapper.querySelector("input").value = "";
-                addCompany(companyName);
-                companyWrapper.classList.remove("active");
-
-                const mainCompanyDropdown = document.querySelector('.wrapp.company-dropdown .select-btn span');
-                if (mainCompanyDropdown) {
-                    mainCompanyDropdown.innerText = code ? `${companyName} (${code})` : companyName;
-                    delete mainCompanyDropdown.dataset.originalName;
-                }
-
-                updateCompanyStatusLabel('not-yet');
+            const formData = new FormData(form);
+            
+            // Manually add anti-forgery token if it exists
+            const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+            if (tokenInput) {
+                formData.append("__RequestVerificationToken", tokenInput.value);
             }
+
+
+            // Perform AJAX request
+            fetch('/RFQ/CreateCustomer', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                // Clone the response to be able to read it twice (once as text, once as json if possible)
+                const responseClone = response.clone();
+                console.log('Server response status:', response.status, response.statusText);
+
+                return response.text().then(text => {
+                    console.log('Raw server response:', text);
+                    if (!response.ok) {
+                         // If response is not OK, throw an error with the text content
+                         throw new Error(`Server responded with ${response.status}: ${text}`);
+                    }
+                    try {
+                        // Try to parse the text as JSON
+                        return JSON.parse(text);
+                    } catch (err) {
+                        // If parsing fails, throw an error with the raw text
+                        throw new Error(`Failed to parse JSON. Raw response: ${text}`);
+                    }
+                });
+            })
+            .then(data => {
+                if (data.success) {
+                    // Close the pop-up
+                    modal.classList.remove("active");
+                    document.body.classList.remove("pop-up-active");
+
+                    // Add new customer to the client-side list
+                    if (window.serverSideCustomerData) {
+                        window.serverSideCustomerData.push({ value: data.customerId.toString(), text: data.customerName });
+                    }
+
+                    // Re-initialize the company dropdown
+                    if (window.addCompany) {
+                        window.addCompany(data.customerName);
+                    }
+                    
+                    // Find the new customer in the dropdown and select it
+                     if (window.companyWrapper) {
+                        const companyOptions = window.companyWrapper.querySelector(".option");
+                        const newOption = Array.from(companyOptions.children).find(li => li.getAttribute('data-value') == data.customerId);
+                        if (newOption) {
+                            updateName(newOption);
+                        }
+                    }
+
+                } else {
+                    // Handle business logic error from server
+                    console.error("Error saving customer:", data.errors);
+                    alert("Failed to save customer: " + (data.errors ? data.errors.join("\n") : "Unknown server error."));
+                }
+            })
+            .catch(error => {
+                console.error('Fetch Error:', error);
+                alert("An unexpected error occurred. Please check the console for details. Error: " + error.message);
+            });
         });
     });
 
@@ -1229,7 +1282,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const matchCustomerBillingAddressCheckbox = document.getElementById("match-customer-billing-address-checkbox");
     const customerAddressFields = [
-        "address", "street", "city", "province", "country", "zip-code"
+        "address", "street", "city", "province", "country", "zip-code", "address-detail"
     ];
 
     function updateCustomerShippingAddress() {
@@ -1250,15 +1303,18 @@ document.addEventListener("DOMContentLoaded", function () {
             customerAddressFields.forEach(field => {
                 const shipping = document.getElementById(`customer-shipping-${field}`);
                 if (shipping) {
-                    shipping.disabled = this.checked;
+                    shipping.readOnly = this.checked;
                 }
             });
-            if (this.checked) updateCustomerShippingAddress();
+
+            updateCustomerShippingAddress();
         });
 
         customerAddressFields.forEach(field => {
             const billing = document.getElementById(`customer-billing-${field}`);
-            if (billing) billing.addEventListener("input", updateCustomerShippingAddress);
+            if (billing) {
+                billing.addEventListener("input", updateCustomerShippingAddress);
+            }
         });
     }
 
@@ -1408,6 +1464,78 @@ document.addEventListener("DOMContentLoaded", function () {
                 endUserInput.value = title && name ? `${title} ${name}` : name;
             }
         });
+    });
+
+    document.addEventListener('click', function (e) {
+        // Handle toggling the form body
+        const header = e.target.closest('.end-user-form-header');
+        if (header) {
+            const form = header.closest('.end-user-form');
+            const body = form.querySelector('.end-user-form-body');
+            const icon = header.querySelector('.toggle-form-icon');
+            body.style.display = body.style.display === 'none' ? '' : 'none';
+            icon.classList.toggle('bx-chevron-down');
+            icon.classList.toggle('bx-chevron-right');
+        }
+
+        // Handle adding a new end user form
+        if (e.target.classList.contains('add-end-user-btn')) {
+            const container = document.getElementById('end-user-forms-container');
+            const newIndex = container.children.length;
+            const originalForm = container.querySelector('.end-user-form');
+            const newForm = originalForm.cloneNode(true);
+
+            newForm.dataset.index = newIndex;
+            newForm.querySelectorAll('[name]').forEach(input => {
+                const name = input.getAttribute('name');
+                if (name) {
+                    input.setAttribute('name', name.replace(/\[0\]/, `[${newIndex}]`));
+                    input.value = ''; // Clear the value of the new input
+                }
+            });
+
+            // Ensure the new form is expanded
+            const body = newForm.querySelector('.end-user-form-body');
+            const icon = newForm.querySelector('.toggle-form-icon');
+            body.style.display = '';
+            icon.classList.add('bx-chevron-down');
+            icon.classList.remove('bx-chevron-right');
+
+            // Show the remove button on the new form
+            const removeButton = newForm.querySelector('.remove-end-user-btn');
+            if (removeButton) {
+                removeButton.style.display = 'inline-block';
+            }
+
+            // Update the number
+            const numberSpan = newForm.querySelector('.end-user-number');
+            if (numberSpan) {
+                numberSpan.textContent = newIndex + 1;
+            }
+
+            container.appendChild(newForm);
+        }
+
+        // Handle removing an end user form
+        if (e.target.classList.contains('remove-end-user-btn')) {
+            e.target.closest('.end-user-form').remove();
+            // Re-index and re-number the remaining forms
+            const container = document.getElementById('end-user-forms-container');
+            const forms = container.querySelectorAll('.end-user-form');
+            forms.forEach((form, index) => {
+                form.dataset.index = index;
+                form.querySelectorAll('[name]').forEach(input => {
+                    const name = input.getAttribute('name');
+                    if (name) {
+                        input.setAttribute('name', name.replace(/\[\d+\]/, `[${index}]`));
+                    }
+                });
+                const numberSpan = form.querySelector('.end-user-number');
+                if (numberSpan) {
+                    numberSpan.textContent = index + 1;
+                }
+            });
+        }
     });
 
     window.itemWrappers = document.querySelectorAll(".wrapp.item-dropdown");
