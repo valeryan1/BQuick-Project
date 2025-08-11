@@ -189,6 +189,8 @@ namespace BQuick.Models
         [Display(Name = "Existing Attachments")]
         public List<RFQAttachment> ExistingAttachments { get; set; } = new List<RFQAttachment>();
 
+        public List<ContactPersonCreateViewModel> ContactPersons { get; set; }
+
 
         // --- Properti untuk mengisi Dropdown Lists ---
         public SelectList? CustomerList { get; set; }
@@ -209,6 +211,8 @@ namespace BQuick.Models
             PurchasingRequestSectionItems = new List<RfqCreatePurchasingRequestItemViewModel>();
             SurveySectionItems = new List<RfqCreateSurveyRequestItemViewModel>();
             MeetingSectionItems = new List<RfqCreateMeetingItemViewModel>();
+            ContactPersons = new List<ContactPersonCreateViewModel>();
+
 
             // Your other initializations are good.
             EndUserContactPersonList = new SelectList(Enumerable.Empty<SelectListItem>(), "Value", "Text");

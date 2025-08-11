@@ -712,6 +712,45 @@ namespace BQuick.Controllers
                 _context.Customers.Add(customer);
                 await _context.SaveChangesAsync();
 
+                // After saving the customer, save the associated contact persons
+                if (viewModel.ContactPersons != null && viewModel.ContactPersons.Any())
+                {
+                    foreach (var contactVm in viewModel.ContactPersons)
+                    {
+                        if (string.IsNullOrWhiteSpace(contactVm.FullName)) continue; // Skip empty entries
+
+                        string uniqueFileName = null;
+                        if (contactVm.ProfilePicture != null && contactVm.ProfilePicture.Length > 0)
+                        {
+                            string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads/contact_profiles");
+                            if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                            uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(contactVm.ProfilePicture.FileName);
+                            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                            using (var fileStream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await contactVm.ProfilePicture.CopyToAsync(fileStream);
+                            }
+                        }
+
+                        var contactPerson = new CustomerContactPerson
+                        {
+                            CustomerID = customer.CustomerID, // Link to the newly created customer
+                            FullName = contactVm.FullName,
+                            Title = contactVm.Title,
+                            JobPosition = contactVm.JobPosition,
+                            Email = contactVm.Email,
+                            PhoneNumber = contactVm.PhoneNumber,
+                            Mobile = contactVm.Mobile,
+                            Notes = contactVm.Notes,
+                            ProfilePictureUrl = uniqueFileName != null ? "/uploads/contact_profiles/" + uniqueFileName : null,
+                            IsPrimary = contactVm.IsPrimary,
+                        };
+                        _context.CustomerContactPersons.Add(contactPerson);
+                    }
+                    await _context.SaveChangesAsync(); // Save all new contact persons
+                }
+
                 return Json(new { success = true, customerId = customer.CustomerID, customerName = customer.CompanyName });
             }
             catch (Exception ex)

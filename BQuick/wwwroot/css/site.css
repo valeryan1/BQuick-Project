@@ -1,4 +1,4 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Outfit:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Outfit:wght@100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Outfit:wght@100..900&family=Roboto:ital,wdth,wght@0,96.3,100..900;1,96.3,100..900&display=swap');
 
 * {
@@ -1594,14 +1594,22 @@ body.pop-up-active.notif-bar-active::before {
     align-items: center;
 }
 
+.form-separator {
+    margin: 20px 0;
+    border: 1px solid #ccc;
+}
+
 .add-customer-form-save-btn {
     background-color: #154fa4;
     color: #ffffff;
+    border: none;
+    border-radius: 0.375rem;
 }
 
 .add-customer-form-save-btn:hover {
     background-color: #183578;
 }
+
 
 /*.btn-link-style {
     background: none;*/ /* Menghapus background */

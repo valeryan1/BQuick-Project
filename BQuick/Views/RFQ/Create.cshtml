@@ -330,7 +330,6 @@
                             </div>
 
                             <div class="mx-1 add-customer-contact-form-pop-up">
-
                                 <div class="show-customer-contact-form-pop-up">
                                     <div id="customer-end-user-panel" class="customer-contact-panel" role="tabpanel" aria-labelledby="tab-end-user">
                                         <div id="end-user-forms-container">
@@ -354,7 +353,7 @@
                                                         <label class="form-label form-label-bold">Profile Picture</label>
                                                         <input class="form-control" type="file" name="ContactPersons[0].ProfilePicture">
                                                     </div>
-                                                    <div class="mb-5 row">
+                                                    <div class="mb-4 row">
                                                         <div class="col-12 col-sm-6">
                                                             <div class="mb-3">
                                                                 <label class="form-label form-label-bold">Email</label>
@@ -372,7 +371,7 @@
                                                         <div class="col-12 col-sm-6">
                                                             <div class="mb-3">
                                                                 <label class="form-label form-label-bold">Title</label>
-                                                                <select class="form-select" name="ContactPersons[0].Position">
+                                                                <select class="form-select" name="ContactPersons[0].Title">
                                                                     <option value="" hidden>Title</option>
                                                                     <option value="Mr">Mr</option>
                                                                     <option value="Mrs">Mrs</option>
@@ -390,6 +389,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                                <hr class="form-separator" style="margin: 0px 5px 30px 5px;" />
                                             </div>
                                         </div>
                                         <div class="d-flex justify-content-start mt-3">
@@ -400,152 +400,135 @@
                                     </div>
 
                                     <div id="customer-purchasing-panel" class="customer-contact-panel" role="tabpanel" aria-labelledby="tab-purchasing" hidden>
-                                        <div class="mb-5 d-flex align-items-center gap-1">
-                                            <span class="fw-bold">
-                                                Purchasing Information
-                                            </span>
-
-                                            <i class='bx bx-chevron-right ms-auto' id="customer-contact-information-form-close-chevron-purchasing" style="font-size: 20px;"></i>
-                                            <i class='bx bx-minus ms-auto' id="customer-contact-information-form-open-minus-purchasing" style="font-size: 20px;"></i>
+                                        <div id="purchasing-forms-container">
+                                            <div class="purchasing-form" data-index="1">
+                                                <div class="purchasing-form-header mb-3 d-flex align-items-center gap-1" style="font-size: 20px; cursor: pointer;">
+                                                    <i class='bx bx-info-circle' style="font-size: 18px;"></i>
+                                                    <span class="fw-bold">Purchasing Information</span>
+                                                    <span class="purchasing-number ms-3" style="background-color: black; color: white; border-radius: 50%; width: 18px; height: 18px; display: inline-flex; justify-content: center; align-items: center; font-size: 12px; margin-left: 10px;">1</span>
+                                                    <div class="ms-auto">
+                                                        <i class="bx bx-minus remove-purchasing-btn text-danger" style="display: none; cursor: pointer; margin-left: auto;"></i>
+                                                        <i class='bx bx-chevron-down toggle-form-icon'></i>
+                                                    </div>
+                                                </div>
+                                                <div class="purchasing-form-body px-4">
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Customer Name</label>
+                                                        <input class="form-control" placeholder="Customer Name" name="ContactPersons[1].FullName" required />
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Profile Picture</label>
+                                                        <input class="form-control" type="file" name="ContactPersons[1].ProfilePicture">
+                                                    </div>
+                                                    <div class="mb-4 row">
+                                                        <div class="col-12 col-sm-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label form-label-bold">Email</label>
+                                                                <input type="email" class="form-control" placeholder="Email" name="ContactPersons[1].Email">
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label class="form-label form-label-bold">Phone</label>
+                                                                <input type="tel" class="form-control" placeholder="Phone" name="ContactPersons[1].PhoneNumber">
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label class="form-label form-label-bold">Mobile</label>
+                                                                <input type="tel" class="form-control" placeholder="Mobile" name="ContactPersons[1].Mobile">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-12 col-sm-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label form-label-bold">Title</label>
+                                                                <select class="form-select" name="ContactPersons[1].Title">
+                                                                    <option value="" hidden>Title</option>
+                                                                    <option value="Mr">Mr</option>
+                                                                    <option value="Mrs">Mrs</option>
+                                                                    <option value="Ms">Ms</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label class="form-label form-label-bold">Job Position</label>
+                                                                <input type="text" class="form-control" name="ContactPersons[1].JobPosition" value="Purchasing" readonly />
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label class="form-label form-label-bold">Notes</label>
+                                                                <input type="text" class="form-control" placeholder="Notes" name="ContactPersons[1].Notes">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-
-                                        <div class="show-customer-contact-information-form-pop-up">
-                                            <div class="mb-3">
-                                                <label class="form-label form-label-bold">Customer Name</label>
-                                                <input class="form-control" placeholder="Customer Name" id="customer-contact-name" required />
-                                            </div>
-
-                                            <div class="mb-3">
-                                                <label class="form-label form-label-bold">Profile Picture</label>
-                                                <input class="form-control" type="file" name="purchasing-profile-picture">
-                                            </div>
-
-                                            <div class="mb-2 row">
-                                                <div class="mb-1 d-flex align-items-center gap-1" style="font-size: 20px;">
-                                                    <i class='bx bx-info-circle'></i>
-                                                    <span class="fw-bold">
-                                                        Basic Information
-                                                    </span>
-                                                </div>
-
-                                                <div class="col-12 col-sm-6">
-                                                    <div class="mb-3">
-                                                        <label class="form-label form-label-bold">Email</label>
-                                                        <input type="email" class="form-control" placeholder="Email">
-                                                    </div>
-
-                                                    <div class="mb-3">
-                                                        <label class="form-label form-label-bold">Phone</label>
-                                                        <input type="tel" class="form-control" placeholder="Phone">
-                                                    </div>
-
-                                                    <div class="mb-3">
-                                                        <label class="form-label form-label-bold">Mobile</label>
-                                                        <input type="tel" class="form-control" placeholder="Mobile">
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-12 col-sm-6">
-                                                    <div class="mb-3">
-                                                        <label class="form-label form-label-bold">Title</label>
-                                                        <select class="form-select" id="customer-contact-title">
-                                                            <option value="" hidden>Title</option>
-                                                            <option value="Mr">Mr</option>
-                                                            <option value="Mrs">Mrs</option>
-                                                            <option value="Ms">Ms</option>
-                                                        </select>
-                                                    </div>
-
-                                                    <div class="mb-3">
-                                                        <label class="form-label form-label-bold">Job Position</label>
-                                                        <input type="text" class="form-control" placeholder="Job Position">
-                                                    </div>
-
-                                                    <div class="mb-3">
-                                                        <label class="form-label form-label-bold">Notes</label>
-                                                        <input type="text" class="form-control" placeholder="Notes">
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="d-flex justify-content-start">
-                                                <button type="button" class="btn btn-success">Add User</button>
-                                            </div>
+                                        <div class="d-flex justify-content-start mt-3">
+                                            <button type="button" class="btn btn-light add-purchasing-btn">
+                                                <i class='bx bxs-user-plus add-purchasing-btn' style="font-size: 25px;"></i>
+                                            </button>
                                         </div>
                                     </div>
 
                                     <div id="customer-it-engineer-panel" class="customer-contact-panel" role="tabpanel" aria-labelledby="tab-it-engineer" hidden>
-                                        <div class="mb-5 d-flex align-items-center gap-1">
-                                            <span class="fw-bold">
-                                                IT Engineer Information
-                                            </span>
-
-                                            <i class='bx bx-chevron-right ms-auto' id="customer-contact-information-form-close-chevron-it-engineer" style="font-size: 20px;"></i>
-                                            <i class='bx bx-minus ms-auto' id="customer-contact-information-form-open-minus-it-engineer" style="font-size: 20px;"></i>
+                                        <div id="it-engineer-forms-container">
+                                            <div class="it-engineer-form" data-index="2">
+                                                <div class="it-engineer-form-header mb-3 d-flex align-items-center gap-1" style="font-size: 20px; cursor: pointer;">
+                                                    <i class='bx bx-info-circle' style="font-size: 18px;"></i>
+                                                    <span class="fw-bold">IT Engineer Information</span>
+                                                    <span class="it-engineer-number ms-3" style="background-color: black; color: white; border-radius: 50%; width: 18px; height: 18px; display: inline-flex; justify-content: center; align-items: center; font-size: 12px; margin-left: 10px;">1</span>
+                                                    <div class="ms-auto">
+                                                        <i class="bx bx-minus remove-it-engineer-btn text-danger" style="display: none; cursor: pointer; margin-left: auto;"></i>
+                                                        <i class='bx bx-chevron-down toggle-form-icon'></i>
+                                                    </div>
+                                                </div>
+                                                <div class="it-engineer-form-body px-4">
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Customer Name</label>
+                                                        <input class="form-control" placeholder="Customer Name" name="ContactPersons[2].FullName" required />
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label form-label-bold">Profile Picture</label>
+                                                        <input class="form-control" type="file" name="ContactPersons[2].ProfilePicture">
+                                                    </div>
+                                                    <div class="mb-4 row">
+                                                        <div class="col-12 col-sm-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label form-label-bold">Email</label>
+                                                                <input type="email" class="form-control" placeholder="Email" name="ContactPersons[2].Email">
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label class="form-label form-label-bold">Phone</label>
+                                                                <input type="tel" class="form-control" placeholder="Phone" name="ContactPersons[2].PhoneNumber">
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label class="form-label form-label-bold">Mobile</label>
+                                                                <input type="tel" class="form-control" placeholder="Mobile" name="ContactPersons[2].Mobile">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-12 col-sm-6">
+                                                            <div class="mb-3">
+                                                                <label class="form-label form-label-bold">Title</label>
+                                                                <select class="form-select" name="ContactPersons[2].Title">
+                                                                    <option value="" hidden>Title</option>
+                                                                    <option value="Mr">Mr</option>
+                                                                    <option value="Mrs">Mrs</option>
+                                                                    <option value="Ms">Ms</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label class="form-label form-label-bold">Job Position</label>
+                                                                <input type="text" class="form-control" name="ContactPersons[2].JobPosition" value="IT Engineer" readonly />
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label class="form-label form-label-bold">Notes</label>
+                                                                <input type="text" class="form-control" placeholder="Notes" name="ContactPersons[2].Notes">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <hr class="form-separator" />
+                                            </div>
                                         </div>
-
-                                        <div class="show-customer-contact-information-form-pop-up">
-                                            <div class="mb-3">
-                                                <label class="form-label form-label-bold">Customer Name</label>
-                                                <input class="form-control" placeholder="Customer Name" id="customer-contact-name" required />
-                                            </div>
-
-                                            <div class="mb-5">
-                                                <label class="form-label form-label-bold">Profile Picture</label>
-                                                <input class="form-control" type="file" name="it-engineer-profile-picture">
-                                            </div>
-
-                                            <div class="mb-5 row">
-                                                <div class="mb-1 d-flex align-items-center gap-1" style="font-size: 20px;">
-                                                    <i class='bx bx-info-circle'></i>
-                                                    <span class="fw-bold">
-                                                        Basic Information
-                                                    </span>
-                                                </div>
-
-                                                <div class="col-12 col-sm-6">
-                                                    <div class="mb-3">
-                                                        <label class="form-label form-label-bold">Email</label>
-                                                        <input type="email" class="form-control" placeholder="Email">
-                                                    </div>
-
-                                                    <div class="mb-3">
-                                                        <label class="form-label form-label-bold">Phone</label>
-                                                        <input type="tel" class="form-control" placeholder="Phone">
-                                                    </div>
-
-                                                    <div class="mb-3">
-                                                        <label class="form-label form-label-bold">Mobile</label>
-                                                        <input type="tel" class="form-control" placeholder="Mobile">
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-12 col-sm-6">
-                                                    <div class="mb-3">
-                                                        <label class="form-label form-label-bold">Title</label>
-                                                        <select class="form-select" id="customer-contact-title">
-                                                            <option value="" hidden>Title</option>
-                                                            <option value="Mr">Mr</option>
-                                                            <option value="Mrs">Mrs</option>
-                                                            <option value="Ms">Ms</option>
-                                                        </select>
-                                                    </div>
-
-                                                    <div class="mb-3">
-                                                        <label class="form-label form-label-bold">Job Position</label>
-                                                        <input type="text" class="form-control" placeholder="Job Position">
-                                                    </div>
-
-                                                    <div class="mb-3">
-                                                        <label class="form-label form-label-bold">Notes</label>
-                                                        <input type="text" class="form-control" placeholder="Notes">
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="d-flex justify-content-start">
-                                                <button type="button" class="btn btn-success">Add User</button>
-                                            </div>
+                                        <div class="d-flex justify-content-start mt-3">
+                                            <button type="button" class="btn btn-light add-it-engineer-btn">
+                                                <i class='bx bxs-user-plus add-it-engineer-btn' style="font-size: 25px;"></i>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -553,7 +536,7 @@
                         </div>
 
                         <div class="d-flex justify-content-center gap-2">
-                            <button type="submit" id="save-rfq-btn" form="create-rfq-form" class="btn add-customer-form-save-btn btn-uniform">
+                            <button type="submit" id="save-rfq-btn" form="create-rfq-form" class="add-customer-form-save-btn btn-uniform">
                                 Save
                             </button>
 

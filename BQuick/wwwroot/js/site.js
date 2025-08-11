@@ -1467,76 +1467,118 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     document.addEventListener('click', function (e) {
-        // Handle toggling the form body
-        const header = e.target.closest('.end-user-form-header');
+        // Handle toggling the form body for both End User and Purchasing
+        const header = e.target.closest('.end-user-form-header, .purchasing-form-header, .it-engineer-form-header');
         if (header) {
-            const form = header.closest('.end-user-form');
-            const body = form.querySelector('.end-user-form-body');
+            const form = header.closest('.end-user-form, .purchasing-form, .it-engineer-form');
+            const body = form.querySelector('.end-user-form-body, .purchasing-form-body, .it-engineer-form-body');
             const icon = header.querySelector('.toggle-form-icon');
-            body.style.display = body.style.display === 'none' ? '' : 'none';
-            icon.classList.toggle('bx-chevron-down');
-            icon.classList.toggle('bx-chevron-right');
+
+            if (body && icon) {
+                body.style.display = body.style.display === 'none' ? '' : 'none';
+                icon.classList.toggle('bx-chevron-down');
+                icon.classList.toggle('bx-chevron-right');
+            }
         }
 
-        // Handle adding a new end user form
-        if (e.target.classList.contains('add-end-user-btn')) {
-            const container = document.getElementById('end-user-forms-container');
-            const newIndex = container.children.length;
-            const originalForm = container.querySelector('.end-user-form');
+        function renumberAllForms() {
+            const allForms = document.querySelectorAll('.end-user-form, .purchasing-form, .it-engineer-form');
+            allForms.forEach((form, index) => {
+                form.querySelectorAll('[name^="ContactPersons"]').forEach(input => {
+                    const name = input.getAttribute('name');
+                    if (name) {
+                        const newName = name.replace(/\[\d+\]/, `[${index}]`);
+                        input.setAttribute('name', newName);
+                    }
+                });
+            });
+
+            ['end-user', 'purchasing', 'it-engineer'].forEach(type => {
+                const container = document.getElementById(`${type}-forms-container`);
+                if (container) {
+                    const forms = container.querySelectorAll(`.${type}-form`);
+                    forms.forEach((form, index) => {
+                        const numberSpan = form.querySelector(`.${type}-number`);
+                        if (numberSpan) {
+                            numberSpan.textContent = index + 1;
+                        }
+                    });
+                }
+            });
+        }
+
+        function addContactForm(type) {
+            const container = document.getElementById(`${type}-forms-container`);
+            if (!container) return;
+
+            const originalForm = container.querySelector(`.${type}-form`);
+            if (!originalForm) return;
+
             const newForm = originalForm.cloneNode(true);
 
-            newForm.dataset.index = newIndex;
-            newForm.querySelectorAll('[name]').forEach(input => {
-                const name = input.getAttribute('name');
-                if (name) {
-                    input.setAttribute('name', name.replace(/\[0\]/, `[${newIndex}]`));
-                    input.value = ''; // Clear the value of the new input
+            newForm.querySelectorAll('input, select, textarea').forEach(input => {
+                if (input.type === 'checkbox' || input.type === 'radio') {
+                    input.checked = false;
+                } else if (!input.readOnly) { // Do not clear readonly fields
+                    input.value = '';
                 }
             });
 
-            // Ensure the new form is expanded
-            const body = newForm.querySelector('.end-user-form-body');
-            const icon = newForm.querySelector('.toggle-form-icon');
-            body.style.display = '';
-            icon.classList.add('bx-chevron-down');
-            icon.classList.remove('bx-chevron-right');
+            const jobPositionInput = newForm.querySelector('[name*="JobPosition"]');
+            if (jobPositionInput) {
+                if (type === 'purchasing') {
+                    jobPositionInput.value = 'Purchasing';
+                } else if (type === 'it-engineer') {
+                    jobPositionInput.value = 'IT Engineer';
+                }
+            }
 
-            // Show the remove button on the new form
-            const removeButton = newForm.querySelector('.remove-end-user-btn');
+            const body = newForm.querySelector(`.${type}-form-body`);
+            if (body) body.style.display = '';
+
+            const icon = newForm.querySelector('.toggle-form-icon');
+            if (icon) {
+                icon.classList.add('bx-chevron-down');
+                icon.classList.remove('bx-chevron-right');
+            }
+
+            const removeButton = newForm.querySelector(`.remove-${type}-btn`);
             if (removeButton) {
                 removeButton.style.display = 'inline-block';
             }
 
-            // Update the number
-            const numberSpan = newForm.querySelector('.end-user-number');
-            if (numberSpan) {
-                numberSpan.textContent = newIndex + 1;
-            }
-
             container.appendChild(newForm);
+            renumberAllForms();
         }
 
-        // Handle removing an end user form
-        if (e.target.classList.contains('remove-end-user-btn')) {
-            e.target.closest('.end-user-form').remove();
-            // Re-index and re-number the remaining forms
-            const container = document.getElementById('end-user-forms-container');
-            const forms = container.querySelectorAll('.end-user-form');
-            forms.forEach((form, index) => {
-                form.dataset.index = index;
-                form.querySelectorAll('[name]').forEach(input => {
-                    const name = input.getAttribute('name');
-                    if (name) {
-                        input.setAttribute('name', name.replace(/\[\d+\]/, `[${index}]`));
-                    }
-                });
-                const numberSpan = form.querySelector('.end-user-number');
-                if (numberSpan) {
-                    numberSpan.textContent = index + 1;
-                }
-            });
+        const addEndUserBtn = e.target.closest('.add-end-user-btn');
+        if (addEndUserBtn) {
+            addContactForm('end-user');
+            return;
+        }
+
+        const addPurchasingBtn = e.target.closest('.add-purchasing-btn');
+        if (addPurchasingBtn) {
+            addContactForm('purchasing');
+            return;
+        }
+
+        const addItEngineerBtn = e.target.closest('.add-it-engineer-btn');
+        if (addItEngineerBtn) {
+            addContactForm('it-engineer');
+            return;
+        }
+
+        const removeBtn = e.target.closest('.remove-end-user-btn, .remove-purchasing-btn, .remove-it-engineer-btn');
+        if (removeBtn) {
+            const formToRemove = removeBtn.closest('.end-user-form, .purchasing-form, .it-engineer-form');
+            if (formToRemove) {
+                formToRemove.remove();
+                renumberAllForms();
+            }
         }
     });
+
 
     window.itemWrappers = document.querySelectorAll(".wrapp.item-dropdown");
 
@@ -2138,25 +2180,7 @@ document.addEventListener("DOMContentLoaded", function () {
             `;
             itemTableBody.appendChild(newRow);
         });
-   
-
-
-/*    // Attach files to the form on submission
-    const mainForm = document.getElementById('create-rfq-form');
-        if (mainForm) {
-            mainForm.addEventListener('submit', function (e) {
-                const mainAttachmentWrapper = document.getElementById('main-rfq-attachment-wrapper');
-                const fileInput = document.getElementById('attachmentFiles');
-
-                if (mainAttachmentWrapper && fileInput && mainAttachmentWrapper.uploadedFiles) {
-                    const dataTransfer = new DataTransfer();
-                    mainAttachmentWrapper.uploadedFiles.forEach(file => {
-                        dataTransfer.items.add(file);
-                    });
-                    fileInput.files = dataTransfer.files;
-                }
-            });
-        }*/
+  
     }
 
     const addRowBtnItem = document.getElementById('addRowBtnItem');

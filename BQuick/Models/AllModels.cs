@@ -313,22 +313,36 @@ namespace BQuick.Models
         [Key]
         public int ContactPersonID { get; set; }
 
+        [Required]
         public int CustomerID { get; set; }
         [ForeignKey("CustomerID")]
-        [InverseProperty("ContactPersons")]
         public virtual Customer Customer { get; set; }
 
         [Required]
         [StringLength(200)]
         public string FullName { get; set; }
+
         [StringLength(100)]
-        public string? Position { get; set; } // Made nullable
+        public string? Title { get; set; }
+
+        [StringLength(100)]
+        public string? JobPosition { get; set; } // Added this
+
         [EmailAddress]
         [StringLength(150)]
-        public string? Email { get; set; } // Made nullable
+        public string? Email { get; set; }
+
         [StringLength(50)]
-        public string? PhoneNumber { get; set; } // Made nullable
-        public bool IsPrimary { get; set; } = false;
+        public string? PhoneNumber { get; set; }
+
+        [StringLength(50)]
+        public string? Mobile { get; set; }
+
+        public string? Notes { get; set; }
+
+        public string? ProfilePictureUrl { get; set; } // Added this
+
+        public bool IsPrimary { get; set; }
     }
 
     // --- Entitas Terkait Item & Vendor ---
