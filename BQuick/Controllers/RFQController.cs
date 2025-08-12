@@ -677,94 +677,101 @@ namespace BQuick.Controllers
                 return Json(new { success = false, errors = new[] { "Customer Code already exists." } });
             }
 
-            try
+            using (var transaction = await _context.Database.BeginTransactionAsync())
             {
-                var customer = new Customer
+                try
                 {
-                    CompanyName = viewModel.CompanyName,
-                    CustomerCode = viewModel.CustomerCode,
-                    CustomerType = viewModel.CustomerType,
-                    Fax = viewModel.Fax,
-                    Email = viewModel.Email,
-                    Phone = viewModel.Phone,
-                    Mobile = viewModel.Mobile,
-                    DefaultCurrency = viewModel.DefaultCurrency ?? "IDR",
-                    DefaultTermsOfPaymentID = viewModel.DefaultTermsOfPaymentID,
-                    NPWP = viewModel.NPWP,
-                    AccountReceivableCode = viewModel.AccountReceivableCode,
-                    AccountPayableCode = viewModel.AccountPayableCode,
-                    BillingAddressStreet = viewModel.BillingAddressStreet,
-                    BillingAddressCity = viewModel.BillingAddressCity,
-                    BillingAddressProvince = viewModel.BillingAddressProvince,
-                    BillingAddressCountry = viewModel.BillingAddressCountry,
-                    BillingAddressZipCode = viewModel.BillingAddressZipCode,
-                    BillingAddressDetail = viewModel.BillingAddressDetail,
-                    ShippingAddressStreet = viewModel.ShippingAddressStreet,
-                    ShippingAddressCity = viewModel.ShippingAddressCity,
-                    ShippingAddressProvince = viewModel.ShippingAddressProvince,
-                    ShippingAddressCountry = viewModel.ShippingAddressCountry,
-                    ShippingAddressZipCode = viewModel.ShippingAddressZipCode,
-                    ShippingAddressDetail = viewModel.ShippingAddressDetail,
-                    CreatedTimestamp = DateTime.UtcNow,
-                    LastModifiedTimestamp = DateTime.UtcNow
-                };
-
-                _context.Customers.Add(customer);
-                await _context.SaveChangesAsync();
-
-                // After saving the customer, save the associated contact persons
-                if (viewModel.ContactPersons != null && viewModel.ContactPersons.Any())
-                {
-                    foreach (var contactVm in viewModel.ContactPersons)
+                    var customer = new Customer
                     {
-                        if (string.IsNullOrWhiteSpace(contactVm.FullName)) continue; // Skip empty entries
+                        CompanyName = viewModel.CompanyName,
+                        CustomerCode = viewModel.CustomerCode,
+                        CustomerType = viewModel.CustomerType,
+                        Fax = viewModel.Fax,
+                        Email = viewModel.Email,
+                        Phone = viewModel.Phone,
+                        Mobile = viewModel.Mobile,
+                        DefaultCurrency = viewModel.DefaultCurrency ?? "IDR",
+                        DefaultTermsOfPaymentID = viewModel.DefaultTermsOfPaymentID,
+                        NPWP = viewModel.NPWP,
+                        AccountReceivableCode = viewModel.AccountReceivableCode,
+                        AccountPayableCode = viewModel.AccountPayableCode,
+                        BillingAddressStreet = viewModel.BillingAddressStreet,
+                        BillingAddressCity = viewModel.BillingAddressCity,
+                        BillingAddressProvince = viewModel.BillingAddressProvince,
+                        BillingAddressCountry = viewModel.BillingAddressCountry,
+                        BillingAddressZipCode = viewModel.BillingAddressZipCode,
+                        BillingAddressDetail = viewModel.BillingAddressDetail,
+                        ShippingAddressStreet = viewModel.ShippingAddressStreet,
+                        ShippingAddressCity = viewModel.ShippingAddressCity,
+                        ShippingAddressProvince = viewModel.ShippingAddressProvince,
+                        ShippingAddressCountry = viewModel.ShippingAddressCountry,
+                        ShippingAddressZipCode = viewModel.ShippingAddressZipCode,
+                        ShippingAddressDetail = viewModel.ShippingAddressDetail,
+                        CreatedTimestamp = DateTime.UtcNow,
+                        LastModifiedTimestamp = DateTime.UtcNow
+                    };
 
-                        string uniqueFileName = null;
-                        if (contactVm.ProfilePicture != null && contactVm.ProfilePicture.Length > 0)
+                    _context.Customers.Add(customer);
+                    await _context.SaveChangesAsync(); // Save customer to get ID, protected by transaction
+
+                    // After saving the customer, save the associated contact persons
+                    if (viewModel.ContactPersons != null && viewModel.ContactPersons.Any())
+                    {
+                        foreach (var contactVm in viewModel.ContactPersons)
                         {
-                            string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads/contact_profiles");
-                            if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+                            if (string.IsNullOrWhiteSpace(contactVm.FullName)) continue; // Skip empty entries
 
-                            uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(contactVm.ProfilePicture.FileName);
-                            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-                            using (var fileStream = new FileStream(filePath, FileMode.Create))
+                            string uniqueFileName = null;
+                            if (contactVm.ProfilePicture != null && contactVm.ProfilePicture.Length > 0)
                             {
-                                await contactVm.ProfilePicture.CopyToAsync(fileStream);
+                                string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads/contact_profiles");
+                                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                                uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(contactVm.ProfilePicture.FileName);
+                                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                                {
+                                    await contactVm.ProfilePicture.CopyToAsync(fileStream);
+                                }
                             }
+
+                            var contactPerson = new CustomerContactPerson
+                            {
+                                CustomerID = customer.CustomerID, // Link to the newly created customer
+                                FullName = contactVm.FullName,
+                                Title = contactVm.Title,
+                                JobPosition = contactVm.JobPosition,
+                                Email = contactVm.Email,
+                                PhoneNumber = contactVm.PhoneNumber,
+                                Mobile = contactVm.Mobile,
+                                Notes = contactVm.Notes,
+                                ProfilePictureUrl = uniqueFileName != null ? "/uploads/contact_profiles/" + uniqueFileName : null,
+                                IsPrimary = contactVm.IsPrimary,
+                            };
+                            _context.CustomerContactPersons.Add(contactPerson);
                         }
-
-                        var contactPerson = new CustomerContactPerson
-                        {
-                            CustomerID = customer.CustomerID, // Link to the newly created customer
-                            FullName = contactVm.FullName,
-                            Title = contactVm.Title,
-                            JobPosition = contactVm.JobPosition,
-                            Email = contactVm.Email,
-                            PhoneNumber = contactVm.PhoneNumber,
-                            Mobile = contactVm.Mobile,
-                            Notes = contactVm.Notes,
-                            ProfilePictureUrl = uniqueFileName != null ? "/uploads/contact_profiles/" + uniqueFileName : null,
-                            IsPrimary = contactVm.IsPrimary,
-                        };
-                        _context.CustomerContactPersons.Add(contactPerson);
+                        await _context.SaveChangesAsync(); // Save all new contact persons, also protected
                     }
-                    await _context.SaveChangesAsync(); // Save all new contact persons
-                }
 
-                return Json(new { success = true, customerId = customer.CustomerID, customerName = customer.CompanyName });
-            }
-            catch (Exception ex)
-            {
-                // Log the detailed exception
-                Debug.WriteLine($"Exception saving customer: {ex.ToString()}");
-                var innerEx = ex.InnerException;
-                string errorMessage = ex.Message;
-                while (innerEx != null)
-                {
-                    errorMessage += "\nInner Exception: " + innerEx.Message;
-                    innerEx = innerEx.InnerException;
+                    await transaction.CommitAsync(); // Commit transaction if all successful
+
+                    return Json(new { success = true, customerId = customer.CustomerID, customerName = customer.CompanyName });
                 }
-                return Json(new { success = false, errors = new[] { "An internal server error occurred while saving the customer.", errorMessage } });
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync(); // Rollback on any error
+
+                    // Log the detailed exception
+                    Debug.WriteLine($"Exception saving customer: {ex.ToString()}");
+                    var innerEx = ex.InnerException;
+                    string errorMessage = ex.Message;
+                    while (innerEx != null)
+                    {
+                        errorMessage += "\nInner Exception: " + innerEx.Message;
+                        innerEx = innerEx.InnerException;
+                    }
+                    return Json(new { success = false, errors = new[] { "An internal server error occurred while saving the customer.", errorMessage } });
+                }
             }
         }
 

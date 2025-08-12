@@ -1487,7 +1487,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 form.querySelectorAll('[name^="ContactPersons"]').forEach(input => {
                     const name = input.getAttribute('name');
                     if (name) {
-                        const newName = name.replace(/\[\d+\]/, `[${index}]`);
+                        const newName = name.replace(/\d+/, `${index}`);
                         input.setAttribute('name', newName);
                     }
                 });
@@ -1511,27 +1511,156 @@ document.addEventListener("DOMContentLoaded", function () {
             const container = document.getElementById(`${type}-forms-container`);
             if (!container) return;
 
-            const originalForm = container.querySelector(`.${type}-form`);
-            if (!originalForm) return;
+            let newForm = null;
 
-            const newForm = originalForm.cloneNode(true);
-
-            newForm.querySelectorAll('input, select, textarea').forEach(input => {
-                if (input.type === 'checkbox' || input.type === 'radio') {
-                    input.checked = false;
-                } else if (!input.readOnly) { // Do not clear readonly fields
-                    input.value = '';
+            if (type === 'end-user') {
+                const originalForm = container.querySelector(`.${type}-form`);
+                if (!originalForm) {
+                    console.error('Original end-user form not found to clone.');
+                    return; 
                 }
-            });
 
-            const jobPositionInput = newForm.querySelector('[name*="JobPosition"]');
-            if (jobPositionInput) {
+                newForm = originalForm.cloneNode(true);
+                newForm.querySelectorAll('input, select, textarea').forEach(input => {
+                    if (input.type === 'checkbox' || input.type === 'radio') {
+                        input.checked = false;
+                    } else if (!input.readOnly) {
+                        input.value = '';
+                    }
+                });
+
+                const removeButton = newForm.querySelector(`.remove-${type}-btn`);
+                if (removeButton) {
+                    removeButton.style.display = 'inline-block';
+                }
+
+            } else {
+                const tempDiv = document.createElement('div');
+                let formHtml = '';
                 if (type === 'purchasing') {
-                    jobPositionInput.value = 'Purchasing';
+                    formHtml = `
+                    <div class="purchasing-form" data-index="1">
+                        <div class="purchasing-form-header mb-3 d-flex align-items-center gap-1" style="font-size: 20px; cursor: pointer;">
+                            <i class='bx bx-info-circle' style="font-size: 18px;"></i>
+                            <span class="fw-bold">Purchasing Information</span>
+                            <span class="purchasing-number ms-3" style="background-color: black; color: white; border-radius: 50%; width: 18px; height: 18px; display: inline-flex; justify-content: center; align-items: center; font-size: 12px; margin-left: 10px;">1</span>
+                            <div class="ms-auto">
+                                <i class="bx bx-minus remove-purchasing-btn text-danger" style="display: inline-block; cursor: pointer; margin-left: auto;"></i>
+                                <i class='bx bx-chevron-down toggle-form-icon'></i>
+                            </div>
+                        </div>
+                        <div class="purchasing-form-body px-4">
+                            <div class="mb-3">
+                                <label class="form-label form-label-bold">Customer Name</label>
+                                <input class="form-control" placeholder="Customer Name" name="ContactPersons[1].FullName" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label form-label-bold">Profile Picture</label>
+                                <input class="form-control" type="file" name="ContactPersons[1].ProfilePicture">
+                            </div>
+                            <div class="mb-4 row">
+                                <div class="col-12 col-sm-6">
+                                    <div class="mb-3">
+                                        <label class="form-label form-label-bold">Email</label>
+                                        <input type="email" class="form-control" placeholder="Email" name="ContactPersons[1].Email">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label form-label-bold">Phone</label>
+                                        <input type="tel" class="form-control" placeholder="Phone" name="ContactPersons[1].PhoneNumber">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label form-label-bold">Mobile</label>
+                                        <input type="tel" class="form-control" placeholder="Mobile" name="ContactPersons[1].Mobile">
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6">
+                                    <div class="mb-3">
+                                        <label class="form-label form-label-bold">Title</label>
+                                        <select class="form-select" name="ContactPersons[1].Title">
+                                            <option value="" hidden>Title</option>
+                                            <option value="Mr">Mr</option>
+                                            <option value="Mrs">Mrs</option>
+                                            <option value="Ms">Ms</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label form-label-bold">Job Position</label>
+                                        <input type="text" class="form-control" name="ContactPersons[1].JobPosition" value="Purchasing" readonly />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label form-label-bold">Notes</label>
+                                        <input type="text" class="form-control" placeholder="Notes" name="ContactPersons[1].Notes">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="form-separator" style="margin: 0px 5px 30px 5px;" />
+                    </div>`;
                 } else if (type === 'it-engineer') {
-                    jobPositionInput.value = 'IT Engineer';
+                    formHtml = `
+                    <div class="it-engineer-form" data-index="2">
+                        <div class="it-engineer-form-header mb-3 d-flex align-items-center gap-1" style="font-size: 20px; cursor: pointer;">
+                            <i class='bx bx-info-circle' style="font-size: 18px;"></i>
+                            <span class="fw-bold">IT Engineer Information</span>
+                            <span class="it-engineer-number ms-3" style="background-color: black; color: white; border-radius: 50%; width: 18px; height: 18px; display: inline-flex; justify-content: center; align-items: center; font-size: 12px; margin-left: 10px;">1</span>
+                            <div class="ms-auto">
+                                <i class="bx bx-minus remove-it-engineer-btn text-danger" style="display: inline-block; cursor: pointer; margin-left: auto;"></i>
+                                <i class='bx bx-chevron-down toggle-form-icon'></i>
+                            </div>
+                        </div>
+                        <div class="it-engineer-form-body px-4">
+                            <div class="mb-3">
+                                <label class="form-label form-label-bold">Customer Name</label>
+                                <input class="form-control" placeholder="Customer Name" name="ContactPersons[2].FullName" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label form-label-bold">Profile Picture</label>
+                                <input class="form-control" type="file" name="ContactPersons[2].ProfilePicture">
+                            </div>
+                            <div class="mb-4 row">
+                                <div class="col-12 col-sm-6">
+                                    <div class="mb-3">
+                                        <label class="form-label form-label-bold">Email</label>
+                                        <input type="email" class="form-control" placeholder="Email" name="ContactPersons[2].Email">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label form-label-bold">Phone</label>
+                                        <input type="tel" class="form-control" placeholder="Phone" name="ContactPersons[2].PhoneNumber">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label form-label-bold">Mobile</label>
+                                        <input type="tel" class="form-control" placeholder="Mobile" name="ContactPersons[2].Mobile">
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-6">
+                                    <div class="mb-3">
+                                        <label class="form-label form-label-bold">Title</label>
+                                        <select class="form-select" name="ContactPersons[2].Title">
+                                            <option value="" hidden>Title</option>
+                                            <option value="Mr">Mr</option>
+                                            <option value="Mrs">Mrs</option>
+                                            <option value="Ms">Ms</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label form-label-bold">Job Position</label>
+                                        <input type="text" class="form-control" name="ContactPersons[2].JobPosition" value="IT Engineer" readonly />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label form-label-bold">Notes</label>
+                                        <input type="text" class="form-control" placeholder="Notes" name="ContactPersons[2].Notes">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                       <hr class="form-separator" style="margin: 0px 5px 30px 5px;" />
+                    </div>`;
                 }
+                tempDiv.innerHTML = formHtml;
+                newForm = tempDiv.firstElementChild;
             }
+
+            if (!newForm) return;
 
             const body = newForm.querySelector(`.${type}-form-body`);
             if (body) body.style.display = '';
@@ -1540,11 +1669,6 @@ document.addEventListener("DOMContentLoaded", function () {
             if (icon) {
                 icon.classList.add('bx-chevron-down');
                 icon.classList.remove('bx-chevron-right');
-            }
-
-            const removeButton = newForm.querySelector(`.remove-${type}-btn`);
-            if (removeButton) {
-                removeButton.style.display = 'inline-block';
             }
 
             container.appendChild(newForm);
